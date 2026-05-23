@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Prestige HQ | Оставить отзыв</title>
+    <style>
+        body { margin: 0; background-color: #0f0f0f; color: white; font-family: sans-serif; }
+        
+        /* Лоадер (Золотая тема для Отзывов) */
+        #lmsh-loader {
+            position: fixed; inset: 0; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            background: white;
+            animation: startSequence 2.9s forwards;
+        }
+        @keyframes startSequence {
+            0% { background: white; }
+            17% { background: #0f0f0f; }
+            100% { background: #0f0f0f; }
+        }
+        .lmsh-window-gold {
+            padding: 40px; border: 1px solid #ffc107; border-radius: 12px;
+            backdrop-filter: blur(15px); background: rgba(20, 20, 15, 0.8);
+            text-align: center; opacity: 0; box-shadow: 0 0 30px rgba(255, 193, 7, 0.2);
+            animation: showWindow 0.3s ease forwards 0.6s;
+        }
+        @keyframes showWindow { to { opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+        /* Контейнер формы */
+        .container { padding: 40px; max-width: 600px; margin: auto; display: none; }
+        input, textarea, select { display: block; width: 100%; margin: 10px 0; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        
+        /* Акцент на золото */
+        button { background: #ffc107; color: #000; border: none; padding: 15px; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; font-size: 16px; }
+        button:hover { background: #e0a800; }
+        h2 { color: #ffc107; }
+        label { font-size: 14px; color: #aaa; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="lmsh-loader">
+        <div class="lmsh-window-gold">
+            <h1 id="status-text" style="color: #ffc107;">ЛМСХ: Отзывы</h1>
+        </div>
+    </div>
+
+    <div class="container" id="main-form">
+        <h2>Ваше мнение о Prestige HQ</h2>
+        <form id="review-form">
+            <label>Ваша оценка:</label>
+            <select id="rating" required>
+                <option value="5">⭐⭐⭐⭐⭐ (Отлично)</option>
+                <option value="4">⭐⭐⭐⭐ (Хорошо)</option>
+                <option value="3">⭐⭐⭐ (Нормально)</option>
+                <option value="2">⭐⭐ (Плохо)</option>
+                <option value="1">⭐ (Ужасно)</option>
+            </select>
+
+            <input type="text" id="user-name" placeholder="Ваше имя" required>
+            <input type="email" id="user-email" placeholder="Ваш Email" required>
+            
+            <textarea id="feedback" placeholder="Расскажите подробнее о вашем опыте..." rows="5" required></textarea>
+
+            <button type="submit">Оставить золотой отзыв</button>
+        </form>
+    </div>
+
+    <script>
+        // Инициализация загрузки (Тайминги ЛМСХ)
+        setTimeout(() => { document.getElementById('status-text').innerText = 'Инициализация...'; }, 2300);
+        setTimeout(() => {
+            document.getElementById('lmsh-loader').style.animation = 'fadeOut 0.3s forwards';
+            document.getElementById('main-form').style.display = 'block';
+        }, 2600);
+
+        // Отправка в наш бот
+        document.getElementById('review-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
+            const chatId = "5365364862";
+            const formSource = "Отзывы"; // Маркировка формы
+            
+            const ratingValue = document.getElementById('rating').value;
+            const stars = "⭐".repeat(ratingValue); // Создаем визуальный ряд звезд для сообщения
+
+            const text = `⭐ *Новый отзыв о Prestige HQ*\n` +
+                         `🔗 *From Form:* ${formSource}\n\n` +
+                         `🌟 *Рейтинг:* ${ratingValue}/5 (${stars})\n` +
+                         `👤 *Имя:* ${document.getElementById('user-name').value}\n` +
+                         `📧 *Email:* ${document.getElementById('user-email').value}\n` +
+                         `📝 *Отзыв:* ${document.getElementById('feedback').value}`;
+            
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+                });
+                
+                if(res.ok) { 
+                    alert("Спасибо! Ваш отзыв передан в Штаб."); 
+                    this.reset(); 
+                } else { 
+                    alert("Ошибка при отправке."); 
+                }
+            } catch(err) { 
+                alert("Ошибка связи со Штабом."); 
+            }
+        });
+    </script>
+</body>
+</html>
