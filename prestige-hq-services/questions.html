@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Prestige HQ | Штаб ЛМСХ</title>
+    <style>
+        body { margin: 0; background-color: #0f0f0f; color: white; font-family: sans-serif; }
+        
+        /* Лоадер */
+        #lmsh-loader {
+            position: fixed; inset: 0; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            background: white;
+            animation: startSequence 2.9s forwards;
+        }
+        @keyframes startSequence {
+            0% { background: white; }
+            17% { background: #0f0f0f; }
+            100% { background: #0f0f0f; }
+        }
+        .lmsh-window {
+            padding: 40px; border: 1px solid #007bff; border-radius: 12px;
+            backdrop-filter: blur(15px); background: rgba(15, 15, 15, 0.8);
+            text-align: center; opacity: 0;
+            animation: showWindow 0.3s ease forwards 0.6s;
+        }
+        @keyframes showWindow { to { opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+        /* Стили формы */
+        .container { padding: 40px; max-width: 600px; margin: auto; display: none; }
+        input, textarea, select { display: block; width: 100%; margin: 10px 0; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        .hidden { display: none; }
+        button { background: #007bff; color: white; border: none; padding: 15px; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <div id="lmsh-loader">
+        <div class="lmsh-window">
+            <h1 id="status-text">ЛМСХ: Вопросы</h1>
+        </div>
+    </div>
+
+    <div class="container" id="main-form">
+        <h2>Вопросы или Проблемы</h2>
+        <form id="form-data">
+            <label>Тип обращения:</label>
+            <select id="type-select" onchange="toggleBlocks()" required>
+                <option value="">Выберите тип...</option>
+                <option value="Вопрос">Вопрос</option>
+                <option value="Проблема">Проблема</option>
+            </select>
+
+            <div id="block-question" class="hidden">
+                <textarea id="q-text" placeholder="Ваш вопрос (макс. 250 симв.)" maxlength="250"></textarea>
+                <label>Нужен ли ответ на почту?</label>
+                <select id="q-email-need"><option>Да</option><option>Нет</option></select>
+            </div>
+
+            <div id="block-problem" class="hidden">
+                <textarea id="p-text" placeholder="Описание проблемы (макс. 500 симв.)" maxlength="500"></textarea>
+                <label>Требуется ли срочное вмешательство?</label>
+                <select id="p-urgent"><option>Да</option><option>Нет</option></select>
+                <label>Прикрепить логи/скриншот?</label>
+                <select id="file-toggle" onchange="toggleFile()">
+                    <option value="no">Нет</option>
+                    <option value="yes">Да</option>
+                </select>
+                <input type="file" id="file-input" class="hidden">
+            </div>
+
+            <hr style="border:0; border-top:1px solid #333; margin: 20px 0;">
+            <input type="text" id="user-name" placeholder="Ваше имя" required>
+            <input type="email" id="user-email" placeholder="Ваш Email" required>
+            <button type="submit">Отправить в Штаб</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleBlocks() {
+            const val = document.getElementById('type-select').value;
+            document.getElementById('block-question').classList.toggle('hidden', val !== 'Вопрос');
+            document.getElementById('block-problem').classList.toggle('hidden', val !== 'Проблема');
+        }
+        function toggleFile() {
+            const val = document.getElementById('file-toggle').value;
+            document.getElementById('file-input').classList.toggle('hidden', val !== 'yes');
+        }
+
+        setTimeout(() => { document.getElementById('status-text').innerText = 'Инициализация...'; }, 2300);
+        setTimeout(() => {
+            document.getElementById('lmsh-loader').style.animation = 'fadeOut 0.3s forwards';
+            document.getElementById('main-form').style.display = 'block';
+        }, 2600);
+
+        document.getElementById('form-data').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
+            const chatId = "5365364862";
+            
+            const type = document.getElementById('type-select').value;
+            const name = document.getElementById('user-name').value;
+            const email = document.getElementById('user-email').value;
+            const details = type === 'Вопрос' ? document.getElementById('q-text').value : document.getElementById('p-text').value;
+            
+            const text = `📬 *Новое обращение ЛМСХ*\n👤 Имя: ${name}\n📧 Email: ${email}\n📋 Тип: ${type}\n📝 Описание: ${details}`;
+            
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+                });
+                if(res.ok) { alert("Отправлено в Штаб!"); this.reset(); toggleBlocks(); }
+                else { alert("Ошибка отправки."); }
+            } catch(err) { alert("Ошибка связи с сервером."); }
+        });
+    </script>
+</body>
+</html>
