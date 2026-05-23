@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Prestige HQ | Предложить идею</title>
+    <style>
+        body { margin: 0; background-color: #0f0f0f; color: white; font-family: sans-serif; }
+        
+        /* Лоадер (Зеленая тема для Идей) */
+        #lmsh-loader {
+            position: fixed; inset: 0; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            background: white;
+            animation: startSequence 2.9s forwards;
+        }
+        @keyframes startSequence {
+            0% { background: white; }
+            17% { background: #0f0f0f; }
+            100% { background: #0f0f0f; }
+        }
+        .lmsh-window-green {
+            padding: 40px; border: 1px solid #28a745; border-radius: 12px;
+            backdrop-filter: blur(15px); background: rgba(15, 20, 15, 0.8);
+            text-align: center; opacity: 0; box-shadow: 0 0 30px rgba(40, 167, 69, 0.2);
+            animation: showWindow 0.3s ease forwards 0.6s;
+        }
+        @keyframes showWindow { to { opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+        /* Контейнер формы */
+        .container { padding: 40px; max-width: 600px; margin: auto; display: none; }
+        input, textarea, select { display: block; width: 100%; margin: 10px 0; padding: 12px; background: #1a1a1a; border: 1px solid #333; color: white; border-radius: 5px; box-sizing: border-box; }
+        button { background: #28a745; color: white; border: none; padding: 15px; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        button:hover { background: #218838; }
+        h2 { color: #28a745; }
+    </style>
+</head>
+<body>
+
+    <div id="lmsh-loader">
+        <div class="lmsh-window-green">
+            <h1 id="status-text" style="color: #28a745;">ЛМСХ: Идеи</h1>
+        </div>
+    </div>
+
+    <div class="container" id="main-form">
+        <h2>Предложить идею для Штаба</h2>
+        <form id="idea-form">
+            <input type="text" id="title" placeholder="Название идеи" required>
+            <textarea id="desc" placeholder="Суть идеи (детально)" rows="4" required></textarea>
+            <textarea id="benefit" placeholder="Какую пользу принесет Штабу?" rows="3" required></textarea>
+            
+            <label>Приоритет:</label>
+            <select id="priority">
+                <option value="Низкий">Низкий</option>
+                <option value="Средний">Средний</option>
+                <option value="Высокий">Высокий</option>
+            </select>
+
+            <input type="text" id="author" placeholder="Ваше имя" required>
+            <button type="submit">Отправить идею в Штаб</button>
+        </form>
+    </div>
+
+    <script>
+        // Инициализация загрузки
+        setTimeout(() => { document.getElementById('status-text').innerText = 'Инициализация...'; }, 2300);
+        setTimeout(() => {
+            document.getElementById('lmsh-loader').style.animation = 'fadeOut 0.3s forwards';
+            document.getElementById('main-form').style.display = 'block';
+        }, 2600);
+
+        // Отправка в бот
+        document.getElementById('idea-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
+            const chatId = "5365364862";
+            const formSource = "Предложить идею"; // ВОТ ЭТА СТРОКА МАРКИРУЕТ ИСТОЧНИК
+            
+            const text = `💡 *Новая идея для ЛМСХ*\n` +
+                         `🔗 *From Form:* ${formSource}\n\n` +
+                         `📌 *Название:* ${document.getElementById('title').value}\n` +
+                         `📝 *Суть:* ${document.getElementById('desc').value}\n` +
+                         `🚀 *Польза:* ${document.getElementById('benefit').value}\n` +
+                         `⭐ *Приоритет:* ${document.getElementById('priority').value}\n` +
+                         `👤 *Автор:* ${document.getElementById('author').value}`;
+            
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+                });
+                if(res.ok) { alert("Идея успешно доставлена в Штаб!"); this.reset(); }
+                else { alert("Ошибка при отправке."); }
+            } catch(err) { alert("Ошибка связи."); }
+        });
+    </script>
+</body>
+</html>
