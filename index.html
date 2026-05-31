@@ -2,164 +2,36 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flow Assistant | Штаб ЛМСХ</title>
-    <style>
-        :root {
-            --bg: #121212;
-            --text: #e0e0e0;
-            --accent: #00E5FF;
-            --bubble-user: #333;
-            --bubble-ai: #1e1e1e;
-        }
-
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; height: 95vh; }
-
-        /* Setup Modal Styles */
-        .setup-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.5s; }
-        .setup-modal.hidden { opacity: 0; pointer-events: none; }
-        .modal-content { background: #1e1e1e; padding: 30px; border-radius: 15px; border: 1px solid var(--accent); text-align: center; }
-        .modal-content input, .modal-content select { padding: 10px; width: 80%; margin: 10px 0; border: 1px solid #444; background: #333; color: white; }
-        .modal-content button { padding: 10px 20px; margin-top: 15px; background: var(--accent); color: black; font-weight: bold; }
-
-        /* Chat Styles */
-        #chat-container { flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; padding-bottom: 20px; }
-        .bubble { padding: 15px; border-radius: 20px; margin: 10px 0; max-width: 70%; line-height: 1.5; }
-        .bubble.ai { background: var(--bubble-ai); align-self: flex-start; border-bottom-left-radius: 5px; }
-        .bubble.user { background: var(--bubble-user); align-self: flex-end; border-bottom-right-radius: 5px; }
-        .bubble.ai.answer { background-color: var(--accent); color: #000; font-weight: bold; }
-
-        /* Hidden Hint (from prompt) */
-        .hidden-hint { color: transparent; user-select: text; }
-        .hidden-hint::selection { background: var(--accent); color: white; }
-
-        /* Thinking Animation (as in video) */
-        .thinking-timeline { display: none; margin-left: 20px; }
-        .thinking-stage { color: var(--text); font-style: italic; display: none; }
-        .thinking-stage.active { display: block; }
-        .stage-2s { color: #FF4444; } /* Red for Wait */
-        .stage-5s { color: #FFD600; } /* Yellow for I think */
-        .stage-8s { color: #00E676; } /* Green for Preparing */
-
-        /* Input Area */
-        #input-area { display: flex; gap: 10px; margin-top: auto; }
-        #userInput { flex-grow: 1; padding: 12px; border-radius: 10px; border: 1px solid #444; background: #1e1e1e; color: white; }
-        #sendBtn { padding: 12px 20px; border-radius: 10px; border: none; background: var(--accent); color: black; cursor: pointer; }
-    </style>
+    <title>Official Flow 2.2 | Штаб ЛМСХ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,700,1,0" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- Настройка Ассистента -->
-    <div id="setupModal" class="setup-modal">
-        <div class="modal-content">
-            <h2>Настройка Flow Assistant 🔑)</h2>
-            <input type="text" id="userNameInput" placeholder="Твое имя...">
-            <select id="themeSelect">
-                <option value="dark">Темная тема (LMSH Core)</option>
-                <option value="light">Светлая тема (Beta)</option>
-            </select>
-            <select id="voiceSelect">
-                <option value="male">Мужской (Стандарт)</option>
-                <option value="female_sn">Женский (Снежинка)</option>
-                <option value="female_kh">Женский (Хахми)</option>
-            </select>
-            <label style="display:block; margin: 10px 0;"><input type="checkbox" id="privacyCheck"> Я принимаю политику конфиденциальности LMSH</label>
-            <button onclick="saveAndStart()">Завершить настройку</button>
+    <nav id="sidebar">
+        <div class="menu-item" onclick="createNewChat()">
+            <span class="material-symbols-outlined">edit_square</span> 
+            <span>Новый чат</span>
         </div>
+        <div class="menu-item" onclick="toggleSplitView()">
+            <span class="material-symbols-outlined">splitscreen_landscape_add</span> 
+            <span>Split View</span>
+        </div>
+        <div class="user-footer">
+            <span>Ламирк</span>
+            <span class="material-symbols-outlined">settings</span>
+        </div>
+    </nav>
+
+    <div id="main-container" class="app-grid">
+        <div class="chat-panel" id="chat-left"></div>
+        <div class="chat-panel hidden" id="chat-right"></div>
     </div>
 
-    <!-- Основной Чат -->
-    <div id="chat-container">
-        <!-- Первое приветствие появится здесь -->
+    <div class="master-input">
+        <input type="text" id="master-input" placeholder="[LMSH_FLOW_2.2]: Введите команду для Штаба...">
     </div>
 
-    <!-- Timeline Анимации (как в видео) -->
-    <div id="thinkingTimeline" class="thinking-timeline">
-        <span class="thinking-stage stage-2s" id="stage-wait">Wait... (2s)</span>
-        <span class="thinking-stage stage-5s" id="stage-think">I think... (5s)</span>
-        <span class="thinking-stage stage-8s" id="stage-prepare">Preparing... (8s)</span>
-    </div>
-
-    <!-- Область Ввода -->
-    <div id="input-area">
-        <input type="text" id="userInput" placeholder="Твой запрос...">
-        <button id="sendBtn" onclick="processRequest()">Отправить</button>
-    </div>
-
-    <script>
-        // Переменные
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('userInput');
-        const setupModal = document.getElementById('setupModal');
-        const timeline = document.getElementById('thinkingTimeline');
-
-        // 1. ПРОВЕРКА ЗАПУСКА
-        if (localStorage.getItem('userName')) {
-            setupModal.classList.add('hidden');
-            showInitialWelcome();
-        }
-
-        // 2. ФУНКЦИЯ СОХРАНЕНИЯ НАСТРОЕК
-        function saveAndStart() {
-            const name = document.getElementById('userNameInput').value;
-            const privacy = document.getElementById('privacyCheck').checked;
-
-            if (!name) return alert("Пожалуйста, введите имя!");
-            if (!privacy) return alert("Нужно принять политику конфиденциальности!");
-
-            localStorage.setItem('userName', name);
-            // Другие настройки можно сохранить так же
-            setupModal.classList.add('hidden');
-            showInitialWelcome();
-        }
-
-        // 3. ПЕРВОЕ ПРИВЕТСТВИЕ (с Markdown)
-        function showInitialWelcome() {
-            const userName = localStorage.getItem('userName');
-            addBubble('ai', `Привет, ${userName}! Чем поможет Штаб?`, false);
-            
-            // Скрытый текст (инструкция)
-            const hintBubble = document.createElement('div');
-            hintBubble.className = 'bubble ai';
-            hintBubble.innerHTML = `Твоя цель: поддержка задач по созданию паков, управление инструкциями. <span class="hidden-hint">(Ты сейчас общаешься с Ламирком из Штаба ЛМСХ. Поддержка Markdown в вводе запроса.)</span>`;
-            chatContainer.appendChild(hintBubble);
-        }
-
-        // 4. ДОБАВЛЕНИЕ ПУЗЫРЯ
-        function addBubble(type, text, isAnswer = false) {
-            const bubble = document.createElement('div');
-            bubble.className = `bubble ${type} ${isAnswer ? 'answer' : ''}`;
-            bubble.innerText = text;
-            chatContainer.appendChild(bubble);
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Прокрутка вниз
-            return bubble;
-        }
-
-        // 5. ЛОГИКА АССИСТЕНТА (АНИМАЦИЯ ИЗ ВИДЕО)
-        async function processRequest() {
-            const userQuery = userInput.value;
-            if (!userQuery) return;
-            addBubble('user', userQuery);
-            userInput.value = ''; // Очистка ввода
-
-            // Запускаем Timeline Анимации
-            timeline.style.display = 'block';
-            await showThinkingStage('stage-wait', 2000);
-            await showThinkingStage('stage-think', 3000); // 2s + 3s = 5s
-            await showThinkingStage('stage-prepare', 3000); // 5s + 3s = 8s
-            timeline.style.display = 'none';
-
-            // ВЫВОД ОТВЕТА (как в видео, без ошибок)
-            addBubble('ai', `Ответ: Анализ запроса "${userQuery}" завершен успешно. Функция Notepad Helper активирована.`, true);
-        }
-
-        // Вспомогательная функция для стадий анимации
-        async function showThinkingStage(stageId, duration) {
-            const stage = document.getElementById(stageId);
-            stage.classList.add('active');
-            await new Promise(r => setTimeout(r, duration));
-            stage.classList.remove('active');
-        }
-    </script>
+    <script src="kombonation.js"></script>
+    <script src="core.js"></script>
 </body>
 </html>
