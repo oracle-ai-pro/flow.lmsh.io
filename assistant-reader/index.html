@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+    <style>
+        :root { --bg: #0d0e11; --card: #17181f; --text: #e2e2e9; --primary: #adc6ff; --surface: #292a33; }
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; display: flex; height: 100vh; margin: 0; }
+        
+        /* СИСТЕМА ЧАТОВ (СЛЕВА) */
+        .sidebar { width: 260px; background: var(--card); border-right: 1px solid var(--surface); padding: 20px; }
+        .chat-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; cursor: pointer; border-radius: 12px; }
+        .chat-item:hover { background: var(--surface); }
+
+        /* РИДЕР (СПРАВА) */
+        .main-reader { flex: 1; display: flex; flex-direction: column; padding: 20px; align-items: center; }
+        .reader-card { width: 100%; max-width: 600px; background: var(--card); padding: 20px; border-radius: 28px; }
+        
+        /* КНОПКА ОТПРАВКИ */
+        #send-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        
+        .scan-animation { height: 2px; background: var(--primary); animation: scan 1.5s infinite; margin: 10px 0; display: none; }
+        @keyframes scan { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h3>Истории <button onclick="newStory()"><span class="material-symbols-rounded">edit_square</span></button></h3>
+        <div id="story-list"></div>
+    </div>
+
+    <div class="main-reader">
+        <div class="reader-card">
+            <div id="display-area">Выбери историю или создай новую</div>
+            <div id="scan-line" class="scan-animation"></div>
+            <input id="input-field" oninput="checkInput()" placeholder="Введите запрос...">
+            <button id="send-btn" onclick="processQuery()" disabled>Отправить</button>
+        </div>
+    </div>
+
+    <script>
+        function checkInput() {
+            const input = document.getElementById('input-field').value;
+            document.getElementById('send-btn').disabled = input.trim().length === 0;
+        }
+
+        function processQuery() {
+            const scan = document.getElementById('scan-line');
+            scan.style.display = 'block';
+            setTimeout(() => {
+                scan.style.display = 'none';
+                // Здесь будет логика "мозга" ИИ
+                alert("Анализ завершен. Оракул готов.");
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
