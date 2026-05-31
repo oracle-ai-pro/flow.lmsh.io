@@ -21,6 +21,20 @@
         
         .scan-animation { height: 2px; background: var(--primary); animation: scan 1.5s infinite; margin: 10px 0; display: none; }
         @keyframes scan { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+        .reader-card { 
+    width: 90%; 
+    max-width: 500px; 
+    background: #17181f; 
+    padding: 25px; 
+    border-radius: 24px; 
+    border: 1px solid #333;
+    margin-top: 50px; /* Отступ сверху */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group { display: flex; gap: 10px; width: 100%; }
     </style>
 </head>
 <body>
@@ -32,28 +46,27 @@
 
     <div class="main-reader">
         <div class="reader-card">
-            <div id="display-area">Выбери историю или создай новую</div>
-            <div id="scan-line" class="scan-animation"></div>
-            <input id="input-field" oninput="checkInput()" placeholder="Введите запрос...">
-            <button id="send-btn" onclick="processQuery()" disabled>Отправить</button>
-        </div>
+    <h3 style="margin-top:0">Выбери историю или создай новую</h3>
+    <div class="input-group">
+        <input id="input-field" class="reader-input" placeholder="Название или запрос...">
+        <button class="btn btn-ask" onclick="processQuery()">Отправить</button>
     </div>
+    <div id="response-area" style="color: var(--m3-primary);"></div>
+</div>
 
-    <script>
-        function checkInput() {
-            const input = document.getElementById('input-field').value;
-            document.getElementById('send-btn').disabled = input.trim().length === 0;
-        }
+<script>
+    // 1. Все твои переменные (const...)
+    
+    // 2. Функции обработки событий (processQuery, getAgentResponse и др.)
+    function processQuery() {
+        // ... твой код ...
+    }
 
-        function processQuery() {
-            const scan = document.getElementById('scan-line');
-            scan.style.display = 'block';
-            setTimeout(() => {
-                scan.style.display = 'none';
-                // Здесь будет логика "мозга" ИИ
-                alert("Анализ завершен. Оракул готов.");
-            }, 2000);
-        }
-    </script>
+    function getAgentResponse(text) {
+        // ... твой код ...
+    }
+    
+    // 3. Другие функции (exportMD, toggleTheme...)
+</script>
 </body>
 </html>
