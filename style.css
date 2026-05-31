@@ -1,0 +1,59 @@
+body {
+    background-color: #0a0a0a;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', monospace;
+    margin: 0;
+    display: flex;
+}
+
+#sidebar {
+    width: 60px;
+    height: 100vh;
+    background: #111;
+    border-right: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.menu-item { margin-bottom: 20px; cursor: pointer; color: #888; }
+.menu-item:hover { color: #fff; }
+
+.app-grid {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: 1fr; /* По умолчанию один чат */
+    gap: 10px;
+    padding: 20px;
+    transition: 0.5s;
+}
+
+.app-grid.split-active {
+    grid-template-columns: 1fr 1fr; /* Раздвижение для Dual-Core */
+}
+
+.chat-panel {
+    background: #161616;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.hidden { display: none; }
+
+.master-input {
+    position: fixed;
+    bottom: 20px;
+    left: 80px;
+    right: 20px;
+}
+
+#master-input {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #444;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+}
