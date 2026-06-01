@@ -8,12 +8,12 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .controls { display: flex; gap: 10px; margin-bottom: 20px; }
-        .main-btn { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: 600; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.3s; }
-        .main-btn:hover { background: #e0e0e0; }
+        .main-btn { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: 600; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .card { background: white; padding: 20px; border-radius: 20px; width: 300px; margin: 10px auto; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .material-symbols-outlined { font-size: 28px; cursor: pointer; color: #6e8efb; transition: 0.3s; }
+        .material-symbols-outlined { font-size: 28px; cursor: pointer; color: #6e8efb; }
         .material-symbols-outlined.active { color: #f44336; }
-        .info-section { margin-top: 30px; width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #333; font-size: 0.9em; }
+        .timer-info { font-size: 0.75em; color: #888; margin-top: 5px; }
+        input { width: 40px; border: 1px solid #ccc; border-radius: 5px; padding: 2px; text-align: center; }
     </style>
 </head>
 <body>
@@ -23,10 +23,9 @@
         <button class="main-btn" onclick="setAll(true)">Включить все</button>
     </div>
 
-    <div id="cards-container">
-        </div>
+    <div id="cards-container"></div>
 
-    <div class="info-section">
+    <div class="info-section" style="margin-top: 20px; width: 300px; background: white; padding: 15px; border-radius: 15px; font-size: 0.9em;">
         <details>
             <summary>ℹ️ Как работают уведомления?</summary>
             <ul>
@@ -37,62 +36,75 @@
     </div>
 
     <script>
-        // Данные для карточек
         const members = [
-            { id: 'lamirk', name: 'Ламирк', role: 'Главный инженер' },
-            { id: 'murzik', name: 'Мурзик', role: 'Верная Помощница' },
-            { id: 'snezhinka', name: 'Снежинка', role: 'Женский вокал' },
-            { id: 'hakhmi', name: 'Хахми', role: 'Мужской вокал' }
+            { id: 'lamirk', name: 'Ламирк', role: 'Главный инженер', timer: 5 },
+            { id: 'murzik', name: 'Мурзик', role: 'Верная Помощница', timer: 10 },
+            { id: 'snezhinka', name: 'Снежинка', role: 'Женский вокал', timer: 15 },
+            { id: 'hakhmi', name: 'Хахми', role: 'Мужской вокал', timer: 20 }
         ];
 
-        // Отрисовка карточек
         const container = document.getElementById('cards-container');
-        members.forEach(member => {
-            const isActive = localStorage.getItem('notify_' + member.id) === 'true';
-            container.innerHTML += `
-                <div class="card" id="card-${member.id}">
-                    <div><strong>${member.name}</strong><p style="font-size: 0.8em; color: #666;">${member.role}</p></div>
-                    <span class="material-symbols-outlined ${isActive ? 'active' : ''}" 
-                          onclick="toggleNotify('${member.id}')">
-                          ${isActive ? 'notifications_active' : 'notifications'}
-                    </span>
-                </div>
-            `;
-        });
 
-        // Регистрация Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+        function render() {
+            container.innerHTML = '';
+            members.forEach(member => {
+                const isActive = localStorage.getItem('notify_' + member.id) === 'true';
+                const savedTime = localStorage.getItem('time_' + member.id) || member.timer;
+                const alarmTime = localStorage.getItem('alarm_' + member.id) || '';
+
+                container.innerHTML += `
+                    <div class="card" id="card-${member.id}">
+                        <div>
+                            <strong>${member.name}</strong>
+                            <p style="font-size: 0.8em; color: #666;">${member.role}</p>
+                            <input type="number" id="input-${member.id}" value="${savedTime}" onchange="updateTime('${member.id}')"> мин
+                            <div class="timer-info" id="status-${member.id}">${isActive && alarmTime ? 'Уведомление в: ' + alarmTime : 'Выключено'}</div>
+                        </div>
+                        <span class="material-symbols-outlined ${isActive ? 'active' : ''}" 
+                              onclick="toggleNotify('${member.id}')">
+                              ${isActive ? 'notifications_active' : 'notifications'}
+                        </span>
+                    </div>
+                `;
+            });
+        }
+
+        function updateTime(id) {
+            localStorage.setItem('time_' + id, document.getElementById('input-' + id).value);
         }
 
         function toggleNotify(id) {
-            const icon = document.querySelector(`#card-${id} .material-symbols-outlined`);
-            const isActive = icon.classList.toggle('active');
-            icon.innerText = isActive ? 'notifications_active' : 'notifications';
-            localStorage.setItem('notify_' + id, isActive);
+            const isActive = document.querySelector(`#card-${id} .material-symbols-outlined`).classList.toggle('active');
+            const minutes = document.getElementById('input-' + id).value;
             
             if (isActive) {
-                // Пример запуска уведомления через 5 секунд
-                setTimeout(() => showNotification("Напоминание от Штаба ЛМСХ", `Активировано для ${id}`), 5000);
+                const now = new Date();
+                const alarm = new Date(now.getTime() + minutes * 60000);
+                const timeString = alarm.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                localStorage.setItem('alarm_' + id, timeString);
+                localStorage.setItem('notify_' + id, 'true');
+                document.getElementById('status-' + id).innerText = 'Уведомление в: ' + timeString;
+                
+                setTimeout(() => showNotification("Штаб ЛМСХ", `Время вышло для ${members.find(m => m.id === id).name}!`), minutes * 60000);
+            } else {
+                localStorage.setItem('notify_' + id, 'false');
+                document.getElementById('status-' + id).innerText = 'Выключено';
             }
+            render(); // Перерисовка для иконок
         }
 
         function showNotification(title, body) {
             if (Notification.permission === 'granted') {
-                navigator.serviceWorker.ready.then(reg => reg.showNotification(title, { body }));
+                new Notification(title, { body });
             } else {
                 Notification.requestPermission();
             }
         }
 
-        function setAll(state) {
-            members.forEach(m => {
-                localStorage.setItem('notify_' + m.id, state);
-                const icon = document.querySelector(`#card-${m.id} .material-symbols-outlined`);
-                icon.classList.toggle('active', state);
-                icon.innerText = state ? 'notifications_active' : 'notifications';
-            });
-        }
+        // Инициализация
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+        render();
     </script>
 </body>
 </html>
