@@ -1,5 +1,25 @@
-body { background: #F3EDF7; font-family: sans-serif; padding: 20px; }
-.chat-card { background: white; border-radius: 28px; padding: 24px; max-width: 500px; margin: auto; }
-.chip { display: inline-block; padding: 8px 16px; margin: 4px; border-radius: 16px; background: #E8DEF8; cursor: pointer; font-weight: bold; }
-input { width: 100%; padding: 12px; border-radius: 28px; border: 2px solid #CAC4D0; box-sizing: border-box; margin-top: 15px; }
-.material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 700; vertical-align: middle; }
+:root {
+    --primary: #6750A4;
+    --on-surface: #1C1B1F;
+    --surface-container: #F3EDF7;
+    --error: #B3261E;
+}
+
+body { font-family: 'Segoe UI', sans-serif; background: var(--surface-container); padding: 20px; }
+.chat-card { background: white; border-radius: 28px; padding: 24px; max-width: 500px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.top-bar { display: flex; justify-content: space-between; align-items: center; }
+
+/* Баннер */
+.status-banner { background: #F9DEDC; color: var(--error); padding: 12px; border-radius: 12px; margin: 15px 0; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+
+/* Кнопки и иконки */
+.material-symbols-rounded { font-variation-settings: 'FILL' 1, 'wght' 700; cursor: pointer; vertical-align: middle; }
+.chip { display: inline-block; padding: 8px 16px; margin: 4px; border-radius: 16px; background: #E8DEF8; cursor: pointer; font-weight: bold; color: var(--primary); }
+
+/* Инпут */
+input { width: 100%; padding: 14px; border-radius: 28px; border: 2px solid #CAC4D0; box-sizing: border-box; margin-top: 15px; }
+
+/* Фидбек */
+.feedback-box { display: flex; gap: 10px; margin-top: 10px; }
+.liked { color: var(--primary); }
+.reported { color: var(--error); }
