@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Штаб ЛМСХ - Панель управления</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+        .main-btn { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: 600; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.3s; }
+        .main-btn:hover { background: #e0e0e0; }
+        .card { background: white; padding: 20px; border-radius: 20px; width: 300px; margin: 10px auto; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .material-symbols-outlined { font-size: 28px; cursor: pointer; color: #6e8efb; transition: 0.3s; }
+        .material-symbols-outlined.active { color: #f44336; }
+        .info-section { margin-top: 30px; width: 300px; background: #fff; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); color: #333; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button class="main-btn" onclick="setAll(false)">Отключить все</button>
+        <button class="main-btn" onclick="setAll(true)">Включить все</button>
+    </div>
+
+    <div id="cards-container">
+        </div>
+
+    <div class="info-section">
+        <details>
+            <summary>ℹ️ Как работают уведомления?</summary>
+            <ul>
+                <li>Разрешите уведомления в браузере.</li>
+                <li>В настройках MIUI: Автозапуск ВКЛ, Контроль активности — Без ограничений.</li>
+            </ul>
+        </details>
+    </div>
+
+    <script>
+        // Данные для карточек
+        const members = [
+            { id: 'lamirk', name: 'Ламирк', role: 'Главный инженер' },
+            { id: 'murzik', name: 'Мурзик', role: 'Верная Помощница' },
+            { id: 'snezhinka', name: 'Снежинка', role: 'Женский вокал' },
+            { id: 'hakhmi', name: 'Хахми', role: 'Мужской вокал' }
+        ];
+
+        // Отрисовка карточек
+        const container = document.getElementById('cards-container');
+        members.forEach(member => {
+            const isActive = localStorage.getItem('notify_' + member.id) === 'true';
+            container.innerHTML += `
+                <div class="card" id="card-${member.id}">
+                    <div><strong>${member.name}</strong><p style="font-size: 0.8em; color: #666;">${member.role}</p></div>
+                    <span class="material-symbols-outlined ${isActive ? 'active' : ''}" 
+                          onclick="toggleNotify('${member.id}')">
+                          ${isActive ? 'notifications_active' : 'notifications'}
+                    </span>
+                </div>
+            `;
+        });
+
+        // Регистрация Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        function toggleNotify(id) {
+            const icon = document.querySelector(`#card-${id} .material-symbols-outlined`);
+            const isActive = icon.classList.toggle('active');
+            icon.innerText = isActive ? 'notifications_active' : 'notifications';
+            localStorage.setItem('notify_' + id, isActive);
+            
+            if (isActive) {
+                // Пример запуска уведомления через 5 секунд
+                setTimeout(() => showNotification("Напоминание от Штаба ЛМСХ", `Активировано для ${id}`), 5000);
+            }
+        }
+
+        function showNotification(title, body) {
+            if (Notification.permission === 'granted') {
+                navigator.serviceWorker.ready.then(reg => reg.showNotification(title, { body }));
+            } else {
+                Notification.requestPermission();
+            }
+        }
+
+        function setAll(state) {
+            members.forEach(m => {
+                localStorage.setItem('notify_' + m.id, state);
+                const icon = document.querySelector(`#card-${m.id} .material-symbols-outlined`);
+                icon.classList.toggle('active', state);
+                icon.innerText = state ? 'notifications_active' : 'notifications';
+            });
+        }
+    </script>
+</body>
+</html>
