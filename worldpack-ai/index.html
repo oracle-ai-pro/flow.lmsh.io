@@ -7,12 +7,33 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="chat-card" id="app">
-        <h3>Worldpack AI: Kosmo Level</h3>
-        <div id="faq-group"></div>
-        <div id="chat-window"></div>
-        <input type="text" id="user-input" placeholder="Задай вопрос по паку...">
+
+<div class="chat-card">
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <div class="top-bar">
+        <h3>Worldpack AI</h3>
+        <span class="material-symbols-rounded" id="settings-icon" onclick="toggleSettings()" style="cursor:pointer;">settings</span>
     </div>
-    <script src="script.js"></script>
+
+    <!-- ОКНО НАСТРОЕК (Скрыто по умолчанию) -->
+    <div id="settings-panel" style="display:none; margin-bottom: 20px; padding: 10px; background: #EFE6FF; border-radius: 16px;">
+        <p>1. Перейди в <a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a>.</p>
+        <p>2. Создай API Key и вставь его ниже:</p>
+        <input type="password" id="api-key-input" placeholder="Введите ваш API Key">
+        <button onclick="saveKey()" class="chip" style="background:#6750A4; color:white;">Сохранить ключ</button>
+    </div>
+
+    <!-- КРАСНОЕ ОКОШКО СТАТУСА -->
+    <div class="status-banner">
+        <span class="material-symbols-rounded">info</span>
+        <small>Worldpack AI отвечает только на настроенные вопросы.</small>
+    </div>
+
+    <div id="faq-group"></div>
+    <div id="chat-window"></div>
+    <input type="text" id="user-input" placeholder="Задай вопрос по паку...">
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
