@@ -2,50 +2,53 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Select service | flow.lmsh.io</title>
+    <title>Prestige HQ | Dashboard</title>
     <style>
-        body { margin: 0; background: #0f0f0f; color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        body { margin: 0; background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
         
-        /* Логотип */
-        .logo { width: 150px; height: 150px; margin-bottom: 40px; border-radius: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        /* Неоновый Логотип */
+        .logo { width: 150px; height: 150px; margin-bottom: 40px; border-radius: 20px; 
+                box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); border: 2px solid #333; }
         
-        .dashboard { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 900px; }
+        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; width: 100%; max-width: 800px; }
         
         .card { 
-            padding: 30px; border-radius: 15px; text-align: center; cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid #333; background: #1a1a1a;
+            padding: 30px; border-radius: 20px; text-align: center; cursor: pointer;
+            transition: all 0.4s ease; background: #0a0a0a; border: 1px solid #222;
+            position: relative; overflow: hidden;
         }
-        .card:hover { transform: translateY(-10px); border-color: #555; background: #222; }
+        .card:hover { transform: translateY(-5px); }
         
-        .card-blue:hover { box-shadow: 0 0 20px rgba(0, 123, 255, 0.3); }
-        .card-green:hover { box-shadow: 0 0 20px rgba(40, 167, 69, 0.3); }
-        .card-gold:hover { box-shadow: 0 0 20px rgba(255, 193, 7, 0.3); }
+        /* Неоновое свечение */
+        .card-blue:hover { box-shadow: 0 0 25px #007bff; border-color: #007bff; }
+        .card-green:hover { box-shadow: 0 0 25px #28a745; border-color: #28a745; }
+        .card-gold:hover { box-shadow: 0 0 25px #ffc107; border-color: #ffc107; }
+        .card-purple:hover { box-shadow: 0 0 25px #7C3AED; border-color: #7C3AED; }
         
-        .card-blue { border-top: 5px solid #007bff; }
-        .card-green { border-top: 5px solid #28a745; }
-        .card-gold { border-top: 5px solid #ffc107; }
-        
-        h3 { margin: 10px 0; }
-        p { color: #888; font-size: 0.9em; }
+        h3 { margin: 10px 0; letter-spacing: 1px; }
+        p { color: #aaa; font-size: 0.85em; }
     </style>
 </head>
 <body>
 
-    <img src="logo.png" alt="LMSH Logo" class="logo">
+    <img src="image.png" alt="LMSH Logo" class="logo">
 
     <div class="dashboard">
         <div class="card card-blue" onclick="location.href='questions.html'">
-            <h3>Вопросы или Проблемы</h3>
-            <p>Если у вас есть Вопросы или Проблемы с сайтом, то обратитесь сюда. С Июля форма переезжает на Отзывы</p>
+            <h3>Вопросы / Проблемы</h3>
+            <p>Техподдержка Штаба</p>
         </div>
         <div class="card card-green" onclick="location.href='ideas.html'">
-            <h3>Предлложить Идею</h3>
-            <p>Если у вас появилась новая идея, вы можете ее написать, укажите зачем, смысл и как это будет работать.</p>
+            <h3>Предложить Идею</h3>
+            <p>Инновации для Prestige HQ</p>
         </div>
         <div class="card card-gold" onclick="location.href='reviews.html'">
             <h3>Отзывы</h3>
-            <p>Оставьте Отзыв о Сайте. Расскажите с какими проблемами вы столкнулись и какую оценку поставите нам</p>
+            <p>Оцените нашу работу</p>
+        </div>
+        <div class="card card-purple" onclick="location.href='upload_pack.html'">
+            <h3>Опубликовать Пак</h3>
+            <p>Ремиксы и ваш контент</p>
         </div>
     </div>
 
