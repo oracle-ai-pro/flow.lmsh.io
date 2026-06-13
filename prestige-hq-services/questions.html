@@ -17,11 +17,28 @@
 
         /* Форма */
         .container { padding: 40px; max-width: 600px; margin: auto; display: none; }
-        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
-        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid #222; color: white; border-radius: 25px; outline: none; transition: 0.3s; box-sizing: border-box; }
-        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 123, 255, 0.2); }
-        .char-counter { font-size: 12px; color: #666; text-align: right; margin-top: -5px; margin-bottom: 10px; }
-        button { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+    transition: 0.3s;
+    margin-bottom: 20px;
+}
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent);
+}
+.back-btn .material-symbols-rounded {
+    font-size: 18px;
+}
 
         /* FAB Button */
         .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 20px rgba(0, 123, 255, 0.5); z-index: 1000; color: white; }
@@ -36,7 +53,10 @@
     </div>
 
     <div class="container" id="main-form">
-        <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
+        <a href="select-service.html" class="back-btn">
+    <span class="material-symbols-rounded">arrow_back</span>
+    Назад
+</a>
         <h2>Вопросы или Проблемы</h2>
         <form id="form-data">
             <select id="type-select">
