@@ -38,16 +38,42 @@
     <div class="container" id="main-form">
         <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
         <h2>Вопросы или Проблемы</h2>
-        <form id="form-data">
-            <select id="type-select">
-                <option value="Вопрос">Вопрос</option>
-                <option value="Проблема">Проблема</option>
-            </select>
-            <textarea id="q-text" placeholder="Ваш вопрос/проблема" maxlength="250" oninput="updateCounter(this)"></textarea>
-            <div id="counter" class="char-counter">0/250</div>
-            <input type="text" id="user-name" placeholder="Ваше имя" required>
-            <button type="submit">Отправить в Штаб</button>
-        </form>
+        <div class="maintenance-card">
+    <div class="icon-glow">
+        <span class="material-symbols-rounded">build</span>
+    </div>
+    <h3>Sorry! Has Error happenend</h3>
+    <p>Мы обнаружили серьезную проблему. Временно недоступно.</p>
+    <p>If do you need a question, please open titan system form!</p>
+</div>
+
+<style>
+    .maintenance-card {
+        background: #050505; /* Абсолютно черный */
+        border: 1px solid #1a1a1a; /* Тонкая граница для глубины */
+        border-radius: 30px; /* Сильное скругление */
+        padding: 40px;
+        text-align: center;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5); /* Объемная тень */
+        transition: 0.4s;
+    }
+
+    /* Цвет границы меняем тут */
+    .maintenance-card:hover { border-color: #007bff; } 
+
+    .icon-glow {
+        width: 70px; height: 70px;
+        background: rgba(0, 123, 255, 0.1);
+        border-radius: 20px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 20px auto;
+    }
+    .icon-glow span { font-size: 32px; color: #007bff; }
+    
+    h3 { font-size: 20px; font-weight: 600; margin-bottom: 10px; }
+    p { color: #666; font-size: 14px; }
+</style>
     </div>
 
     <script>
