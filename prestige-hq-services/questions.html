@@ -8,34 +8,29 @@
     <style>
         :root { --accent: #007bff; --bg: #050505; --card: #0a0a0a; --text: #fff; --border: #222; }
         body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; }
-
-        /* Анимации */
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         .container { padding: 40px 20px; max-width: 500px; margin: auto; animation: slideUp 0.6s ease; }
-        
-        /* Стили формы */
-        .back-btn { display: flex; align-items: center; background: none; border: 1px solid var(--border); color: #666; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
-        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 20px; outline: none; box-sizing: border-box; transition: 0.3s; }
-        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 123, 255, 0.2); }
+        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 20px; outline: none; transition: 0.3s; box-sizing: border-box; }
         button { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: bold; margin-top: 10px; }
 
         /* AI Оверлей */
         .ai-overlay { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
-        .ai-bar { background: var(--card); border: 1px solid var(--accent); padding: 12px 20px; border-radius: 30px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.3s; }
+        .ai-bar { background: var(--card); border: 1px solid var(--accent); padding: 12px 20px; border-radius: 30px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .ai-chat { display: none; background: var(--card); border: 1px solid var(--border); width: 320px; height: 450px; border-radius: 25px; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
         .ai-chat.active { display: flex; animation: slideUp 0.3s ease; }
         .chat-stream { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .bubble { padding: 12px 16px; border-radius: 18px; font-size: 14px; max-width: 80%; }
+        .bubble { padding: 12px 16px; border-radius: 18px; font-size: 14px; max-width: 85%; }
         .bubble.ai { background: #1a1a1a; align-self: flex-start; }
         .bubble.user { background: var(--accent); align-self: flex-end; }
     </style>
 </head>
 <body>
 
-    <div class="container" id="main-form">
-        <button class="back-btn" onclick="location.href='select-service.html'"><span class="material-symbols-rounded">arrow_back</span> Назад</button>
+    <div class="container">
         <h2>Штаб Prestige HQ</h2>
         <form id="form-data">
             <select id="type-select"><option>Вопрос</option><option>Проблема</option></select>
@@ -56,10 +51,10 @@
                 <span class="material-symbols-rounded" onclick="collapseAI()" style="cursor:pointer">keyboard_arrow_down</span>
             </div>
             <div id="chat-stream" class="chat-stream">
-                <div class="bubble ai">Привет! Готов помочь с обращением.</div>
+                <div class="bubble ai">Привет! Готов проанализировать твой запрос.</div>
             </div>
             <div style="padding:10px; border-top:1px solid #222; display:flex; gap:5px;">
-                <input id="ai-field" placeholder="Напиши вопрос..." style="margin:0">
+                <input id="ai-field" placeholder="Напиши..." style="margin:0">
                 <button onclick="askAI()" style="width:50px; padding:0; margin:0"><span class="material-symbols-rounded">arrow_upward</span></button>
             </div>
         </div>
@@ -72,27 +67,25 @@
         function askAI() {
             const field = document.getElementById('ai-field');
             const chat = document.getElementById('chat-stream');
-            if(!field.value) return;
+            if(!field.value.trim()) return;
+
             chat.innerHTML += `<div class="bubble user">${field.value}</div>`;
-            chat.innerHTML += `<div class="bubble ai">Система Prestige AI анализирует запрос...</div>`;
-            field.value = ""; chat.scrollTop = chat.scrollHeight;
+            const analysisId = 'id-' + Date.now();
+            chat.innerHTML += `<div class="bubble ai" id="${analysisId}"><span class="material-symbols-rounded" style="animation:spin 2s linear infinite">settings</span> Анализ...</div>`;
+            
+            const q = field.value;
+            field.value = "";
+            chat.scrollTop = chat.scrollHeight;
+
+            setTimeout(() => {
+                document.getElementById(analysisId).innerText = "Реестр ЛМСХ: Запрос '" + q + "' обработан успешно.";
+                chat.scrollTop = chat.scrollHeight;
+            }, 1500);
         }
 
         document.getElementById('form-data').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('send-btn');
-            btn.innerText = "ОТПРАВКА...";
-            
-            const data = {
-                name: document.getElementById('user-name').value,
-                type: document.getElementById('type-select').value,
-                text: document.getElementById('q-text').value
-            };
-
-            // Логика отправки...
-            await new Promise(r => setTimeout(r, 1000));
-            alert("Успешно доставлено в Штаб!");
-            btn.innerText = "ОТПРАВИТЬ В ШТАБ";
+            alert("Данные приняты в Штаб!");
             document.getElementById('form-data').reset();
         });
     </script>
