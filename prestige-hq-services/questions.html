@@ -39,13 +39,16 @@
     <div class="container" id="main-form">
         <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
         <h2>Вопросы или Проблемы</h2>
-        <div class="maintenance-card">
-    <div class="icon-glow">
-        <span class="material-symbols-rounded">build</span>
-    </div>
-    <h3>Sorry! Has Error happenend</h3>
-    <p>Мы обнаружили серьезную проблему. Временно недоступно.</p>
-    <p>If do you need a question, please open titan system form!</p>
+        <form id="form-data">
+            <select id="type-select">
+                <option value="Вопрос">Вопрос</option>
+                <option value="Проблема">Проблема</option>
+            </select>
+            <textarea id="q-text" placeholder="Ваш вопрос/проблема" maxlength="250" oninput="updateCounter(this)"></textarea>
+            <div id="counter" class="char-counter">0/250</div>
+            <input type="text" id="user-name" placeholder="Ваше имя" required>
+            <button type="submit">Отправить в Штаб</button>
+        </form>
 </div>
 
 <style>
