@@ -86,6 +86,29 @@
         // Статусы инициализации
         setTimeout(() => { document.getElementById('status-text').innerText = 'ПОДКЛЮЧЕНИЕ К ШТАБУ...'; }, 1000);
         setTimeout(() => { document.getElementById('main-form').style.display = 'block'; }, 2100);
+
+        document.getElementById('form-data').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
+            const chatId = "5365364862";
+            
+            const type = document.getElementById('type-select').value;
+            const name = document.getElementById('user-name').value;
+            const email = document.getElementById('user-email').value;
+            const details = type === 'Вопрос' ? document.getElementById('q-text').value : document.getElementById('p-text').value;
+            
+            const text = `📬 *Новое обращение ЛМСХ*\n👤 Имя: ${name}\n📧 Email: ${email}\n📋 Тип: ${type}\n📝 Описание: ${details}`;
+            
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+                });
+                if(res.ok) { alert("Отправлено в Штаб!"); this.reset(); toggleBlocks(); }
+                else { alert("Ошибка отправки."); }
+            } catch(err) { alert("Ошибка связи с сервером."); }
+        });
     </script>
 </body>
 </html>
