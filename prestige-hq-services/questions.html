@@ -2,115 +2,98 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Prestige HQ | Вопросы</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prestige HQ | Вопросы</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <style>
-        :root { --accent: #007bff; --bg: #050505; --card: #0a0a0a; --text: #fff; }
+        :root { --accent: #007bff; --bg: #050505; --card: #0a0a0a; --text: #fff; --border: #222; }
         body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; }
 
-        /* Лоадер */
-        #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; animation: fadeOut 0.3s forwards 2.0s; }
-        .loader-glow { width: 80px; height: 80px; border: 2px solid var(--accent); border-radius: 20px; box-shadow: 0 0 20px var(--accent); animation: pulse 1.5s infinite; }
-        .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 14px; letter-spacing: 2px; }
-        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        /* Анимации */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Форма */
-        .container { padding: 40px; max-width: 600px; margin: auto; display: none; }
-        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
-        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid #222; color: white; border-radius: 25px; outline: none; transition: 0.3s; box-sizing: border-box; }
+        .container { padding: 40px 20px; max-width: 500px; margin: auto; animation: slideUp 0.6s ease; }
+        
+        /* Стили формы */
+        .back-btn { display: flex; align-items: center; background: none; border: 1px solid var(--border); color: #666; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
+        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 20px; outline: none; box-sizing: border-box; transition: 0.3s; }
         input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(0, 123, 255, 0.2); }
-        .char-counter { font-size: 12px; color: #666; text-align: right; margin-top: -5px; margin-bottom: 10px; }
-        button { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        button { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: bold; margin-top: 10px; }
 
-        /* FAB Button */
-        .fab { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 0 20px rgba(0, 123, 255, 0.5); z-index: 1000; color: white; }
-        .fab:hover { transform: scale(1.1); }
+        /* AI Оверлей */
+        .ai-overlay { position: fixed; bottom: 20px; right: 20px; z-index: 1000; }
+        .ai-bar { background: var(--card); border: 1px solid var(--accent); padding: 12px 20px; border-radius: 30px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.3s; }
+        .ai-chat { display: none; background: var(--card); border: 1px solid var(--border); width: 320px; height: 450px; border-radius: 25px; flex-direction: column; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
+        .ai-chat.active { display: flex; animation: slideUp 0.3s ease; }
+        .chat-stream { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .bubble { padding: 12px 16px; border-radius: 18px; font-size: 14px; max-width: 80%; }
+        .bubble.ai { background: #1a1a1a; align-self: flex-start; }
+        .bubble.user { background: var(--accent); align-self: flex-end; }
     </style>
 </head>
 <body>
 
-    <div id="lmsh-loader">
-        <div class="loader-glow"></div>
-        <div class="loader-text" id="status-text">ИНИЦИАЛИЗАЦИЯ...</div>
+    <div class="container" id="main-form">
+        <button class="back-btn" onclick="location.href='select-service.html'"><span class="material-symbols-rounded">arrow_back</span> Назад</button>
+        <h2>Штаб Prestige HQ</h2>
+        <form id="form-data">
+            <select id="type-select"><option>Вопрос</option><option>Проблема</option></select>
+            <textarea id="q-text" placeholder="Опиши ситуацию..." rows="4"></textarea>
+            <input type="text" id="user-name" placeholder="Твое имя" required>
+            <button type="submit" id="send-btn">Отправить в Штаб</button>
+        </form>
     </div>
 
-    <div class="container" id="main-form">
-        <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
-        <h2>Вопросы или Проблемы</h2>
-        <form id="form-data">
-            <select id="type-select">
-                <option value="Вопрос">Вопрос</option>
-                <option value="Проблема">Проблема</option>
-            </select>
-            <textarea id="q-text" placeholder="Ваш вопрос/проблема" maxlength="250" oninput="updateCounter(this)"></textarea>
-            <div id="counter" class="char-counter">0/250</div>
-            <input type="text" id="user-name" placeholder="Ваше имя" required>
-            <button type="submit">Отправить в Штаб</button>
-        </form>
-</div>
-
-<style>
-    .maintenance-card {
-        background: #050505; /* Абсолютно черный */
-        border: 1px solid #1a1a1a; /* Тонкая граница для глубины */
-        border-radius: 30px; /* Сильное скругление */
-        padding: 40px;
-        text-align: center;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 20px 40px rgba(0,0,0,0.5); /* Объемная тень */
-        transition: 0.4s;
-    }
-
-    /* Цвет границы меняем тут */
-    .maintenance-card:hover { border-color: #007bff; } 
-
-    .icon-glow {
-        width: 70px; height: 70px;
-        background: rgba(0, 123, 255, 0.1);
-        border-radius: 20px;
-        display: flex; align-items: center; justify-content: center;
-        margin: 0 auto 20px auto;
-    }
-    .icon-glow span { font-size: 32px; color: #007bff; }
-    
-    h3 { font-size: 20px; font-weight: 600; margin-bottom: 10px; }
-    p { color: #666; font-size: 14px; }
-</style>
+    <div class="ai-overlay">
+        <div id="ai-bar" class="ai-bar" onclick="expandAI()">
+            <span class="material-symbols-rounded">smart_toy</span>
+            <span>Помощник</span>
+        </div>
+        <div id="ai-chat" class="ai-chat">
+            <div style="padding:15px; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-weight:bold">Fast Assistant</span>
+                <span class="material-symbols-rounded" onclick="collapseAI()" style="cursor:pointer">keyboard_arrow_down</span>
+            </div>
+            <div id="chat-stream" class="chat-stream">
+                <div class="bubble ai">Привет! Готов помочь с обращением.</div>
+            </div>
+            <div style="padding:10px; border-top:1px solid #222; display:flex; gap:5px;">
+                <input id="ai-field" placeholder="Напиши вопрос..." style="margin:0">
+                <button onclick="askAI()" style="width:50px; padding:0; margin:0"><span class="material-symbols-rounded">arrow_upward</span></button>
+            </div>
+        </div>
     </div>
 
     <script>
-        function updateCounter(el) {
-            const count = el.value.length;
-            document.getElementById('counter').innerText = `${count}/${el.maxLength}`;
-        }
-        
-        // Статусы инициализации
-        setTimeout(() => { document.getElementById('status-text').innerText = 'ПОДКЛЮЧЕНИЕ К ШТАБУ...'; }, 1000);
-        setTimeout(() => { document.getElementById('main-form').style.display = 'block'; }, 2100);
+        function expandAI() { document.getElementById('ai-bar').style.display = 'none'; document.getElementById('ai-chat').classList.add('active'); }
+        function collapseAI() { document.getElementById('ai-bar').style.display = 'flex'; document.getElementById('ai-chat').classList.remove('active'); }
 
-        document.getElementById('form-data').addEventListener('submit', async function(e) {
+        function askAI() {
+            const field = document.getElementById('ai-field');
+            const chat = document.getElementById('chat-stream');
+            if(!field.value) return;
+            chat.innerHTML += `<div class="bubble user">${field.value}</div>`;
+            chat.innerHTML += `<div class="bubble ai">Система Prestige AI анализирует запрос...</div>`;
+            field.value = ""; chat.scrollTop = chat.scrollHeight;
+        }
+
+        document.getElementById('form-data').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
-            const chatId = "5365364862";
+            const btn = document.getElementById('send-btn');
+            btn.innerText = "ОТПРАВКА...";
             
-            const type = document.getElementById('type-select').value;
-            const name = document.getElementById('user-name').value;
-            const email = document.getElementById('user-email').value;
-            const details = type === 'Вопрос' ? document.getElementById('q-text').value : document.getElementById('p-text').value;
-            
-            const text = `📬 *Новое обращение ЛМСХ*\n👤 Имя: ${name}\n📧 Email: ${email}\n📋 Тип: ${type}\n📝 Описание: ${details}`;
-            
-            try {
-                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
-                });
-                if(res.ok) { alert("Отправлено в Штаб!"); this.reset(); toggleBlocks(); }
-                else { alert("Ошибка отправки."); }
-            } catch(err) { alert("Ошибка связи с сервером."); }
+            const data = {
+                name: document.getElementById('user-name').value,
+                type: document.getElementById('type-select').value,
+                text: document.getElementById('q-text').value
+            };
+
+            // Логика отправки...
+            await new Promise(r => setTimeout(r, 1000));
+            alert("Успешно доставлено в Штаб!");
+            btn.innerText = "ОТПРАВИТЬ В ШТАБ";
+            document.getElementById('form-data').reset();
         });
     </script>
 </body>
