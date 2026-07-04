@@ -7,23 +7,44 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <style>
         :root { --accent: #28a745; --bg: #050505; --card: #0a0a0a; --text: #fff; }
-        body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; }
 
-        /* Живой лоадер (Зеленая инициализация) */
+        /* Живой лоадер */
         #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; animation: fadeOut 0.3s forwards 2.0s; }
-        .loader-glow { width: 80px; height: 80px; border: 2px solid var(--accent); border-radius: 20px; box-shadow: 0 0 20px var(--accent); animation: pulse 1.5s infinite; }
-        .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 14px; letter-spacing: 2px; }
+        .loader-glow { width: 80px; height: 80px; border: 2px solid var(--accent); border-radius: 20px; box-shadow: 0 0 20px rgba(40, 167, 69, 0.5); animation: pulse 1.5s infinite; }
+        .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 
-        /* Форма */
-        .container { padding: 40px; max-width: 600px; margin: auto; display: none; }
-        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
+        /* Форма и контейнер */
+        .container { padding: 40px 20px; max-width: 600px; margin: auto; display: none; }
+        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
+        .back-btn:hover { border-color: var(--accent); color: var(--accent); }
+        
         input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid #222; color: white; border-radius: 20px; outline: none; transition: 0.3s; box-sizing: border-box; }
-        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(40, 167, 69, 0.2); }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(40, 167, 69, 0.2); }
         .char-counter { font-size: 12px; color: #666; text-align: right; margin-top: -5px; margin-bottom: 10px; }
-        button { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        h2 { color: var(--accent); }
+        
+        /* Двухъядерная панель */
+        .action-bar { display: flex; gap: 10px; margin-top: 10px; }
+        button { border: none; padding: 15px; border-radius: 20px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-check { background: #1a1a1a; border: 1px solid #444; flex: 1; }
+        .btn-check:hover { border-color: #666; }
+        .btn-send { background: var(--accent); flex: 2; }
+        .btn-send:hover { box-shadow: 0 0 15px rgba(40, 167, 69, 0.4); }
+
+        h2 { color: var(--accent); margin-bottom: 20px; }
+
+        /* Секция Топ-3 */
+        .top-ideas { margin-top: 50px; border-top: 1px solid #222; padding-top: 30px; }
+        .top-ideas h3 { color: #fff; display: flex; align-items: center; gap: 10px; }
+        .idea-card { background: #111; border: 1px solid #222; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-left: 4px solid var(--accent); }
+        .idea-card h4 { margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px; color: #fff; }
+        .idea-card p { margin: 0; color: #aaa; font-size: 14px; line-height: 1.5; }
+        .btn-all-ideas { background: transparent; border: 1px dashed var(--accent); color: var(--accent); width: 100%; margin-top: 10px; }
+        .btn-all-ideas:hover { background: rgba(40, 167, 69, 0.1); }
+
     </style>
 </head>
 <body>
@@ -36,6 +57,7 @@
     <div class="container" id="main-form">
         <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
         <h2>Предложить идею для Штаба</h2>
+        
         <form id="idea-form">
             <input type="text" id="title" placeholder="Название идеи" required>
             
@@ -47,31 +69,101 @@
             
             <select id="priority">
                 <option value="Низкий">Приоритет: Низкий</option>
-                <option value="Средний">Приоритет: Средний</option>
+                <option value="Средний" selected>Приоритет: Средний</option>
                 <option value="Высокий">Приоритет: Высокий</option>
             </select>
 
             <input type="text" id="author" placeholder="Ваше имя" required>
-            <button type="submit">Отправить в Штаб</button>
+            <input type="email" id="user-email" placeholder="Email для обратной связи" required>
+
+            <div class="action-bar">
+                <button type="button" class="btn-check" onclick="checkIdea()">Проверить</button>
+                <button type="submit" class="btn-send">Отправить в Штаб</button>
+            </div>
         </form>
+
+        <!-- Блок Топ-3 Идей -->
+        <div class="top-ideas">
+            <h3><span class="material-symbols-rounded">stars</span> Топ инноваций</h3>
+            
+            <div class="idea-card">
+                <h4><span class="material-symbols-rounded" style="color:var(--accent); font-size:18px;">bolt</span> Авто-тестирование форм</h4>
+                <p>Внедрить скрипт, который будет сам проверять отправку данных в ТГ-бота каждую ночь.</p>
+            </div>
+            
+            <div class="idea-card">
+                <h4><span class="material-symbols-rounded" style="color:var(--accent); font-size:18px;">database</span> Локальный архив</h4>
+                <p>Сохранять историю отправленных логов в LocalStorage для быстрого доступа.</p>
+            </div>
+
+            <button class="btn-all-ideas" onclick="location.href='all-ideas.html'">Посмотреть весь архив</button>
+        </div>
+    </div>
+
+    <!-- AI-Помощник -->
+    <div class="ai-overlay">
+        <div id="ai-bar" onclick="checkIdea()" style="position:fixed; bottom:20px; right:20px; background:#0a0a0a; border:1px solid var(--accent); padding:12px 20px; border-radius:30px; display:flex; align-items:center; gap:10px; cursor:pointer; color:white; box-shadow:0 10px 20px rgba(0,0,0,0.5); z-index: 100;">
+            <span class="material-symbols-rounded">smart_toy</span>
+            <span>Помощник ЛМСХ</span>
+        </div>
     </div>
 
     <script>
+        // Счетчики символов
         function updateCounter(el, id) {
             document.getElementById(id).innerText = `${el.value.length}/${el.maxLength}`;
         }
 
-        // Логика инициализации
+        // Логика загрузки
         setTimeout(() => { document.getElementById('status-text').innerText = 'ПОДКЛЮЧЕНИЕ К КАНАЛУ IDEAS...'; }, 1000);
         setTimeout(() => { document.getElementById('main-form').style.display = 'block'; }, 2100);
 
-        // Отправка
+        // Интеллект Помощника
+        async function checkIdea() {
+            const author = document.getElementById('author').value.trim();
+            const title = document.getElementById('title').value.trim();
+            const desc = document.getElementById('desc').value.trim();
+            const benefit = document.getElementById('benefit').value.trim();
+	    const email = document.getElementById('user-email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            showAIStatus("Оценка инновационного потенциала...");
+            await new Promise(r => setTimeout(r, 1500));
+
+            const name = author || "Шеф";
+            
+	    if (!emailRegex.test(email)) {
+        showAIStatus("Шеф, кажется, в адресе почты ошибка. Проверь синтаксис!");
+        return;
+    }
+
+            if (title.length < 5 || desc.length < 20 || benefit.length < 10) {
+                showAIStatus(`${name}, идея выглядит сыровато. Добавь конкретики в суть и пользу!`);
+            } else {
+                showAIStatus(`${name}, отличный инженерный набросок! Идея готова к отправке.`);
+            }
+        }
+
+        function showAIStatus(msg) {
+            let bubble = document.getElementById('ai-bubble');
+            if (!bubble) {
+                bubble = document.createElement('div');
+                bubble.id = 'ai-bubble';
+                bubble.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); border:1px solid var(--accent); padding:20px; border-radius:20px; z-index:10000; color:white; font-weight:bold; text-align:center; box-shadow:0 0 30px rgba(40,167,69,0.4); animation:fadeIn 0.3s; width:80%; max-width:320px;";
+                document.body.appendChild(bubble);
+            }
+            bubble.innerText = msg;
+            bubble.style.display = 'block';
+            setTimeout(() => { bubble.style.display = 'none'; }, 4000);
+        }
+
+        // Отправка в Штаб
         document.getElementById('idea-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
             const chatId = "5365364862";
             
-            const text = `💡 *Новая идея для ЛМСХ*\n\n📌 *Название:* ${document.getElementById('title').value}\n📝 *Суть:* ${document.getElementById('desc').value}\n🚀 *Польза:* ${document.getElementById('benefit').value}\n⭐ *Приоритет:* ${document.getElementById('priority').value}\n👤 *Автор:* ${document.getElementById('author').value}`;
+            const text = `💡 *Новая идея для ЛМСХ*\n\n📌 *Название:* ${document.getElementById('title').value}\n👤 *Автор:* ${document.getElementById('author').value}\n📧 *Email:* ${document.getElementById('user-email').value}\n📝 *Суть:* ${document.getElementById('desc').value}\n🚀 *Польза:* ${document.getElementById('benefit').value}\n⭐ *Приоритет:* ${document.getElementById('priority').value}`;
             
             try {
                 const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -79,9 +171,18 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
                 });
-                if(res.ok) { alert("Идея в Штабе!"); this.reset(); }
-                else { alert("Ошибка связи."); }
-            } catch(err) { alert("Ошибка соединения."); }
+                
+                if(res.ok) { 
+                    showAIStatus("Инновация успешно зарегистрирована в Штабе!");
+                    this.reset();
+                    document.getElementById('c1').innerText = "0/500";
+                    document.getElementById('c2').innerText = "0/300";
+                } else { 
+                    showAIStatus("Ошибка связи со Штабом."); 
+                }
+            } catch(err) { 
+                showAIStatus("Критическая ошибка соединения."); 
+            }
         });
     </script>
 </body>
