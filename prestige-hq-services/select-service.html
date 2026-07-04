@@ -5,29 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Prestige HQ | Dashboard</title>
     <style>
-        body { margin: 0; background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; }
+        :root { --accent: #ffc107; }
+        body { margin: 0; background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; transition: 0.3s; box-sizing: border-box; }
         
-        /* Неоновый Логотип */
-        .logo { width: 150px; height: 150px; margin-bottom: 40px; border-radius: 20px; 
-                box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); border: 2px solid #333; }
+        .logo { width: 120px; margin-bottom: 30px; border-radius: 20px; border: 2px solid #333; box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); }
+        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; max-width: 700px; }
         
-        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; width: 100%; max-width: 800px; }
-        
-        .card { 
-            padding: 30px; border-radius: 20px; text-align: center; cursor: pointer;
-            transition: all 0.4s ease; background: #0a0a0a; border: 1px solid #222;
-            position: relative; overflow: hidden;
-        }
+        .card { padding: 25px; border-radius: 20px; text-align: center; cursor: pointer; transition: all 0.4s ease; background: #0a0a0a; border: 1px solid #222; position: relative; overflow: hidden; }
         .card:hover { transform: translateY(-5px); }
+        .card.blurred { filter: blur(6px); opacity: 0.4; pointer-events: none; }
+
+        /* Градиентные неоновые эффекты */
+        .card-blue:hover { border-color: #007bff; box-shadow: 0 0 20px #007bff; background: linear-gradient(145deg, #0a0a0a, #001f3f); }
+        .card-green:hover { border-color: #28a745; box-shadow: 0 0 20px #28a745; background: linear-gradient(145deg, #0a0a0a, #002d13); }
+        .card-gold:hover { border-color: #ffc107; box-shadow: 0 0 20px #ffc107; background: linear-gradient(145deg, #0a0a0a, #3f3000); }
+        .card-purple:hover { border-color: #7C3AED; box-shadow: 0 0 20px #7C3AED; background: linear-gradient(145deg, #0a0a0a, #2a154a); }
+        .card-gray:hover { border-color: #555; box-shadow: 0 0 15px #333; background: #111; }
         
-        /* Неоновое свечение */
-        .card-blue:hover { box-shadow: 0 0 25px #007bff; border-color: #007bff; }
-        .card-green:hover { box-shadow: 0 0 25px #28a745; border-color: #28a745; }
-        .card-gold:hover { box-shadow: 0 0 25px #ffc107; border-color: #ffc107; }
-        .card-purple:hover { box-shadow: 0 0 25px #7C3AED; border-color: #7C3AED; }
+        #context-menu { position: absolute; background: #1a1a1a; border: 1px solid #444; border-radius: 12px; display: none; z-index: 1000; padding: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .menu-item { padding: 10px 15px; cursor: pointer; font-size: 13px; border-radius: 8px; transition: 0.2s; }
+        .menu-item:hover { background: var(--accent); color: #000; }
         
-        h3 { margin: 10px 0; letter-spacing: 1px; }
-        p { color: #aaa; font-size: 0.85em; }
+        #assistant-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #111; border: 1px solid #444; border-radius: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 1000; transition: 0.3s; font-weight: bold; color: var(--accent); }
+        #assistant-btn:hover { border-color: var(--accent); transform: scale(1.1); text-shadow: 0 0 10px var(--accent); }
+        
+        /* ПРОКАЧАННОЕ ЧАТ ОКНО ИИ */
+        #chat-window { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; height: 500px; background: #0a0a0a; border: 1px solid var(--accent); border-radius: 24px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 0 40px rgba(0,0,0,0.9); overflow: hidden; font-family: sans-serif; }
+        #chat-header { padding: 18px 25px; border-bottom: 1px solid #1a1a1a; font-weight: bold; background: #000; display: flex; justify-content: space-between; align-items: center; }
+        #chat-title { color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; font-size: 13px; }
+        
+        #chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: radial-gradient(circle at top, #0f172a00, #000000); }
+        
+        /* Капсульные бабблы */
+        .msg-bubble { max-width: 75%; padding: 12px 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; animation: bubbleAppear 0.25s ease forwards; }
+        .msg-user { background: linear-gradient(135deg, #0055ff, #0088ff); color: #fff; align-self: flex-end; border-radius: 20px 20px 4px 20px; box-shadow: 0 4px 15px rgba(0, 85, 255, 0.2); }
+        .msg-ai { background: #111; color: #f0f0f0; align-self: flex-start; border-radius: 20px 20px 20px 4px; border: 1px solid #222; }
+        
+        #chat-input { padding: 15px; border-top: 1px solid #1a1a1a; display: flex; gap: 10px; background: #000; }
+        #chat-input input { flex: 1; background: #111; border: 1px solid #222; color: white; padding: 12px 20px; border-radius: 50px; outline: none; transition: 0.3s; }
+        #chat-input input:focus { border-color: var(--accent); }
+        #chat-input button { background: var(--accent); border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; color: black; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        #chat-input button:hover { transform: scale(1.05); filter: brightness(1.2); }
+
+        #chat-body::-webkit-scrollbar { width: 4px; }
+        #chat-body::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+
+        @keyframes bubbleAppear { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
     </style>
 </head>
 <body>
@@ -35,23 +59,131 @@
     <img src="image.png" alt="LMSH Logo" class="logo">
 
     <div class="dashboard">
-        <div class="card card-blue" onclick="location.href='questions.html'">
-            <h3>Вопросы / Проблемы</h3>
-            <p>Техподдержка Штаба</p>
+        <div class="card card-blue" onclick="location.href='questions.html'" data-link="questions.html" data-color="#007bff"><h3>Вопросы</h3><p>Техподдержка</p></div>
+        <div class="card card-green" onclick="location.href='ideas.html'" data-link="ideas.html" data-color="#28a745" data-ideas="true"><h3>Идеи</h3><p>Инновации</p></div>
+        <div class="card card-gold" onclick="location.href='reviews.html'" data-link="reviews.html" data-color="#ffc107"><h3>Отзывы</h3><p>Оцените нас</p></div>
+        <div class="card card-purple" onclick="showAIStatus('Домен kosmo level installer не вышел. Публикация паков пока невозможна!')" data-link="upload_pack.html" data-color="#7C3AED"><h3>Пак</h3><p>Ваш контент</p></div>
+        <div class="card card-gray" onclick="showAIStatus('Недоступно!')" data-link="preregistration.html" data-color="#555"><h3>Предрегистрация</h3><p>Оформите Предрегистрацию</p></div>
+        <div class="card card-gray" onclick="location.href='review_pack.html'" data-link="review_pack.html" data-color="#555"><h3>Оценить Пак</h3><p>Новая форма</p></div>
+    </div>
+
+    <div id="context-menu">
+        <div class="menu-item" id="ideas-view" style="display:none;" onclick="location.href='all-ideas.html'">Посмотреть идеи</div>
+        <div class="menu-item" onclick="discuss()">Обсудить с Assistant</div>
+    </div>
+
+    <div id="assistant-btn" onclick="openChat('Помощник ЛМСХ')"><span>AI</span></div>
+
+    <div id="chat-window">
+        <div id="chat-header">
+            <span id="chat-title">Помощник ЛМСХ</span>
+            <span onclick="closeChat()" style="cursor:pointer; color: #666;">✕</span>
         </div>
-        <div class="card card-green" onclick="location.href='ideas.html'">
-            <h3>Предложить Идею</h3>
-            <p>Инновации для Prestige HQ</p>
+        <div id="chat-body">
+            <div class="msg-bubble msg-ai">Привет! На связи бортовой ИИ Штаба ЛМСХ. Чем могу помочь тебе сегодня?</div>
         </div>
-        <div class="card card-gold" onclick="location.href='reviews.html'">
-            <h3>Отзывы</h3>
-            <p>Оцените нашу работу</p>
-        </div>
-        <div class="card card-purple" onclick="location.href='upload_pack.html'">
-            <h3>Опубликовать Пак</h3>
-            <p>Ремиксы и ваш контент</p>
+        <div id="chat-input">
+            <input type="text" id="chat-msg" placeholder="Введите..." onkeydown="if(event.key === 'Enter') sendMessage()">
+	<button onclick="sendMessage()">➤</button>
         </div>
     </div>
 
+    <script>
+        const menu = document.getElementById('context-menu');
+        let activeCard = null;
+
+        document.querySelectorAll('.card').forEach(card => {
+            card.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                activeCard = card;
+                document.querySelectorAll('.card').forEach(c => { if(c !== card) c.classList.add('blurred'); });
+                document.documentElement.style.setProperty('--accent', card.dataset.color);
+                document.getElementById('ideas-view').style.display = card.dataset.ideas ? 'block' : 'none';
+                menu.style.top = e.pageY + 'px'; menu.style.left = e.pageX + 'px'; menu.style.display = 'block';
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#context-menu')) menu.style.display = 'none';
+            if (!e.target.closest('#context-menu')) document.querySelectorAll('.card').forEach(c => c.classList.remove('blurred'));
+        });
+
+        // Открытие/закрытие чата
+        function openChat(topic) { 
+            document.getElementById('chat-window').style.display = 'flex'; 
+            document.getElementById('chat-title').innerText = topic + " 🤖"; 
+        }
+        
+        function closeChat() { 
+            document.getElementById('chat-window').style.display = 'none'; 
+        }
+
+        // Рендеринг бабблов по разным сторонам
+        function appendBubble(text, side) {
+            const chatBody = document.getElementById('chat-body');
+            const bubble = document.createElement('div');
+            bubble.className = `msg-bubble msg-${side}`;
+            bubble.innerText = text;
+            chatBody.appendChild(bubble);
+            chatBody.scrollTop = chatBody.scrollHeight; // Скролл вниз
+        }
+
+        // Интеллектуальная отправка и if-else парсинг ИИ
+        function sendMessage() { 
+            const input = document.getElementById('chat-msg'); 
+            const query = input.value.trim();
+            
+            if (!query) return; 
+            
+            appendBubble(query, 'user');
+            input.value = ""; 
+
+            const lowerQuery = query.toLowerCase();
+
+            // Логика ответов ИИ Помощника
+            setTimeout(() => {
+                if (lowerQuery.includes('привет') || lowerQuery.includes('ку')) {
+                    appendBubble("Приветствую в Главном Дашборде Штаба! Рад помочь.", "ai");
+                } 
+                else if (lowerQuery.includes('отзыв') || lowerQuery.includes('оценить')) {
+                    appendBubble("Секция отзывов обновлена. Ты можешь воспользоваться карточкой 'Оценить Пак' для перехода на форму TITAN REVIEWS.", "ai");
+                } 
+                else if (lowerQuery.includes('идеи') || lowerQuery.includes('инновац')) {
+                    appendBubble("Раздел идей открыт для генерации! Нажми правой кнопкой мыши по карточке 'Идеи', чтобы просмотреть архив предложений Штаба.", "ai");
+                }
+                else if (lowerQuery.includes('пак') || lowerQuery.includes('публикация')) {
+                    appendBubble("Внимание! Публикация паков временно заблокирована, так как домен Kosmo Level Installer ещё не вышел в релиз.", "ai");
+                }
+                else if (lowerQuery.includes('вопрос') || lowerQuery.includes('поддержк')) {
+                    appendBubble("Проблемы с конфигурацией? Перейди в карточку 'Вопросы', чтобы связаться с техподдержкой ЛМСХ.", "ai");
+                }
+                else {
+                    appendBubble("Запрос обрабатывается ядром ИИ Штаба... Для выполнения конкретных операций используй контекстное меню карточек панели.", "ai");
+                }
+            }, 500);
+        }
+
+        function discuss() { 
+            menu.style.display = 'none'; 
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('blurred')); 
+            const topic = activeCard.querySelector('h3').innerText;
+            openChat("Обсуждение: " + topic); 
+            appendBubble(`Бортовой компьютер переведён в режим разбора модуля "${topic}". Задавай свои вопросы по этой теме!`, 'ai');
+        }
+
+        // Фирменный неоновый статус-баббл вместо alert
+        function showAIStatus(msg) { 
+            let bubble = document.getElementById('ai-bubble');
+            if (!bubble) {
+                bubble = document.createElement('div');
+                bubble.id = 'ai-bubble';
+                bubble.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); border:1px solid var(--accent); padding:20px; border-radius:20px; z-index:10000; color:white; font-weight:bold; text-align:center; box-shadow:0 0 30px rgba(255, 193, 7, 0.4); animation:fadeIn 0.3s; width:80%; max-width:320px; line-height: 1.5;";
+                document.body.appendChild(bubble);
+            }
+            bubble.innerHTML = msg.replace(/\n/g, '<br>');
+            bubble.style.display = 'block';
+            setTimeout(() => { bubble.style.display = 'none'; }, 4000);
+        }
+    </script>
 </body>
 </html>
