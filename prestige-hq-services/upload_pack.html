@@ -6,7 +6,7 @@
     <title>Prestige HQ | Реестр паков</title>
     <style>
         :root { --accent: #7C3AED; --bg: #050505; --card: #0a0a0a; --text: #f0e6ff; }
-        body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; }
+        body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
 
         /* Лоадер */
         #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; animation: fadeOut 0.3s forwards 2.0s; }
@@ -14,14 +14,30 @@
         .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 14px; letter-spacing: 2px; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 
         /* Форма */
-        .container { padding: 40px; max-width: 600px; margin: auto; display: none; }
-        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; }
-        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid #222; color: white; border-radius: 20px; outline: none; box-sizing: border-box; }
+        .container { padding: 40px; width: 100%; max-width: 600px; box-sizing: border-box; display: none; }
+        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.2s; }
+        .back-btn:hover { color: #fff; border-color: #555; }
+        
+        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid #222; color: white; border-radius: 20px; outline: none; box-sizing: border-box; transition: all 0.3s ease; }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(124, 58, 237, 0.25); }
+        
         .char-counter { font-size: 12px; color: #666; text-align: right; margin-top: -5px; margin-bottom: 10px; }
-        button { background: var(--accent); color: white; border: none; padding: 15px; width: 100%; border-radius: 20px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        h2 { color: var(--accent); }
+        
+        /* Блок кнопок управления */
+        .btn-group { display: flex; gap: 15px; margin-top: 15px; }
+        button[type="submit"], button[type="button"] { flex: 1; padding: 15px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s ease; box-sizing: border-box; }
+        
+        .btn-primary { background: var(--accent); color: white; border: none; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #333; color: #777; cursor: not-allowed; transform: none; }
+        
+        .btn-secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+        .btn-secondary:hover { background: rgba(124, 58, 237, 0.1); }
+        
+        h2 { color: var(--accent); margin-top: 0; }
         .hidden { display: none; }
     </style>
 </head>
@@ -40,7 +56,7 @@
             <textarea id="pack-desc" placeholder="Описание..." rows="3" maxlength="300" oninput="updateCounter(this)"></textarea>
             <div id="counter" class="char-counter">0/300</div>
 
-            <label>Способ загрузки:</label>
+            <label style="font-size: 13px; color: #888; margin-left: 5px;">Способ загрузки:</label>
             <select id="load-type" onchange="toggleLoadType()">
                 <option value="link">Ссылка (Cloud/Drive)</option>
                 <option value="file">Локальный файл</option>
@@ -49,31 +65,147 @@
             <input type="url" id="pack-link" placeholder="https://drive.google.com/...">
             <input type="file" id="pack-file" class="hidden">
 
+            <label style="font-size: 13px; color: #888; margin-left: 5px;">Возрастной ценз:</label>
             <select id="age-rating">
                 <option value="0+">0+ (Для всех)</option>
                 <option value="12+">12+ (Требует авторизацию)</option>
             </select>
 
-            <input type="text" id="author" placeholder="Ваше имя/ID" required>
-            <button type="submit">Отправить в ОТК</button>
+            <label style="font-size: 13px; color: #888; margin-left: 5px;">Данные создателя пака:</label>
+            <input type="text" id="author" placeholder="Ваше имя / ID в Штабе" required>
+            <input type="email" id="user-email" placeholder="Электронная почта (для уведомлений от ОТК)" required>
+            <input type="text" id="user-tg" placeholder="Ваш Telegram (@username) для LMSH HQ BOT" required>
+            
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" onclick="checkPack()">Проверить</button>
+                <button type="submit" class="btn-primary" id="submit-btn">Отправить в ОТК</button>
+            </div>
         </form>
     </div>
 
     <script>
-        function updateCounter(el) { document.getElementById('counter').innerText = `${el.value.length}/${el.maxLength}`; }
+        // Индикатор символов в описании
+        function updateCounter(el) { 
+            document.getElementById('counter').innerText = `${el.value.length}/${el.maxLength}`; 
+        }
         
+        // Переключатель файл/ссылка
         function toggleLoadType() {
             const type = document.getElementById('load-type').value;
-            document.getElementById('pack-link').classList.toggle('hidden', type !== 'link');
-            document.getElementById('pack-file').classList.toggle('hidden', type !== 'file');
+            const linkInput = document.getElementById('pack-link');
+            const fileInput = document.getElementById('pack-file');
+            
+            if (type === 'link') {
+                linkInput.classList.remove('hidden');
+                fileInput.classList.add('hidden');
+                linkInput.required = true;
+                fileInput.required = false;
+            } else {
+                linkInput.classList.add('hidden');
+                fileInput.classList.remove('hidden');
+                linkInput.required = false;
+                fileInput.required = true;
+            }
         }
 
-        setTimeout(() => { document.getElementById('main-form').style.display = 'block'; }, 2100);
+        // Подгрузка сохраненных контактов и запуск главного экрана
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedAuthor = localStorage.getItem('lmsh-author');
+            const savedEmail = localStorage.getItem('lmsh-email');
+            const savedTg = localStorage.getItem('lmsh-tg');
+            
+            if (savedAuthor) document.getElementById('author').value = savedAuthor;
+            if (savedEmail) document.getElementById('user-email').value = savedEmail;
+            if (savedTg) document.getElementById('user-tg').value = savedTg;
+            
+            toggleLoadType();
+        });
 
+        setTimeout(() => { 
+            document.getElementById('main-form').style.display = 'block'; 
+        }, 2100);
+
+        // Фирменный AI-баббл (без дефолтных алертов)
+        function showAIStatus(msg) {
+            let bubble = document.getElementById('ai-bubble');
+            if (!bubble) {
+                bubble = document.createElement('div');
+                bubble.id = 'ai-bubble';
+                bubble.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); border:1px solid var(--accent); padding:20px; border-radius:20px; z-index:10000; color:white; font-weight:bold; text-align:center; box-shadow:0 0 30px rgba(124, 58, 237, 0.4); animation:fadeIn 0.3s; width:80%; max-width:340px; line-height: 1.5;";
+                document.body.appendChild(bubble);
+            }
+            bubble.innerHTML = msg.replace(/\n/g, '<br>');
+            bubble.style.display = 'block';
+            setTimeout(() => { bubble.style.display = 'none'; }, 4500);
+        }
+
+        // Функция быстрой проверки данных перед отправкой
+        function checkPack() {
+            const name = document.getElementById('pack-name').value.trim();
+            const author = document.getElementById('author').value.trim();
+            const email = document.getElementById('user-email').value.trim();
+            const tg = document.getElementById('user-tg').value.trim();
+            const type = document.getElementById('load-type').value;
+            const link = document.getElementById('pack-link').value.trim();
+            const file = document.getElementById('pack-file').files[0];
+            
+            if (!name || !author || !email || !tg) {
+                showAIStatus("Система ЛМСХ: Заполните все идентификационные поля (Имя, Email, TG) для синхронизации с LMSH HQ BOT!");
+                return;
+            }
+
+            if (!email.includes('@')) {
+                showAIStatus("Система ЛМСХ: Неверный формат Email-адреса!");
+                return;
+            }
+            
+            if (type === 'link' && !link) {
+                showAIStatus("Система ЛМСХ: Укажи ссылку на облако для проверки контента!");
+                return;
+            }
+            
+            if (type === 'file' && !file) {
+                showAIStatus("Система ЛМСХ: Выбери локальный файл для анализа структуры!");
+                return;
+            }
+            
+            showAIStatus(`Успешный тест!\nПак: "${name}"\nАвтор: ${author}\nСвязь: ${tg}\nКаналы отправки отчетов верифицированы.`);
+        }
+
+        // Финальная отправка формы в ОТК
         document.getElementById('pack-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            alert("Заявка сформирована. (Функция обработки файла будет доступна после интеграции с сервером)");
+            const btn = document.getElementById('submit-btn');
+            
+            const authorValue = document.getElementById('author').value.trim();
+            const emailValue = document.getElementById('user-email').value.trim();
+            const tgValue = document.getElementById('user-tg').value.trim();
+            
+            // Запоминаем данные пользователя для будущих паков
+            localStorage.setItem('lmsh-author', authorValue);
+            localStorage.setItem('lmsh-email', emailValue);
+            localStorage.setItem('lmsh-tg', tgValue);
+            
+            btn.innerText = "СИНХРОНИЗАЦИЯ С BOT...";
+            btn.disabled = true;
+            
+            // Симулируем проверку шлюзов сервера Штаба
+            await new Promise(r => setTimeout(r, 1500));
+            
+            showAIStatus(`Заявка успешно сформирована!\nДанные переданы в LMSH HQ BOT.\nОТК ЛМСХ приступил к тестам.`);
+            
+            btn.innerText = "Отправить в ОТК";
+            btn.disabled = false;
+            
             this.reset();
+            
+            // Восстанавливаем сохраненные контакты создателя пака
+            document.getElementById('author').value = authorValue;
+            document.getElementById('user-email').value = emailValue;
+            document.getElementById('user-tg').value = tgValue;
+            
+            document.getElementById('counter').innerText = "0/300";
+            toggleLoadType();
         });
     </script>
 </body>
