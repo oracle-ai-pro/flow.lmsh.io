@@ -1,10 +1,10 @@
-// sw.js
 self.addEventListener('push', (event) => {
-    // В будущем здесь можно обрабатывать серверные push-уведомления
+    // Резерв для push-сервера
 });
 
 // Слушаем событие клика по уведомлению
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
-    event.waitUntil(clients.openWindow('/')); // Открывает главную страницу
+    // Указываем точный путь к твоей папке на GitHub Pages
+    event.waitUntil(clients.openWindow('/flow.lmsh.io/')); 
 });
