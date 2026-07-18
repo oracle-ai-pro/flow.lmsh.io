@@ -8,27 +8,71 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         .controls { display: flex; gap: 10px; margin-bottom: 20px; }
-        .main-btn { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: 600; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .main-btn { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: 600; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.3s; }
+        .main-btn:hover { background: #e0e0e0; }
+        
+        .req-auth-btn { background: #007bff; color: white; display: none; margin-bottom: 20px; }
+        .req-auth-btn:hover { background: #0056b3; }
+
+        .category-title { width: 340px; margin: 20px 0 5px 0; font-size: 1.1em; color: #444; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        
         .card { background: white; padding: 20px; border-radius: 20px; width: 300px; margin: 10px auto; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .material-symbols-outlined { font-size: 28px; cursor: pointer; color: #6e8efb; }
+        .event-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+        
+        .material-symbols-outlined { font-size: 28px; cursor: pointer; color: #6e8efb; transition: 0.3s; }
         .material-symbols-outlined.active { color: #f44336; }
         .timer-info { font-size: 0.75em; color: #888; margin-top: 5px; }
         input { width: 40px; border: 1px solid #ccc; border-radius: 5px; padding: 2px; text-align: center; }
+        
+        .btn-group { display: flex; gap: 8px; width: 100%; margin-top: 10px; }
+        .action-btn { flex: 1; padding: 8px 10px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85em; transition: 0.2s; text-align: center; text-decoration: none; }
+        .btn-purple { background: #2d1b4e; color: white; }
+        .btn-gray { background: #f0f0f0; color: #333; border: 1px solid #ccc; }
+        .btn-outline-blue { background: #eef6ff; color: #007bff; border: 1px solid #007bff; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .btn-outline-blue:hover { background: #007bff; color: white; }
+        .btn-outline-blue.subscribed { background: #28a745; color: white; border-color: #28a745; }
+
+        .info-section { margin-top: 20px; width: 300px; background: white; padding: 15px; border-radius: 15px; font-size: 0.9em; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
+
+    <!-- Кнопка запроса прав, если они не выданы -->
+    <button id="requestPermissionBtn" class="main-btn req-auth-btn" onclick="requestNotificationPermission()">
+        Разрешить уведомления
+    </button>
 
     <div class="controls">
         <button class="main-btn" onclick="setAll(false)">Отключить все</button>
         <button class="main-btn" onclick="setAll(true)">Включить все</button>
     </div>
 
+    <!-- Категория: События -->
+    <div class="category-title">📅 События</div>
+    <div class="card event-card">
+        <div>
+            <strong style="font-size: 1.05em; color: #2d1b4e;">Скорый выход Traitor Level 2.2 Beta 2</strong>
+            <p style="font-size: 0.85em; color: #555; margin: 8px 0;">Уже через пару дней выходит Traitor Level 2.2 Beta 2 и вы можете к ней подготовиться, сделайте предрегистрацию и приготовьтесь к выходу.</p>
+            <p style="font-size: 0.8em; color: #777; margin: 4px 0;"><i>Выход примерно через пару дней</i></p>
+        </div>
+        <div class="btn-group">
+            <a href="#" class="action-btn btn-purple">Перейти</a>
+            <button class="action-btn btn-gray">Предрегистрация</button>
+            <button id="eventNotifyBtn" class="action-btn btn-outline-blue" onclick="toggleEventSubscription()">
+                <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">notifications</span>
+                <span id="eventNotifyText">Получить уведо...</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Категория: Тест Пуш уведомление -->
+    <div class="category-title">🧪 Тест Пуш уведомление</div>
     <div id="cards-container"></div>
 
-    <div class="info-section" style="margin-top: 20px; width: 300px; background: white; padding: 15px; border-radius: 15px; font-size: 0.9em;">
+    <div class="info-section">
         <details>
             <summary>ℹ️ Как работают уведомления?</summary>
-            <ul>
+            <ul style="padding-left: 20px; margin: 8px 0 0 0;">
                 <li>Разрешите уведомления в браузере.</li>
                 <li>В настройках MIUI: Автозапуск ВКЛ, Контроль активности — Без ограничений.</li>
             </ul>
@@ -45,6 +89,22 @@
 
         const container = document.getElementById('cards-container');
 
+        // Проверка состояния разрешения на пуши при старте
+        function checkPermissionButton() {
+            const btn = document.getElementById('requestPermissionBtn');
+            if (Notification.permission === 'default') {
+                btn.style.display = 'block';
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        function requestNotificationPermission() {
+            Notification.requestPermission().then(() => {
+                checkPermissionButton();
+            });
+        }
+
         function render() {
             container.innerHTML = '';
             members.forEach(member => {
@@ -56,7 +116,7 @@
                     <div class="card" id="card-${member.id}">
                         <div>
                             <strong>${member.name}</strong>
-                            <p style="font-size: 0.8em; color: #666;">${member.role}</p>
+                            <p style="font-size: 0.8em; color: #666; margin: 2px 0;">${member.role}</p>
                             <input type="number" id="input-${member.id}" value="${savedTime}" onchange="updateTime('${member.id}')"> мин
                             <div class="timer-info" id="status-${member.id}">${isActive && alarmTime ? 'Уведомление в: ' + alarmTime : 'Выключено'}</div>
                         </div>
@@ -67,6 +127,19 @@
                     </div>
                 `;
             });
+
+            // Восстановление состояния подписки на событие релиза
+            const eventBtn = document.getElementById('eventNotifyBtn');
+            const eventText = document.getElementById('eventNotifyText');
+            if (localStorage.getItem('sub_traitor_beta2') === 'true') {
+                eventBtn.classList.add('subscribed');
+                eventText.innerText = 'Подписка активна';
+                eventBtn.querySelector('.material-symbols-outlined').innerText = 'notifications_active';
+            } else {
+                eventBtn.classList.remove('subscribed');
+                eventText.innerText = 'Получить уведо...';
+                eventBtn.querySelector('.material-symbols-outlined').innerText = 'notifications';
+            }
         }
 
         function updateTime(id) {
@@ -74,36 +147,73 @@
         }
 
         function toggleNotify(id) {
-            const isActive = document.querySelector(`#card-${id} .material-symbols-outlined`).classList.toggle('active');
+            const icon = document.querySelector(`#card-${id} .material-symbols-outlined`);
             const minutes = document.getElementById('input-' + id).value;
+            const isActive = icon.classList.contains('active');
             
-            if (isActive) {
+            if (!isActive) {
+                icon.classList.add('active');
                 const now = new Date();
                 const alarm = new Date(now.getTime() + minutes * 60000);
                 const timeString = alarm.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 
                 localStorage.setItem('alarm_' + id, timeString);
                 localStorage.setItem('notify_' + id, 'true');
-                document.getElementById('status-' + id).innerText = 'Уведомление в: ' + timeString;
                 
                 setTimeout(() => showNotification("Штаб ЛМСХ", `Время вышло для ${members.find(m => m.id === id).name}!`), minutes * 60000);
             } else {
+                icon.classList.remove('active');
                 localStorage.setItem('notify_' + id, 'false');
-                document.getElementById('status-' + id).innerText = 'Выключено';
             }
-            render(); // Перерисовка для иконок
+            render();
+        }
+
+        function toggleEventSubscription() {
+            if (Notification.permission !== 'granted') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        executeEventSubscription();
+                    }
+                });
+            } else {
+                executeEventSubscription();
+            }
+        }
+
+        function executeEventSubscription() {
+            const isSubscribed = localStorage.getItem('sub_traitor_beta2') === 'true';
+            if (!isSubscribed) {
+                localStorage.setItem('sub_traitor_beta2', 'true');
+                showNotification("Успешная подписка", "Мы уведомим вас о выходе Traitor Level 2.2 Beta 2!");
+            } else {
+                localStorage.setItem('sub_traitor_beta2', 'false');
+            }
+            render();
         }
 
         function showNotification(title, body) {
             if (Notification.permission === 'granted') {
-                new Notification(title, { body });
-            } else {
-                Notification.requestPermission();
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.ready.then(reg => {
+                        reg.showNotification(title, { body });
+                    });
+                } else {
+                    new Notification(title, { body });
+                }
             }
+        }
+
+        function setAll(state) {
+            members.forEach(m => {
+                localStorage.setItem('notify_' + m.id, state);
+                if (!state) localStorage.removeItem('alarm_' + m.id);
+            });
+            render();
         }
 
         // Инициализация
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+        checkPermissionButton();
         render();
     </script>
 </body>
