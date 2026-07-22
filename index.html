@@ -2,33 +2,86 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Official Flow 2.2 | Штаб ЛМСХ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,700,1,0" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMSH Flow 2.5 | Корпоративный ИИ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Material+Symbols+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav id="sidebar">
-        <div class="menu-item" onclick="createNewChat()">
-            <span class="material-symbols-outlined">edit_square</span> 
-            <span>Новый чат</span>
-        </div>
-        <div class="menu-item" onclick="toggleSplitView()">
-            <span class="material-symbols-outlined">splitscreen_landscape_add</span> 
-            <span>Split View</span>
-        </div>
-        <div class="user-footer">
-            <span>Ламирк</span>
-            <span class="material-symbols-outlined">settings</span>
-        </div>
-    </nav>
 
-    <div id="main-container" class="app-grid">
-        <div class="chat-panel" id="chat-left"></div>
-        <div class="chat-panel hidden" id="chat-right"></div>
+    <div class="app-wrapper">
+        <!-- Боковое меню -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Штаб ЛМСХ</h3>
+                <button class="icon-btn" onclick="toggleSidebar()" title="Скрыть боковое меню">
+                    <span class="material-symbols-outlined">menu_open</span>
+                </button>
+            </div>
+            
+            <div id="chat-list">
+                <div class="menu-item active" onclick="switchFlow('default', this)">Общий поток</div>
+            </div>
+
+            <div class="sidebar-bottom">
+                <button class="menu-btn" onclick="window.location.href='settings.html'">
+                    <span class="material-symbols-outlined">settings</span> Настройки
+                </button>
+                <button class="menu-btn primary" onclick="openFlowBuilder()">
+                    <span class="material-symbols-outlined">add_circle</span> Создать Flow
+                </button>
+            </div>
+        </nav>
+
+        <!-- Кнопка вызова меню для мобильных -->
+        <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <span class="material-symbols-outlined">menu</span>
+        </button>
+
+        <!-- Основная область -->
+        <main id="main-container" class="app-grid">
+            <div class="chat-panel" id="chat-left">
+                <div class="chat-messages" id="messages-left">
+                    <!-- Приветственный экран (Welcome Screen) -->
+                    <div id="welcome-screen" class="welcome-container">
+                        <div class="welcome-icon">
+                            <span class="material-symbols-outlined">psychology</span>
+                        </div>
+                        <h2>Начните диалог сейчас</h2>
+                        <p>Штаб ЛМСХ готов к работе. Выберите быстрый запрос или введите команду ниже.</p>
+                        <div class="quick-chips">
+                            <button class="quick-chip" onclick="sendQuickPrompt('Привет')">👋 Привет</button>
+                            <button class="quick-chip" onclick="sendQuickPrompt('Что делаете?')">💡 Что делаете?</button>
+                            <button class="quick-chip" onclick="sendQuickPrompt('Статус систем')">⚡ Статус систем</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-panel hidden" id="chat-right">
+                <div class="chat-messages" id="messages-right"></div>
+            </div>
+        </main>
+
+        <!-- Поле ввода -->
+        <footer class="master-input">
+            <input type="text" id="master-input" placeholder="Введите команду или запрос для ИИ...">
+            <button onclick="handleInput()">
+                <span class="material-symbols-outlined">send</span>
+            </button>
+        </footer>
     </div>
 
-    <div class="master-input">
-        <input type="text" id="master-input" placeholder="[LMSH_FLOW_2.2]: Введите команду для Штаба...">
+    <!-- Модальное окно создания Flow -->
+    <div id="flow-builder-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Создание нового Flow</h2>
+            <input type="text" id="flow-name" placeholder="Название (например: Снежинка)">
+            <textarea id="flow-prompt" placeholder="Системная инструкция..."></textarea>
+            <div class="modal-actions">
+                <button onclick="closeFlowBuilder()">Отмена</button>
+                <button class="primary" onclick="saveCustomFlow()">Сохранить</button>
+            </div>
+        </div>
     </div>
 
     <script src="kombonation.js"></script>
