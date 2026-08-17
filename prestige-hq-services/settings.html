@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prestige HQ | Настройки</title>
+    <!-- Material Symbols Outlined -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        :root {
+            --accent: #ffc107; /* Акцентный цвет по умолчанию */
+            --bg-dark: #050505;
+            --card-bg: #0a0a0a;
+            --border-color: #222;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--bg-dark);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px 20px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* КАРТОЧКА НАСТРОЕК */
+        .settings-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 14px;
+        }
+
+        .card-header .material-symbols-outlined {
+            font-size: 28px;
+            color: var(--accent);
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* ПАЛИТРА ЦВЕТОВ */
+        .color-presets {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .color-swatch {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.15);
+        }
+
+        .color-swatch.active {
+            border-color: #fff;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
+        }
+
+        /* КАСТОМНЫЙ ЦВЕТ */
+        .custom-color-picker {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: 1px solid #333;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: none;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 50%; }
+
+        .custom-color-text {
+            flex: 1;
+            padding: 12px 18px;
+            background: #111;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 50px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .custom-color-text:focus {
+            border-color: var(--accent);
+        }
+
+        /* БЛОК ПРЕДПРОСМОТРА */
+        .preview-box {
+            background: #111;
+            border: 1px solid var(--accent);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.03);
+        }
+
+        .preview-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-badge {
+            background: var(--accent);
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* КНОПКИ */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: filter 0.2s, background-color 0.3s;
+        }
+
+        .btn-save { background: var(--accent); color: #000; }
+        .btn-reset { background: #1a1a1a; color: #888; border: 1px solid #333; }
+        .btn-back { background: #222; color: #ccc; }
+        .btn:hover { filter: brightness(1.2); }
+
+        /* ВСПОМОГАТЕЛЬНОЕ МОДАЛЬНОЕ УВЕДОМЛЕНИЕ (TOAST) */
+        #toast-notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(18, 18, 18, 0.95);
+            border: 1px solid var(--accent);
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        #toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        #toast-icon {
+            font-size: 20px;
+            color: var(--accent);
+        }
+
+        #toast-message {
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="settings-card">
+            <div class="card-header">
+                <span class="material-symbols-outlined">palette</span>
+                <h2>Настройки интерфейса</h2>
+            </div>
+
+            <span class="section-title">Выберите акцентный цвет системы:</span>
+            
+            <!-- ПРЕСЕТЫ ЦВЕТОВ -->
+            <div class="color-presets">
+                <div class="color-swatch" style="background: #ffc107;" data-color="#ffc107"></div>
+                <div class="color-swatch" style="background: #00d2ff;" data-color="#00d2ff"></div>
+                <div class="color-swatch" style="background: #007bff;" data-color="#007bff"></div>
+                <div class="color-swatch" style="background: #28a745;" data-color="#28a745"></div>
+                <div class="color-swatch" style="background: #7C3AED;" data-color="#7C3AED"></div>
+                <div class="color-swatch" style="background: #ff9800;" data-color="#ff9800"></div>
+                <div class="color-swatch" style="background: #dc3545;" data-color="#dc3545"></div>
+            </div>
+
+            <!-- СВОЙ ЦВЕТ -->
+            <span class="section-title">Или укажите свой (HEX):</span>
+            <div class="custom-color-picker">
+                <input type="color" id="picker" value="#ffc107">
+                <input type="text" id="color-hex" class="custom-color-text" value="#ffc107" maxlength="7">
+            </div>
+
+            <!-- ПРЕДПРОСМОРТР -->
+            <span class="section-title">Предпросмотр элементов:</span>
+            <div class="preview-box">
+                <div class="preview-info">
+                    <span class="material-symbols-outlined" style="color: var(--accent);">check_circle</span>
+                    <span style="font-size: 14px;">Пример активной карточки</span>
+                </div>
+                <span class="preview-badge">Акцент</span>
+            </div>
+
+            <!-- КНОПКИ ДЕЙСТВИЙ -->
+            <div class="btn-group">
+                <button class="btn btn-save" onclick="saveSettings()">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
+                    Сохранить настройки
+                </button>
+                <button class="btn btn-reset" onclick="resetSettings()">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">restart_alt</span>
+                    Сбросить по умолчанию
+                </button>
+                <button class="btn btn-back" onclick="location.href='select-service.html'">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+                    Назад на Главную
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ВСПЛЫВАЮЩЕЕ УВЕДОМЛЕНИЕ (TOAST) -->
+    <div id="toast-notification">
+        <span class="material-symbols-outlined" id="toast-icon">check_circle</span>
+        <span id="toast-message">Сообщение сохраненено</span>
+    </div>
+
+    <script>
+        const defaultColor = '#ffc107';
+        let currentColor = defaultColor;
+        let toastTimeout = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedColor = localStorage.getItem('lmsh-accent-color') || defaultColor;
+            applyColor(savedColor);
+
+            // Обработка клика по пресетам
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    const color = swatch.dataset.color;
+                    applyColor(color);
+                });
+            });
+
+            // Обработка встроенного color picker
+            document.getElementById('picker').addEventListener('input', (e) => {
+                applyColor(e.target.value);
+            });
+
+            // Обработка текстового ввода HEX
+            document.getElementById('color-hex').addEventListener('input', (e) => {
+                const val = e.target.value;
+                if (/^#[0-9A-F]{6}$/i.test(val)) {
+                    applyColor(val);
+                }
+            });
+        });
+
+        function applyColor(color) {
+            currentColor = color;
+            document.documentElement.style.setProperty('--accent', color);
+            document.getElementById('picker').value = color;
+            document.getElementById('color-hex').value = color;
+
+            // Обновление выделения среди пресетов
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.classList.toggle('active', swatch.dataset.color.toLowerCase() === color.toLowerCase());
+            });
+        }
+
+        // Функция показа плавного всплывающего уведомления
+        function showToast(text, icon = 'check_circle') {
+            const toast = document.getElementById('toast-notification');
+            const msg = document.getElementById('toast-message');
+            const iconElem = document.getElementById('toast-icon');
+
+            msg.innerText = text;
+            iconElem.innerText = icon;
+
+            toast.classList.add('show');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function saveSettings() {
+            localStorage.setItem('lmsh-accent-color', currentColor);
+            showToast("Настройки успешно сохранены!", "check_circle");
+        }
+
+        function resetSettings() {
+            applyColor(defaultColor);
+            localStorage.setItem('lmsh-accent-color', defaultColor);
+            showToast("Настройки сброшены по умолчанию.", "restart_alt");
+        }
+    </script>
+</body>
+</html>
