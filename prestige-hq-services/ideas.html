@@ -6,45 +6,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <style>
-        :root { --accent: #28a745; --bg: #050505; --card: #0a0a0a; --text: #fff; }
+        :root { --accent: #28a745; --bg: #050505; --card: #0a0a0a; --text: #fff; --border: #222; }
+        * { box-sizing: border-box; }
         body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; }
 
-        /* Живой лоадер */
-        #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; animation: fadeOut 0.3s forwards 2.0s; }
-        .loader-glow { width: 80px; height: 80px; border: 2px solid var(--accent); border-radius: 20px; box-shadow: 0 0 20px rgba(40, 167, 69, 0.5); animation: pulse 1.5s infinite; }
-        .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; }
+        /* Лоадер */
+        #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; animation: fadeOut 0.3s forwards 1.8s; }
+        .loader-glow { width: 70px; height: 70px; border: 2px solid var(--accent); border-radius: 20px; box-shadow: 0 0 20px rgba(40, 167, 69, 0.5); animation: pulse 1.5s infinite; }
+        .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 13px; letter-spacing: 2px; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 
-        /* Форма и контейнер */
-        .container { padding: 40px 20px; max-width: 600px; margin: auto; display: none; }
-        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
+        .container { padding: 24px 20px; max-width: 520px; margin: auto; }
+        .back-btn { background: transparent; color: #888; border: 1px solid #333; padding: 8px 18px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; font-size: 13px; }
         .back-btn:hover { border-color: var(--accent); color: var(--accent); }
         
-        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid #222; color: white; border-radius: 20px; outline: none; transition: 0.3s; box-sizing: border-box; }
+        /* Профиль и конфиденциальность */
+        .user-info-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 20px; }
+        .user-profile-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(40, 167, 69, 0.15); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; }
+        .user-details h4 { margin: 0; font-size: 15px; color: #fff; }
+        .user-details p { margin: 2px 0 0 0; font-size: 12px; color: #888; }
+        .privacy-notice { background: rgba(255, 193, 7, 0.08); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 12px; padding: 10px 14px; font-size: 12px; color: #ffc107; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+
+        /* Поля ввода */
+        label { font-size: 12px; color: #aaa; display: block; margin: 12px 0 4px 6px; }
+        input, textarea, select { width: 100%; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 16px; outline: none; transition: 0.3s; font-family: inherit; font-size: 14px; }
         input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(40, 167, 69, 0.2); }
-        .char-counter { font-size: 12px; color: #666; text-align: right; margin-top: -5px; margin-bottom: 10px; }
+        .char-counter { font-size: 12px; color: #666; text-align: right; margin-top: 4px; }
         
-        /* Двухъядерная панель */
-        .action-bar { display: flex; gap: 10px; margin-top: 10px; }
-        button { border: none; padding: 15px; border-radius: 20px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .action-bar { display: flex; gap: 10px; margin-top: 20px; }
+        button.btn { border: none; padding: 14px; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; }
         .btn-check { background: #1a1a1a; border: 1px solid #444; flex: 1; }
-        .btn-check:hover { border-color: #666; }
+        .btn-check:hover { background: #252525; }
         .btn-send { background: var(--accent); flex: 2; }
         .btn-send:hover { box-shadow: 0 0 15px rgba(40, 167, 69, 0.4); }
 
-        h2 { color: var(--accent); margin-bottom: 20px; }
+        h2 { color: var(--accent); margin: 0 0 15px 0; font-size: 20px; }
 
         /* Секция Топ-3 */
-        .top-ideas { margin-top: 50px; border-top: 1px solid #222; padding-top: 30px; }
-        .top-ideas h3 { color: #fff; display: flex; align-items: center; gap: 10px; }
-        .idea-card { background: #111; border: 1px solid #222; padding: 20px; border-radius: 20px; margin-bottom: 15px; border-left: 4px solid var(--accent); }
-        .idea-card h4 { margin: 0 0 10px 0; display: flex; align-items: center; gap: 8px; color: #fff; }
-        .idea-card p { margin: 0; color: #aaa; font-size: 14px; line-height: 1.5; }
-        .btn-all-ideas { background: transparent; border: 1px dashed var(--accent); color: var(--accent); width: 100%; margin-top: 10px; }
+        .top-ideas { margin-top: 40px; border-top: 1px solid var(--border); padding-top: 24px; }
+        .top-ideas h3 { color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; font-size: 16px; }
+        .idea-card { background: #111; border: 1px solid var(--border); padding: 16px; border-radius: 16px; margin-bottom: 12px; border-left: 4px solid var(--accent); }
+        .idea-card h4 { margin: 0 0 8px 0; display: flex; align-items: center; justify-content: space-between; color: #fff; font-size: 15px; }
+        .idea-card p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.4; }
+        .likes-count { font-size: 12px; color: var(--accent); display: flex; align-items: center; gap: 4px; }
+
+        .btn-all-ideas { background: transparent; border: 1px dashed var(--accent); color: var(--accent); width: 100%; padding: 12px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.3s; }
         .btn-all-ideas:hover { background: rgba(40, 167, 69, 0.1); }
 
+        /* Помощник */
+        .ai-overlay { position: fixed; bottom: 24px; right: 24px; z-index: 900; }
+        #ai-bar { background: #0a0a0a; border: 1px solid var(--accent); padding: 12px; border-radius: 30px; display: flex; align-items: center; gap: 10px; cursor: pointer; color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.7); max-width: 220px; overflow: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #ai-bar.collapsed { max-width: 48px; border-radius: 50%; }
+        #ai-bar .ai-text { font-size: 13px; font-weight: 600; white-space: nowrap; }
+        #ai-bar.collapsed .ai-text { display: none; }
+
+        /* Модальное окно */
+        #custom-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        .modal-card { background: #0a0a0a; border: 1px solid var(--accent); width: 88%; max-width: 360px; padding: 24px; border-radius: 20px; text-align: center; }
+        .modal-card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 18px; }
+        .modal-card p { font-size: 13px; color: #ccc; line-height: 1.5; margin-bottom: 20px; }
+        .modal-card button { width: 100%; padding: 12px; background: var(--accent); border: none; color: white; font-weight: bold; border-radius: 50px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -54,134 +77,233 @@
         <div class="loader-text" id="status-text">ИНИЦИАЛИЗАЦИЯ ИДЕЙ...</div>
     </div>
 
-    <div class="container" id="main-form">
+    <div class="container">
         <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
+
+        <!-- КАРТОЧКА ДАННЫХ И ПРЕДУПРЕЖДЕНИЕ -->
+        <div class="user-info-card">
+            <div class="user-profile-header">
+                <div class="user-avatar" id="avatar-icon">👤</div>
+                <div class="user-details">
+                    <h4 id="display-user-name">Загрузка...</h4>
+                    <p id="display-user-email">...</p>
+                </div>
+            </div>
+            <div class="privacy-notice">
+                <span class="material-symbols-rounded" style="font-size: 18px;">lock</span>
+                <span>Ваши данные используются только для идентификации авторов разработчиками. Третьим лицам не передаются.</span>
+            </div>
+        </div>
+
         <h2>Предложить идею для Штаба</h2>
         
         <form id="idea-form">
-            <input type="text" id="title" placeholder="Название идеи" required>
+            <label>Название идеи</label>
+            <input type="text" id="title" placeholder="Краткое и понятное название" required>
             
-            <textarea id="desc" placeholder="Суть идеи (детально)" rows="4" maxlength="500" oninput="updateCounter(this, 'c1')" required></textarea>
-            <div id="c1" class="char-counter">0/500</div>
-
-            <textarea id="benefit" placeholder="Какую пользу принесет Штабу?" rows="3" maxlength="300" oninput="updateCounter(this, 'c2')" required></textarea>
-            <div id="c2" class="char-counter">0/300</div>
-            
-            <select id="priority">
-                <option value="Низкий">Приоритет: Низкий</option>
-                <option value="Средний" selected>Приоритет: Средний</option>
-                <option value="Высокий">Приоритет: Высокий</option>
+            <label>Сфера применения</label>
+            <select id="category">
+                <option value="Интерфейс / UX">🎨 Интерфейс и Дизайн</option>
+                <option value="Автоматизация">🤖 Автоматизация и Бот</option>
+                <option value="Функционал">⚡ Новый Функционал</option>
+                <option value="Другое">💡 Другое</option>
             </select>
 
-            <input type="text" id="author" placeholder="Ваше имя" required>
-            <input type="email" id="user-email" placeholder="Email для обратной связи" required>
+            <label>Суть идеи (детально)</label>
+            <textarea id="desc" placeholder="Опишите подробности вашей идеи..." rows="4" maxlength="500" oninput="updateCounter(this, 'c1')" required></textarea>
+            <div id="c1" class="char-counter">0/500</div>
+
+            <label>Какую пользу принесет Штабу?</label>
+            <textarea id="benefit" placeholder="Почему это важно и что изменится..." rows="3" maxlength="300" oninput="updateCounter(this, 'c2')" required></textarea>
+            <div id="c2" class="char-counter">0/300</div>
+
+            <label>Ссылка на макет / прототип (опционально)</label>
+            <input type="url" id="link" placeholder="https://figma.com/... или ссылка на скриншот">
+
+            <label>Приоритет реализации</label>
+            <select id="priority">
+                <option value="Низкий">🟢 Низкий</option>
+                <option value="Средний" selected>🟡 Средний</option>
+                <option value="Высокий">🔴 Высокий</option>
+            </select>
 
             <div class="action-bar">
-                <button type="button" class="btn-check" onclick="checkIdea()">Проверить</button>
-                <button type="submit" class="btn-send">Отправить в Штаб</button>
+                <button type="button" class="btn btn-check" onclick="checkIdea()">Проверить</button>
+                <button type="submit" class="btn btn-send">Отправить в Штаб</button>
             </div>
         </form>
 
-        <!-- Блок Топ-3 Идей -->
+        <!-- Динамический Топ Идей -->
         <div class="top-ideas">
-            <h3><span class="material-symbols-rounded">stars</span> Топ инноваций</h3>
-            
-            <div class="idea-card">
-                <h4><span class="material-symbols-rounded" style="color:var(--accent); font-size:18px;">bolt</span> Авто-тестирование форм</h4>
-                <p>Внедрить скрипт, который будет сам проверять отправку данных в ТГ-бота каждую ночь.</p>
-            </div>
-            
-            <div class="idea-card">
-                <h4><span class="material-symbols-rounded" style="color:var(--accent); font-size:18px;">database</span> Локальный архив</h4>
-                <p>Сохранять историю отправленных логов в LocalStorage для быстрого доступа.</p>
-            </div>
-
+            <h3><span class="material-symbols-rounded" style="color:var(--accent);">stars</span> Топ лучших инноваций</h3>
+            <div id="top-ideas-container"></div>
             <button class="btn-all-ideas" onclick="location.href='all-ideas.html'">Посмотреть весь архив</button>
         </div>
     </div>
 
     <!-- AI-Помощник -->
     <div class="ai-overlay">
-        <div id="ai-bar" onclick="checkIdea()" style="position:fixed; bottom:20px; right:20px; background:#0a0a0a; border:1px solid var(--accent); padding:12px 20px; border-radius:30px; display:flex; align-items:center; gap:10px; cursor:pointer; color:white; box-shadow:0 10px 20px rgba(0,0,0,0.5); z-index: 100;">
+        <div id="ai-bar" onclick="toggleAIBar()">
             <span class="material-symbols-rounded">smart_toy</span>
-            <span>Помощник ЛМСХ</span>
+            <span class="ai-text">Помощник ЛМСХ</span>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="custom-modal">
+        <div class="modal-card">
+            <h3 id="modal-title">Уведомление</h3>
+            <p id="modal-msg"></p>
+            <button onclick="closeModal()">Понятно</button>
         </div>
     </div>
 
     <script>
-        // Счетчики символов
+        let userName = "";
+        let userEmail = "";
+
+        // Базовые идеи, если сохранённых нет
+        const defaultIdeas = [
+            { id: 101, title: "Интеграция LocalStorage", author: "Ламирк", date: "2 июля 2026", desc: "Сохранять историю отправленных логов и идей в локальную память браузера.", benefit: "Ускорит работу с архивом в 3 раза.", priority: "Высокий", likes: 12 },
+            { id: 102, title: "Умная валидация Email", author: "Мурзик", date: "1 июля 2026", desc: "Проверка адресов электронной почты от спама.", benefit: "Избавит Штаб от мусорных данных.", priority: "Средний", likes: 8 },
+            { id: 103, title: "Быстрые комментарии", author: "Хахми", date: "30 июня 2026", desc: "Обсуждение предложенных идей прямо в архиве.", benefit: "Улучшит обратную связь от команды.", priority: "Низкий", likes: 5 }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => { document.getElementById('status-text').innerText = 'ПОДКЛЮЧЕНИЕ К КАНАЛУ IDEAS...'; }, 800);
+
+            userName = localStorage.getItem('lmsh-author') || 'Гость';
+            userEmail = localStorage.getItem('lmsh-email') || 'Не указан';
+
+            document.getElementById('display-user-name').innerText = userName;
+            document.getElementById('display-user-email').innerText = userEmail;
+            document.getElementById('avatar-icon').innerText = userName.charAt(0).toUpperCase() || '👤';
+
+            // Автоматическое сворачивание Помощника
+            setTimeout(() => {
+                const aiBar = document.getElementById('ai-bar');
+                if (aiBar) aiBar.classList.add('collapsed');
+            }, 3000);
+
+            renderTopIdeas();
+        });
+
         function updateCounter(el, id) {
             document.getElementById(id).innerText = `${el.value.length}/${el.maxLength}`;
         }
 
-        // Логика загрузки
-        setTimeout(() => { document.getElementById('status-text').innerText = 'ПОДКЛЮЧЕНИЕ К КАНАЛУ IDEAS...'; }, 1000);
-        setTimeout(() => { document.getElementById('main-form').style.display = 'block'; }, 2100);
+        function toggleAIBar() {
+            const aiBar = document.getElementById('ai-bar');
+            if (aiBar.classList.contains('collapsed')) {
+                aiBar.classList.remove('collapsed');
+                setTimeout(() => { aiBar.classList.add('collapsed'); }, 4000);
+            } else {
+                checkIdea();
+            }
+        }
 
-        // Интеллект Помощника
+        function showAIStatus(msg, title = "🤖 Помощник ЛМСХ") {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
+        function renderTopIdeas() {
+            let stored = JSON.parse(localStorage.getItem('hq_ideas')) || defaultIdeas;
+            let likesMap = JSON.parse(localStorage.getItem('idea_likes_count')) || {};
+
+            // Подсчёт лайков
+            stored.forEach(item => {
+                item.currentLikes = likesMap[item.id] !== undefined ? likesMap[item.id] : (item.likes || 0);
+            });
+
+            // Сортировка по лайкам (самые популярные наверх)
+            stored.sort((a, b) => b.currentLikes - a.currentLikes);
+
+            const topContainer = document.getElementById('top-ideas-container');
+            topContainer.innerHTML = '';
+
+            stored.slice(0, 3).forEach(idea => {
+                topContainer.innerHTML += `
+                    <div class="idea-card">
+                        <h4>
+                            <span>${idea.title}</span>
+                            <span class="likes-count"><span class="material-symbols-rounded" style="font-size:16px;">thumb_up</span> ${idea.currentLikes}</span>
+                        </h4>
+                        <p>${idea.desc}</p>
+                    </div>
+                `;
+            });
+        }
+
         async function checkIdea() {
-            const author = document.getElementById('author').value.trim();
             const title = document.getElementById('title').value.trim();
             const desc = document.getElementById('desc').value.trim();
             const benefit = document.getElementById('benefit').value.trim();
-	    const email = document.getElementById('user-email').value.trim();
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             
-            showAIStatus("Оценка инновационного потенциала...");
-            await new Promise(r => setTimeout(r, 1500));
-
-            const name = author || "Шеф";
-            
-	    if (!emailRegex.test(email)) {
-        showAIStatus("Шеф, кажется, в адресе почты ошибка. Проверь синтаксис!");
-        return;
-    }
+            showAIStatus("Оценка инновационного потенциала...", "🔍 Анализ");
+            await new Promise(r => setTimeout(r, 1000));
 
             if (title.length < 5 || desc.length < 20 || benefit.length < 10) {
-                showAIStatus(`${name}, идея выглядит сыровато. Добавь конкретики в суть и пользу!`);
+                showAIStatus(`${userName}, идея выглядит недостаточно описанной. Добавьте деталей в суть и пользу!`, "⚠️ Нужны подробности");
             } else {
-                showAIStatus(`${name}, отличный инженерный набросок! Идея готова к отправке.`);
+                showAIStatus(`${userName}, отличный проект! Идея полностью готова к отправке.`, "✅ Все готово");
             }
         }
 
-        function showAIStatus(msg) {
-            let bubble = document.getElementById('ai-bubble');
-            if (!bubble) {
-                bubble = document.createElement('div');
-                bubble.id = 'ai-bubble';
-                bubble.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); border:1px solid var(--accent); padding:20px; border-radius:20px; z-index:10000; color:white; font-weight:bold; text-align:center; box-shadow:0 0 30px rgba(40,167,69,0.4); animation:fadeIn 0.3s; width:80%; max-width:320px;";
-                document.body.appendChild(bubble);
-            }
-            bubble.innerText = msg;
-            bubble.style.display = 'block';
-            setTimeout(() => { bubble.style.display = 'none'; }, 4000);
-        }
-
-        // Отправка в Штаб
         document.getElementById('idea-form').addEventListener('submit', async function(e) {
             e.preventDefault();
+
+            const title = document.getElementById('title').value.trim();
+            const category = document.getElementById('category').value;
+            const desc = document.getElementById('desc').value.trim();
+            const benefit = document.getElementById('benefit').value.trim();
+            const link = document.getElementById('link').value.trim();
+            const priority = document.getElementById('priority').value;
+
             const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
             const chatId = "5365364862";
             
-            const text = `💡 *Новая идея для ЛМСХ*\n\n📌 *Название:* ${document.getElementById('title').value}\n👤 *Автор:* ${document.getElementById('author').value}\n📧 *Email:* ${document.getElementById('user-email').value}\n📝 *Суть:* ${document.getElementById('desc').value}\n🚀 *Польза:* ${document.getElementById('benefit').value}\n⭐ *Приоритет:* ${document.getElementById('priority').value}`;
+            const telegramMsg = `💡 *Новая идея в Штабе*\n\n📌 *Название:* ${title}\n👤 *Автор:* ${userName} (${userEmail})\n🏷️ *Сфера:* ${category}\n📝 *Суть:* ${desc}\n🚀 *Польза:* ${benefit}${link ? `\n🔗 *Макет:* ${link}` : ''}\n⭐ *Приоритет:* ${priority}`;
             
             try {
                 const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
+                    body: JSON.stringify({ chat_id: chatId, text: telegramMsg, parse_mode: 'Markdown' })
                 });
                 
                 if(res.ok) { 
-                    showAIStatus("Инновация успешно зарегистрирована в Штабе!");
+                    // Сохранение новой идеи локально
+                    let stored = JSON.parse(localStorage.getItem('hq_ideas')) || defaultIdeas;
+                    const newIdea = {
+                        id: Date.now(),
+                        title: title,
+                        author: userName,
+                        date: new Date().toLocaleDateString('ru-RU'),
+                        desc: desc,
+                        benefit: benefit,
+                        priority: priority,
+                        likes: 0,
+                        comments: []
+                    };
+                    stored.unshift(newIdea);
+                    localStorage.setItem('hq_ideas', JSON.stringify(stored));
+
+                    showAIStatus("Инновация успешно зарегистрирована в Штабе!", "🎉 Отправлено");
                     this.reset();
                     document.getElementById('c1').innerText = "0/500";
                     document.getElementById('c2').innerText = "0/300";
+                    renderTopIdeas();
                 } else { 
-                    showAIStatus("Ошибка связи со Штабом."); 
+                    showAIStatus("Ошибка связи со Штабом.", "❌ Ошибка"); 
                 }
             } catch(err) { 
-                showAIStatus("Критическая ошибка соединения."); 
+                showAIStatus("Ошибка соединения при отправке.", "❌ Ошибка сети"); 
             }
         });
     </script>
