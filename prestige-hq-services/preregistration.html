@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prestige HQ | Kosmo Level UI2 Preregistration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
+    <style>
+        :root { 
+            --accent: #8e8e93; 
+            --accent-glow: #007aff; 
+            --bg: #121212; 
+            --card: #1c1c1e; 
+            --card-secondary: #2c2c2e;
+            --text: #ffffff; 
+            --border: #3a3a3c; 
+            --cancel: #ff453a;
+        }
+        * { box-sizing: border-box; }
+        body { 
+            margin: 0; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+            padding-bottom: 80px; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Лоадер */
+        #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0a0a0c; animation: fadeOut 0.3s forwards 1.8s; }
+        .loader-glow { width: 70px; height: 70px; border: 2px solid var(--accent-glow); border-radius: 20px; box-shadow: 0 0 20px rgba(0, 122, 255, 0.5); animation: pulse 1.5s infinite; }
+        .loader-text { margin-top: 20px; color: var(--accent-glow); font-family: monospace; font-size: 13px; letter-spacing: 2px; }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+        .container { padding: 24px 20px; max-width: 480px; width: 100%; margin: auto; transition: 0.4s ease; }
+        .back-btn { background: transparent; color: #aaa; border: 1px solid var(--border); padding: 8px 18px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; font-size: 13px; }
+        .back-btn:hover { border-color: var(--accent-glow); color: var(--accent-glow); }
+
+        /* Профиль и карточка пользователя */
+        .user-info-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .user-profile-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .user-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--card-secondary); border: 1px solid var(--accent-glow); display: flex; align-items: center; justify-content: center; color: var(--accent-glow); font-weight: bold; font-size: 18px; }
+        .user-details h4 { margin: 0; font-size: 15px; color: #fff; }
+        .user-details p { margin: 2px 0 0 0; font-size: 12px; color: #aaa; }
+        
+        .privacy-notice { background: rgba(0, 122, 255, 0.08); border: 1px solid rgba(0, 122, 255, 0.25); border-radius: 12px; padding: 10px 14px; font-size: 12px; color: #64d2ff; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+
+        /* Баннер пака */
+        .pack-info-card { background: linear-gradient(135deg, #1c1c1e, #2c2c2e); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; position: relative; overflow: hidden; }
+        .pack-badge { position: absolute; top: 12px; right: 12px; background: rgba(0, 122, 255, 0.15); border: 1px solid var(--accent-glow); color: var(--accent-glow); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; }
+        .pack-info-card h3 { margin: 0 0 8px 0; color: #fff; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .pack-info-card p { margin: 0; font-size: 12px; color: #8e8e93; line-height: 1.4; }
+
+        h2 { color: #fff; margin: 0 0 15px 0; font-size: 20px; text-align: center; font-weight: 600; }
+
+        /* Элементы формы */
+        label { font-size: 12px; color: #8e8e93; display: block; margin: 12px 0 6px 6px; }
+        input, textarea, select { width: 100%; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 16px; outline: none; transition: 0.3s; font-family: inherit; font-size: 14px; }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent-glow); box-shadow: 0 0 12px rgba(0, 122, 255, 0.25); }
+        
+        .cancel-mode input:focus, .cancel-mode textarea:focus { border-color: var(--cancel); box-shadow: 0 0 12px rgba(255, 69, 58, 0.25); }
+
+        .checkbox-container { display: flex; align-items: flex-start; margin: 15px 0; cursor: pointer; font-size: 12px; color: #aaa; gap: 10px; user-select: none; line-height: 1.4; }
+        .checkbox-container input { width: auto; margin: 2px 0 0 0; accent-color: var(--cancel); }
+
+        /* Панель действий */
+        .action-bar { display: flex; gap: 10px; margin-top: 20px; }
+        button.btn { border: none; padding: 14px; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .btn-check { background: var(--card-secondary); border: 1px solid var(--border); flex: 1; }
+        .btn-check:hover { background: #3a3a3c; }
+        .btn-send { background: linear-gradient(135deg, #007aff, #0056b3); flex: 2; box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3); }
+        .btn-send:hover { filter: brightness(1.15); }
+
+        .btn-cancel { background: linear-gradient(135deg, #ff453a, #c62828); flex: 2; box-shadow: 0 4px 15px rgba(255, 69, 58, 0.3); }
+        .btn-cancel:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
+
+        .mode-switcher { text-align: center; margin-top: 20px; font-size: 13px; }
+        .mode-switcher a { color: var(--accent-glow); text-decoration: none; border-bottom: 1px dashed var(--accent-glow); cursor: pointer; transition: 0.2s; }
+        .cancel-mode .mode-switcher a { color: var(--cancel); border-color: var(--cancel); }
+
+        /* Помощник ЛМСХ */
+        .ai-overlay { position: fixed; bottom: 24px; right: 24px; z-index: 900; }
+        #ai-bar { background: var(--card); border: 1px solid var(--accent-glow); padding: 12px; border-radius: 30px; display: flex; align-items: center; gap: 10px; cursor: pointer; color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.7); max-width: 220px; overflow: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #ai-bar.collapsed { max-width: 48px; border-radius: 50%; }
+        #ai-bar .ai-text { font-size: 13px; font-weight: 600; white-space: nowrap; }
+        #ai-bar.collapsed .ai-text { display: none; }
+
+        /* Модальное окно */
+        #custom-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        .modal-card { background: var(--card); border: 1px solid var(--accent-glow); width: 88%; max-width: 360px; padding: 24px; border-radius: 20px; text-align: center; }
+        .modal-card h3 { margin: 0 0 10px 0; color: var(--accent-glow); font-size: 18px; }
+        .modal-card p { font-size: 13px; color: #ccc; line-height: 1.5; margin-bottom: 20px; }
+        .modal-card button { width: 100%; padding: 12px; background: var(--accent-glow); border: none; color: white; font-weight: bold; border-radius: 50px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="lmsh-loader">
+        <div class="loader-glow"></div>
+        <div class="loader-text" id="status-text">ПОДКЛЮЧЕНИЕ К KOSMO UI2...</div>
+    </div>
+
+    <div class="container" id="main-container">
+        <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
+
+        <!-- КАРТОЧКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ -->
+        <div class="user-info-card">
+            <div class="user-profile-header">
+                <div class="user-avatar" id="avatar-icon">👤</div>
+                <div class="user-details">
+                    <h4 id="display-user-name">Загрузка...</h4>
+                    <p id="display-user-email">...</p>
+                </div>
+            </div>
+            <div class="privacy-notice">
+                <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
+                <span>Аккаунт привязан. Уведомления о выходе пака придут прямо в Штаб ЛМСХ.</span>
+            </div>
+        </div>
+
+        <!-- КАРТОЧКА ПАКА -->
+        <div class="pack-info-card">
+            <span class="pack-badge">Скоро в HQ</span>
+            <h3><span class="material-symbols-rounded" style="color:var(--accent-glow);">rocket_launch</span> Kosmo Level UI2</h3>
+            <p>Эксклюзивный графический пак интерфейсов нового поколения для проектов Prestige HQ. Забронируйте доступ до официального релиза.</p>
+        </div>
+
+        <!-- РЕЖИМ ПРЕДРЕГИСТРАЦИИ -->
+        <div id="reg-section">
+            <h2>Предрегистрация 🚀</h2>
+            
+            <form id="form-reg">
+                <label>Периодичность напоминаний</label>
+                <select id="reg-period">
+                    <option value="Раз в неделю">Раз в неделю</option>
+                    <option value="Раз в 2 недели" selected>Раз в 2 недели</option>
+                    <option value="Только к релизу">Только к официальному релизу</option>
+                </select>
+
+                <label>Роль участия</label>
+                <select id="reg-role">
+                    <option value="Early Access VIP">⭐ Early Access VIP (Ранний доступ)</option>
+                    <option value="Тестировщик UI">🧪 Тестировщик интерфейсов</option>
+                    <option value="Наблюдатель">👀 Наблюдатель</option>
+                </select>
+
+                <label>Комментарий / Пожелания Штабу (Опционально)</label>
+                <textarea id="reg-reason" placeholder="Ваши идеи или ожидания от пака..."></textarea>
+
+                <div class="action-bar">
+                    <button type="button" class="btn btn-check" onclick="checkForm()">Проверить</button>
+                    <button type="submit" class="btn btn-send" id="btn-submit-reg">Забронировать</button>
+                </div>
+            </form>
+
+            <div class="mode-switcher">
+                <a onclick="switchMode('cancel')">Нужно отменить предрегистрацию?</a>
+            </div>
+        </div>
+
+        <!-- РЕЖИМ ОТМЕНЫ -->
+        <div id="cancel-section" style="display: none;">
+            <h2 style="color:var(--cancel);">Отмена брони ⚠️</h2>
+            
+            <form id="form-cancel">
+                <label>Причина отмены (Опционально)</label>
+                <textarea id="cancel-reason" placeholder="Укажите, почему решили отказаться..."></textarea>
+
+                <label class="checkbox-container">
+                    <input type="checkbox" id="cancel-agree" onchange="toggleCancelBtn(this)">
+                    <span>Я понимаю, что напоминания прекратятся, и ранний доступ к Kosmo Level UI2 будет аннулирован.</span>
+                </label>
+
+                <div class="action-bar">
+                    <button type="submit" class="btn btn-cancel" id="cancel-submit-btn" disabled>Отменить бронь</button>
+                </div>
+            </form>
+
+            <div class="mode-switcher">
+                <a onclick="switchMode('reg')">Вернуться к предрегистрации</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI-Помощник -->
+    <div class="ai-overlay">
+        <div id="ai-bar" onclick="toggleAIBar()">
+            <span class="material-symbols-rounded" style="color:var(--accent-glow);">smart_toy</span>
+            <span class="ai-text">Помощник ЛМСХ</span>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="custom-modal">
+        <div class="modal-card">
+            <h3 id="modal-title">Уведомление</h3>
+            <p id="modal-msg"></p>
+            <button onclick="closeModal()">Понятно</button>
+        </div>
+    </div>
+
+    <script>
+        let userName = "";
+        let userEmail = "";
+        let currentMode = 'reg';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => { document.getElementById('status-text').innerText = 'СИНХРОНИЗАЦИЯ ПРОФИЛЯ...'; }, 800);
+
+            userName = localStorage.getItem('lmsh-author') || 'Гость';
+            userEmail = localStorage.getItem('lmsh-email') || 'Не указан';
+
+            document.getElementById('display-user-name').innerText = userName;
+            document.getElementById('display-user-email').innerText = userEmail;
+            document.getElementById('avatar-icon').innerText = userName.charAt(0).toUpperCase() || '👤';
+
+            // Авто-сворачивание Помощника
+            setTimeout(() => {
+                const aiBar = document.getElementById('ai-bar');
+                if (aiBar) aiBar.classList.add('collapsed');
+            }, 3000);
+        });
+
+        function switchMode(targetMode) {
+            if (targetMode === currentMode) return;
+
+            const container = document.getElementById('main-container');
+            if (targetMode === 'cancel') {
+                document.getElementById('reg-section').style.display = 'none';
+                document.getElementById('cancel-section').style.display = 'block';
+                container.classList.add('cancel-mode');
+                currentMode = 'cancel';
+            } else {
+                document.getElementById('cancel-section').style.display = 'none';
+                document.getElementById('reg-section').style.display = 'block';
+                container.classList.remove('cancel-mode');
+                currentMode = 'reg';
+            }
+        }
+
+        function toggleCancelBtn(checkbox) {
+            document.getElementById('cancel-submit-btn').disabled = !checkbox.checked;
+        }
+
+        function toggleAIBar() {
+            const aiBar = document.getElementById('ai-bar');
+            if (aiBar.classList.contains('collapsed')) {
+                aiBar.classList.remove('collapsed');
+                setTimeout(() => { aiBar.classList.add('collapsed'); }, 4000);
+            } else {
+                checkForm();
+            }
+        }
+
+        function showAIStatus(msg, title = "🤖 Помощник ЛМСХ") {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
+        async function checkForm() {
+            showAIStatus("Проверка статуса подключения к базе Kosmo UI2...", "🔍 Анализ");
+            await new Promise(r => setTimeout(r, 800));
+
+            if (currentMode === 'reg') {
+                const role = document.getElementById('reg-role').value;
+                showAIStatus(`${userName}, вы выбрали роль "${role}". Данные полностью готовы к отправке в Штаб!`, "✅ Всё готово");
+            } else {
+                showAIStatus(`${userName}, убедитесь, что вы подтвердили согласие галочкой для отмены брони.`, "⚠️ Проверка отмены");
+            }
+        }
+
+        // Отправка предрегистрации
+        document.getElementById('form-reg').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit-reg');
+            btn.disabled = true;
+            btn.innerText = "Регистрация...";
+
+            const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
+            const chatId = "5365364862";
+            
+            const period = document.getElementById('reg-period').value;
+            const role = document.getElementById('reg-role').value;
+            const reason = document.getElementById('reg-reason').value.trim() || "Без комментария";
+
+            const msg = `🚀 *Новая предрегистрация: Kosmo Level UI2*\n\n👤 *Пользователь:* ${userName} (${userEmail})\n🏷️ *Роль:* ${role}\n⏳ *Напоминания:* ${period}\n💬 *Комментарий:* ${reason}`;
+
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'Markdown' })
+                });
+
+                if (res.ok) {
+                    showAIStatus("Предрегистрация на пак Kosmo Level UI2 успешно оформлена!", "🎉 Забронировано");
+                    this.reset();
+                } else {
+                    showAIStatus("Ошибка записи в Штабе.", "❌ Ошибка");
+                }
+            } catch (err) {
+                showAIStatus("Ошибка сети при отправке данных.", "❌ Ошибка сети");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Забронировать";
+            }
+        });
+
+        // Отправка отмены
+        document.getElementById('form-cancel').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('cancel-submit-btn');
+            btn.disabled = true;
+            btn.innerText = "Отмена...";
+
+            const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
+            const chatId = "5365364862";
+            
+            const reason = document.getElementById('cancel-reason').value.trim() || "Причина не указана";
+
+            const msg = `⚠️ *Отмена предрегистрации: Kosmo Level UI2*\n\n👤 *Пользователь:* ${userName} (${userEmail})\n❌ *Статус:* Запрос аннулирован\n💬 *Причина:* ${reason}`;
+
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'Markdown' })
+                });
+
+                if (res.ok) {
+                    showAIStatus("Бронь успешно отменена.", "🗑️ Удалено");
+                    this.reset();
+                    document.getElementById('cancel-agree').checked = false;
+                } else {
+                    showAIStatus("Ошибка связи со Штабом.", "❌ Ошибка");
+                }
+            } catch (err) {
+                showAIStatus(" Ошибка соединения при отправке.", "❌ Ошибка сети");
+            } finally {
+                btn.innerText = "Отменить бронь";
+            }
+        });
+    </script>
+</body>
+</html>
