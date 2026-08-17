@@ -2,31 +2,248 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <title>Prestige HQ | Вопросы</title>
     <style>
-        :root { --accent: #007bff; --bg: #050505; --card: #0a0a0a; --text: #fff; }
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; }
+        :root { 
+            --accent: #007bff; 
+            --bg: #050505; 
+            --card: #0a0a0a; 
+            --text: #fff; 
+            --border: #222;
+        }
+
+        * { box-sizing: border-box; }
+
+        body { 
+            margin: 0; 
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', sans-serif; 
+            padding-bottom: 80px;
+        }
 
         /* Лоадер */
-        #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; animation: fadeOut 0.5s forwards 2.0s; }
+        #lmsh-loader { 
+            position: fixed; 
+            inset: 0; 
+            z-index: 9999; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            background: #000; 
+            animation: fadeOut 0.5s forwards 1.8s; 
+        }
         .loader-box { width: 60px; height: 60px; border: 2px solid var(--accent); border-radius: 15px; animation: pulse 1.5s infinite; }
         .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 12px; letter-spacing: 2px; }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 
-        .container { padding: 40px 20px; max-width: 500px; margin: auto; }
-        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid #222; color: white; border-radius: 20px; outline: none; box-sizing: border-box; }
+        .container { padding: 24px 20px; max-width: 520px; margin: auto; }
 
-        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
+        .back-btn { 
+            background: transparent; 
+            color: #888; 
+            border: 1px solid #333; 
+            padding: 8px 18px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            margin-bottom: 20px; 
+            transition: 0.3s; 
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
         .back-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-        .action-bar { display: flex; gap: 10px; margin-top: 20px; }
-        button { border: none; padding: 15px; border-radius: 20px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        /* ВЕРХНЯЯ КАРТОЧКА И ПРЕДУПРЕЖДЕНИЕ */
+        .user-info-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .user-profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(0, 123, 255, 0.15);
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .user-details h4 { margin: 0; font-size: 15px; color: #fff; }
+        .user-details p { margin: 2px 0 0 0; font-size: 12px; color: #888; }
+
+        .privacy-notice {
+            background: rgba(255, 193, 7, 0.08);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #ffc107;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.4;
+        }
+
+        /* ФОРМА */
+        .form-title {
+            font-size: 20px;
+            margin: 0 0 15px 0;
+            color: #fff;
+        }
+
+        label {
+            font-size: 12px;
+            color: #aaa;
+            display: block;
+            margin: 12px 0 4px 6px;
+        }
+
+        input, textarea, select { 
+            width: 100%; 
+            padding: 14px 16px; 
+            background: var(--card); 
+            border: 1px solid var(--border); 
+            color: white; 
+            border-radius: 16px; 
+            outline: none; 
+            box-sizing: border-box; 
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent);
+        }
+
+        .action-bar { display: flex; gap: 10px; margin-top: 24px; }
+        
+        button.btn { 
+            border: none; 
+            padding: 14px; 
+            border-radius: 50px; 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-size: 14px;
+        }
+
         .btn-send { background: var(--accent); flex: 2; }
+        .btn-send:hover { filter: brightness(1.2); }
         .btn-check { background: #1a1a1a; border: 1px solid #444; flex: 1; }
+        .btn-check:hover { background: #252525; }
+
+        /* ПОМОЩНИК С АНИМАЦИЕЙ СВОРАЧИВАНИЯ */
+        .ai-overlay {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 900;
+        }
+
+        #ai-bar {
+            background: #0a0a0a;
+            border: 1px solid var(--accent);
+            padding: 12px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            white-space: nowrap;
+            max-width: 220px;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #ai-bar.collapsed {
+            max-width: 48px;
+            padding: 12px;
+            border-radius: 50%;
+        }
+
+        #ai-bar .ai-text {
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        #ai-bar.collapsed .ai-text {
+            opacity: 0;
+            width: 0;
+            display: none;
+        }
+
+        /* КАСТОМНОЕ МОДАЛЬНОЕ ОКНО (ВМЕСТО ALERT) */
+        #custom-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .modal-card {
+            background: #0a0a0a;
+            border: 1px solid var(--accent);
+            width: 88%;
+            max-width: 360px;
+            padding: 24px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 123, 255, 0.2);
+        }
+
+        .modal-card h3 {
+            margin: 0 0 10px 0;
+            color: var(--accent);
+            font-size: 18px;
+        }
+
+        .modal-card p {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .modal-card button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            border: none;
+            color: white;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -37,76 +254,167 @@
     </div>
 
     <div class="container">
-	<button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
-        <h2>Новый Вопрос</h2>
+        <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
+
+        <!-- КАРТОЧКА ДАННЫХ И ПРЕДУПРЕЖДЕНИЕ -->
+        <div class="user-info-card">
+            <div class="user-profile-header">
+                <div class="user-avatar" id="avatar-icon">👤</div>
+                <div class="user-details">
+                    <h4 id="display-user-name">Загрузка...</h4>
+                    <p id="display-user-email">...</p>
+                </div>
+            </div>
+            <div class="privacy-notice">
+                <span class="material-symbols-rounded" style="font-size: 18px;">lock</span>
+                <span>Ваши данные используются исключительно для идентифицирования обращений разработчиками. Третьим лицам они недоступны.</span>
+            </div>
+        </div>
+
+        <h2 class="form-title">Новый Вопрос</h2>
+
         <form id="form-data">
-            <input type="text" id="user-name" placeholder="Ваше имя" required>
+            <label>Тип обращения</label>
             <select id="type-select">
-                <option value="Вопрос">Вопрос</option>
-                <option value="Проблема">Проблема</option>
+                <option value="Вопрос">Вопрос по функционалу</option>
+                <option value="Проблема">Техническая проблема / Баг</option>
+                <option value="Консультация">Консультация</option>
             </select>
-            <textarea id="q-text" placeholder="Опишите суть вопроса или проблему..." rows="5"></textarea>
-            
+
+            <label>Приоритет</label>
+            <select id="priority-select">
+                <option value="Обычный">🟢 Обычный</option>
+                <option value="Средний">🟡 Средний</option>
+                <option value="Высокий">🔴 Высокий / Срочно</option>
+            </select>
+
+            <label>Суть вопроса или проблема</label>
+            <textarea id="q-text" placeholder="Опишите подробно вашу проблему или вопрос..." rows="5" required></textarea>
+
+            <label>Ссылка на скриншот / доп. материалы (опционально)</label>
+            <input type="url" id="link-input" placeholder="https://imgur.com/...">
+
             <div class="action-bar">
-                <button type="button" class="btn-check" onclick="checkFields()">Проверить</button>
-                <button type="submit" class="btn-send">Отправить</button>
+                <button type="button" class="btn btn-check" onclick="checkFields()">Проверить</button>
+                <button type="submit" class="btn btn-send">Отправить</button>
             </div>
         </form>
     </div>
 
+    <!-- ПОМОЩНИК ЛМСХ -->
     <div class="ai-overlay">
-        <div id="ai-bar" onclick="checkFields()" style="position:fixed; bottom:20px; right:20px; background:#0a0a0a; border:1px solid #007bff; padding:12px 20px; border-radius:30px; display:flex; align-items:center; gap:10px; cursor:pointer; color:white; box-shadow:0 10px 20px rgba(0,0,0,0.5);">
+        <div id="ai-bar" onclick="toggleAIBar()">
             <span class="material-symbols-rounded">smart_toy</span>
-            <span>Помощник ЛМСХ</span>
+            <span class="ai-text">Помощник ЛМСХ</span>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div id="custom-modal">
+        <div class="modal-card">
+            <h3 id="modal-title">Уведомление</h3>
+            <p id="modal-msg"></p>
+            <button onclick="closeModal()">Понятно</button>
         </div>
     </div>
         
     <script>
-        setTimeout(() => { document.querySelector('.loader-text').innerText = 'Подключение'; }, 1000);
+        let userName = "";
+        let userEmail = "";
 
-        async function checkFields() {
-            const name = document.getElementById('user-name').value.trim();
-            const text = document.getElementById('q-text').value.trim();
-            
-            showAIStatus("Анализ данных в Штабе...");
-            await new Promise(resolve => setTimeout(resolve, 1500));
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => { document.querySelector('.loader-text').innerText = 'Подключение...'; }, 800);
 
-            const displayName = name || "У вас";
-            if (text.length < 15) {
-                showAIStatus(`${displayName}, описание слишком короткое. Добавьте деталей, чтобы я понял проблему!`);
+            // Загрузка данных пользователя
+            userName = localStorage.getItem('lmsh-author') || 'Гость';
+            userEmail = localStorage.getItem('lmsh-email') || 'Не указан';
+
+            document.getElementById('display-user-name').innerText = userName;
+            document.getElementById('display-user-email').innerText = userEmail;
+            document.getElementById('avatar-icon').innerText = userName.charAt(0).toUpperCase() || '👤';
+
+            // Автоматическое сворачивание "Помощник ЛМСХ" через 3 секунды
+            setTimeout(() => {
+                const aiBar = document.getElementById('ai-bar');
+                if (aiBar) {
+                    aiBar.classList.add('collapsed');
+                }
+            }, 3000);
+        });
+
+        // Разворачивание / Сворачивание при клике
+        function toggleAIBar() {
+            const aiBar = document.getElementById('ai-bar');
+            if (aiBar.classList.contains('collapsed')) {
+                aiBar.classList.remove('collapsed');
+                setTimeout(() => { aiBar.classList.add('collapsed'); }, 4000);
             } else {
-                showAIStatus(`${displayName}, всё чисто! Ваши Данные готовы к отправке.`);
+                checkFields();
             }
         }
 
-        function showAIStatus(msg) {
-            let bubble = document.getElementById('ai-bubble');
-            if (!bubble) {
-                bubble = document.createElement('div');
-                bubble.id = 'ai-bubble';
-                bubble.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.9); border:1px solid #007bff; padding:20px; border-radius:20px; z-index:10000; color:white; font-weight:bold; text-align:center; box-shadow:0 0 20px #007bff; animation:fadeIn 0.3s; width:80%; max-width:300px;";
-                document.body.appendChild(bubble);
+        // Кастомные модальные уведомления вместо alert
+        function showAIStatus(msg, title = "🤖 Помощник ЛМСХ") {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
+        async function checkFields() {
+            const text = document.getElementById('q-text').value.trim();
+            
+            showAIStatus("Анализ заполнения формы...", "🔍 Проверка");
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            if (text.length < 15) {
+                showAIStatus(`${userName}, описание слишком короткое (менее 15 символов). Добавьте подробностей!`, "⚠️ Замечание");
+            } else {
+                showAIStatus(`${userName}, обращение составлено корректно и готово к отправке.`, "✅ Все отлично");
             }
-            bubble.innerText = msg;
-            bubble.style.display = 'block';
-            setTimeout(() => { bubble.style.display = 'none'; }, 4000);
         }
 
         document.getElementById('form-data').addEventListener('submit', async (e) => {
             e.preventDefault();
+
+            const type = document.getElementById('type-select').value;
+            const priority = document.getElementById('priority-select').value;
+            const text = document.getElementById('q-text').value.trim();
+            const link = document.getElementById('link-input').value.trim();
+
             const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
             const chatId = "5365364862";
-            const text = `📬 *Новое обращение ЛМСХ*\n👤 Имя: ${document.getElementById('user-name').value}\n📋 Тип: ${document.getElementById('type-select').value}\n📝 Описание: ${document.getElementById('q-text').value}`;
+
+            const telegramMsg = `📬 *Новый Вопрос в Штабе*\n\n👤 *От:* ${userName} (${userEmail})\n📋 *Тип:* ${type}\n🚨 *Приоритет:* ${priority}\n📝 *Текст:* ${text}${link ? `\n🔗 *Ссылка:* ${link}` : ''}`;
             
-            const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
-            });
-            
-            if(res.ok) { 
-                showAIStatus("Сообщение отправлено");
-                document.getElementById('form-data').reset();
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: telegramMsg, parse_mode: 'Markdown' })
+                });
+
+                if (res.ok) {
+                    // Сохранение в истории локально для отображения в you.html
+                    const userPosts = JSON.parse(localStorage.getItem('lmsh-user-posts')) || [];
+                    userPosts.unshift({
+                        id: Date.now(),
+                        type: `Вопрос (${type})`,
+                        text: text,
+                        date: new Date().toLocaleDateString('ru-RU')
+                    });
+                    localStorage.setItem('lmsh-user-posts', JSON.stringify(userPosts));
+
+                    showAIStatus("Ваше обращение успешно отправлено разработчикам!", "🎉 Отправлено");
+                    document.getElementById('form-data').reset();
+                } else {
+                    showAIStatus("Ошибка отправки сообщения. Попробуйте позже.", "❌ Ошибка");
+                }
+            } catch (err) {
+                showAIStatus("Не удалось связаться с сервером Telegram.", "❌ Ошибка сети");
             }
         });
     </script>
