@@ -3,265 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Create a Review Pack | Prestige HQ</title>
+    <title>Prestige HQ | Оценить пак Early Access</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <style>
-        :root { --accent: #00aaff; --bg: #050505; --card: #0a0a0a; }
-        
-        body {
-            font-family: Roboto, Arial, sans-serif;
-            background-color: var(--bg);
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        :root { 
+            --accent: #00aaff; 
+            --bg: #121212; 
+            --card: #1c1c1e; 
+            --card-secondary: #2c2c2e;
+            --text: #ffffff; 
+            --border: #3a3a3c; 
+        }
+        * { box-sizing: border-box; }
+        body { 
+            margin: 0; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; 
+            padding-bottom: 80px; 
             min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Живой лоадер TITAN */
-        #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; animation: fadeOut 0.3s forwards 2.0s; }
-        .loader-glow { width: 80px; height: 80px; border: 2px solid var(--accent); border-radius: 20px; box-shadow: 0 0 20px rgba(0, 170, 255, 0.5); animation: pulse 1.5s infinite; }
-        .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 14px; letter-spacing: 2px; }
+        /* Живой лоадер */
+        #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #0a0a0c; animation: fadeOut 0.3s forwards 1.8s; }
+        .loader-glow { width: 70px; height: 70px; border: 2px solid var(--accent); border-radius: 20px; box-shadow: 0 0 20px rgba(0, 170, 255, 0.5); animation: pulse 1.5s infinite; }
+        .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 13px; letter-spacing: 2px; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 
-        /* Контейнер панели */
-        .container {
-            background: var(--card);
-            padding: 35px;
-            border-radius: 24px;
-            box-shadow: 0 0 25px rgba(0, 170, 255, 0.1), 0 15px 50px rgba(0,0,0,0.9);
-            width: 100%;
-            max-width: 450px;
-            border: 1px solid #1a1a1a;
-            box-sizing: border-box;
-            display: none;
-        }
-        
-        /* Кнопка Назад */
-        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; font-size: 12px; }
+        .container { padding: 24px 20px; max-width: 480px; width: 100%; margin: auto; transition: 0.4s ease; }
+        .back-btn { background: transparent; color: #aaa; border: 1px solid var(--border); padding: 8px 18px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; font-size: 13px; }
         .back-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-        h2 { color: var(--accent); text-align: center; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 25px; font-size: 18px; margin-top: 0; }
-        label { display: block; margin-left: 15px; margin-bottom: 7px; font-size: 12px; color: #666; text-transform: uppercase; }
-
-        /* Легендарные капсулы */
-        input, select {
-            width: 100%;
-            padding: 15px 25px;
-            margin-bottom: 20px;
-            border: 1px solid #222;
-            border-radius: 50px;
-            background: #111;
-            color: white;
-            box-sizing: border-box;
-            outline: none;
-            transition: 0.3s;
-        }
-        input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 170, 255, 0.25); }
-
-        textarea {
-            width: 100%;
-            padding: 15px 25px;
-            margin-bottom: 20px;
-            border: 1px solid #222;
-            border-radius: 20px;
-            background: #111;
-            color: white;
-            box-sizing: border-box;
-            outline: none;
-            height: 100px;
-            resize: none;
-            transition: 0.3s;
-        }
-        textarea:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 170, 255, 0.25); }
-
-        /* ИНТЕРАКТИВНЫЕ ЗВЕЗДЫ */
-        .stars-container {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: center;
-            margin-bottom: 25px;
-            gap: 10px;
-        }
-        .stars-container input { display: none; }
-        .stars-container label {
-            font-size: 35px;
-            color: #222;
-            cursor: pointer;
-            transition: 0.2s;
-            margin: 0;
-        }
-        .stars-container label:before { content: '★'; }
-        .stars-container input:checked ~ label,
-        .stars-container label:hover,
-        .stars-container label:hover ~ label {
-            color: var(--accent);
-            text-shadow: 0 0 15px rgba(0, 170, 255, 0.6);
-        }
-
-        /* Двухъядерная панель кнопок */
-        .btn-group { display: flex; gap: 15px; margin-top: 5px; }
-        button { flex: 1; padding: 16px; border-radius: 50px; cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; box-sizing: border-box; font-size: 13px; }
+        /* Профиль и карточка пользователя */
+        .user-info-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .user-profile-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .user-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--card-secondary); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; font-size: 18px; }
+        .user-details h4 { margin: 0; font-size: 15px; color: #fff; }
+        .user-details p { margin: 2px 0 0 0; font-size: 12px; color: #aaa; }
         
-        .btn-primary { background: linear-gradient(90deg, #0055ff, #00ccff); color: white; border: none; box-shadow: 0 5px 15px rgba(0, 85, 255, 0.3); }
-        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.2); }
-        .btn-primary:disabled { background: #222; color: #444; cursor: not-allowed; box-shadow: none; transform: none; filter: none; }
-        
-        .btn-secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
-        .btn-secondary:hover { background: rgba(0, 170, 255, 0.1); }
+        .privacy-notice { background: rgba(0, 170, 255, 0.08); border: 1px solid rgba(0, 170, 255, 0.25); border-radius: 12px; padding: 10px 14px; font-size: 12px; color: #00aaff; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
 
-        #success { display: none; text-align: center; }
-        #success h3 { color: #4CAF50; text-transform: uppercase; margin-top: 0; }
+        h2 { color: #fff; margin: 0 0 15px 0; font-size: 20px; text-align: center; font-weight: 600; }
+
+        /* Чипсы фокуса оценки */
+        .type-chips { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
+        .chip { background: var(--card-secondary); border: 1px solid var(--border); padding: 8px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; transition: 0.2s; color: #aaa; }
+        .chip.active { border-color: var(--accent); background: rgba(0, 170, 255, 0.15); color: var(--accent); font-weight: bold; }
+
+        /* Звездный рейтинг */
+        .star-rating-wrapper { text-align: center; margin-bottom: 20px; }
+        .star-rating { display: flex; gap: 10px; justify-content: center; cursor: pointer; }
+        .star { font-size: 38px; color: #3a3a3c; transition: 0.2s; user-select: none; }
+        .star.selected { color: var(--accent); text-shadow: 0 0 15px rgba(0, 170, 255, 0.6); }
+        .rating-label { font-size: 13px; color: #aaa; margin-top: 5px; height: 18px; }
+
+        /* Поля формы */
+        label { font-size: 12px; color: #8e8e93; display: block; margin: 12px 0 6px 6px; }
+        input, textarea, select { width: 100%; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 16px; outline: none; transition: 0.3s; font-family: inherit; font-size: 14px; }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 12px rgba(0, 170, 255, 0.25); }
+        textarea { height: 100px; resize: none; }
+        .char-counter { font-size: 11px; color: #666; text-align: right; margin-top: 4px; }
+
+        /* Панель действий */
+        .action-bar { display: flex; gap: 10px; margin-top: 20px; }
+        button.btn { border: none; padding: 14px; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .btn-check { background: var(--card-secondary); border: 1px solid var(--border); flex: 1; }
+        .btn-check:hover { background: #3a3a3c; }
+        .btn-send { background: linear-gradient(135deg, #007aff, #00aaff); flex: 2; box-shadow: 0 4px 15px rgba(0, 170, 255, 0.3); }
+        .btn-send:hover { filter: brightness(1.15); }
+
+        /* Помощник ЛМСХ */
+        .ai-overlay { position: fixed; bottom: 24px; right: 24px; z-index: 900; }
+        #ai-bar { background: var(--card); border: 1px solid var(--accent); padding: 12px; border-radius: 30px; display: flex; align-items: center; gap: 10px; cursor: pointer; color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.7); max-width: 220px; overflow: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #ai-bar.collapsed { max-width: 48px; border-radius: 50%; }
+        #ai-bar .ai-text { font-size: 13px; font-weight: 600; white-space: nowrap; }
+        #ai-bar.collapsed .ai-text { display: none; }
+
+        /* Модальное окно */
+        #custom-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        .modal-card { background: var(--card); border: 1px solid var(--accent); width: 88%; max-width: 360px; padding: 24px; border-radius: 20px; text-align: center; }
+        .modal-card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 18px; }
+        .modal-card p { font-size: 13px; color: #ccc; line-height: 1.5; margin-bottom: 20px; }
+        .modal-card button { width: 100%; padding: 12px; background: var(--accent); border: none; color: white; font-weight: bold; border-radius: 50px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="lmsh-loader">
-    <div class="loader-glow"></div>
-    <div class="loader-text" id="status-text">ИНИЦИАЛИЗАЦИЯ TITAN REVIEWS...</div>
-</div>
-
-<div class="container" id="form-box">
-    <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
-    <h2>Отзыв: Early Access ⚙️</h2>
-    
-    <form id="review-form">
-        <label>Твой никнейм в штабе:</label>
-        <input type="text" id="nickname" placeholder="Введите ник..." required>
-
-        <label>Версия продукта:</label>
-        <select id="version" required>
-            <option value="3.4">Kosmo 3.4 (Актуальная)</option>
-            <option value="3.3">3.3</option>
-            <option value="3.2">3.2</option>
-            <option value="3.1">3.1</option>
-            <option value="3.0">3.0</option>
-            <option value="2.9">2.9</option>
-            <option value="2.8">2.8</option>
-            <option value="2.5">2.5</option>
-            <option value="2.2">2.2</option>
-            <option value="2.0">2.0</option>
-            <option value="1.0">1.0 (Олд)</option>
-        </select>
-
-        <label style="text-align: center; margin-bottom: 10px;">Твоя оценка системы:</label>
-        <div class="stars-container">
-            <input type="radio" id="star5" name="stars" value="5"><label for="star5"></label>
-            <input type="radio" id="star4" name="stars" value="4"><label for="star4"></label>
-            <input type="radio" id="star3" name="stars" value="3"><label for="star3"></label>
-            <input type="radio" id="star2" name="stars" value="2"><label for="star2"></label>
-            <input type="radio" id="star1" name="stars" value="1" required><label for="star1"></label>
-        </div>
-
-        <label>Почему такая оценка?</label>
-        <textarea id="reason" placeholder="Что улучшить? Что понравилось?"></textarea>
-
-        <div class="btn-group">
-            <button type="button" class="btn-secondary" onclick="checkReport()">Проверить</button>
-            <button type="submit" class="btn-primary" id="submit-btn">Отправить отчет</button>
-        </div>
-    </form>
-
-    <div id="success">
-        <h3>Отчет доставлен</h3>
-        <p style="font-size: 13px; color: #888;">Никнейм верифицирован. Данные внесены в базу ЛМСХ.</p>
-        <button onclick="location.reload()" style="background: #111; border: 1px solid #333; color: white; margin-top: 15px; font-size: 11px; width: auto; padding: 10px 20px;">Назад</button>
+    <div id="lmsh-loader">
+        <div class="loader-glow"></div>
+        <div class="loader-text" id="status-text">ПОДКЛЮЧЕНИЕ К EARLY ACCESS...</div>
     </div>
-</div>
 
-<script>
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwwb3ORaGdBVfRNYNRc-FsCRHFTooWzhspB07LS6CywwRQnsX8W6wNLuPcWclZih6Rl/exec';
+    <div class="container">
+        <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
 
-    // Подгрузка никнейма автора из кэша Штаба при старте
-    window.addEventListener('DOMContentLoaded', () => {
-        const savedNickname = localStorage.getItem('lmsh-author');
-        if (savedNickname) {
-            document.getElementById('nickname').value = savedNickname;
-        }
-    });
+        <!-- КАРТОЧКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ -->
+        <div class="user-info-card">
+            <div class="user-profile-header">
+                <div class="user-avatar" id="avatar-icon">👤</div>
+                <div class="user-details">
+                    <h4 id="display-user-name">Загрузка...</h4>
+                    <p id="display-user-email">...</p>
+                </div>
+            </div>
+            <div class="privacy-notice">
+                <span class="material-symbols-rounded" style="font-size: 18px;">verified</span>
+                <span>Идентификатор верифицирован. Отчет зафиксируется за вашим аккаунтом.</span>
+            </div>
+        </div>
 
-    // Логика переключения лоадера
-    setTimeout(() => { document.getElementById('status-text').innerText = 'СИНХРОНИЗАЦИЯ С ШЛЮЗОМ...'; }, 1000);
-    setTimeout(() => { document.getElementById('form-box').style.display = 'block'; }, 2100);
+        <h2>Оценить пак: Early Access ⚙️</h2>
 
-    // Фирменный AI-баббл TITAN REVIEWS
-    function showAIStatus(msg) {
-        let bubble = document.getElementById('ai-bubble');
-        if (!bubble) {
-            bubble = document.createElement('div');
-            bubble.id = 'ai-bubble';
-            bubble.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); border:1px solid var(--accent); padding:20px; border-radius:20px; z-index:10000; color:white; font-weight:bold; text-align:center; box-shadow:0 0 30px rgba(0, 170, 255, 0.4); animation:fadeIn 0.3s; width:80%; max-width:320px; line-height: 1.5;";
-            document.body.appendChild(bubble);
-        }
-        bubble.innerHTML = msg.replace(/\n/g, '<br>');
-        bubble.style.display = 'block';
-        setTimeout(() => { bubble.style.display = 'none'; }, 4000);
-    }
+        <form id="review-form">
+            <!-- Фокус отзыва -->
+            <div class="type-chips">
+                <div class="chip active" data-type="Визуал" onclick="selectType(this)">🎨 Визуал</div>
+                <div class="chip" data-type="Скорость" onclick="selectType(this)">⚡ Скорость</div>
+                <div class="chip" data-type="Удобство" onclick="selectType(this)">✨ UX / Удобство</div>
+                <div class="chip" data-type="Баг" onclick="selectType(this)">🐛 Ошибка</div>
+            </div>
+            <input type="hidden" id="review-type" value="Визуал">
 
-    // Интеллектуальная пред-проверка отчета
-    function checkReport() {
-        const nickname = document.getElementById('nickname').value.trim();
-        const version = document.getElementById('version').value;
-        const starChecked = document.querySelector('input[name="stars"]:checked');
-        const reason = document.getElementById('reason').value.trim();
+            <label>Версия тестируемого продукта</label>
+            <select id="version" required>
+                <option value="3.4" selected>Kosmo 3.4 (Актуальная)</option>
+                <option value="3.3">Kosmo 3.3</option>
+                <option value="3.2">Kosmo 3.2</option>
+                <option value="3.0">Kosmo 3.0</option>
+                <option value="2.5">Kosmo 2.5</option>
+                <option value="1.0">Kosmo 1.0 (Олд)</option>
+            </select>
 
-        if (!nickname) {
-            showAIStatus("Система TITAN: Идентификация провалена. Укажи свой никнейм!");
-            return;
-        }
-        if (!starChecked) {
-            showAIStatus("Система TITAN: Выстави оценку системе по звездной шкале!");
-            return;
-        }
-        
-        const stars = starChecked.value;
-        if (stars <= 3 && reason.length < 10) {
-            showAIStatus("Шеф, при низкой оценке добавь в поле описания конкретики, чтобы мы знали, что чинить.");
-            return;
-        }
+            <!-- Звездный рейтинг -->
+            <div class="star-rating-wrapper">
+                <div class="star-rating" id="stars-container">
+                    <span class="star selected" data-value="1">★</span>
+                    <span class="star selected" data-value="2">★</span>
+                    <span class="star selected" data-value="3">★</span>
+                    <span class="star selected" data-value="4">★</span>
+                    <span class="star selected" data-value="5">★</span>
+                </div>
+                <div class="rating-label" id="rating-label">Отличный пак! 🔥</div>
+                <input type="hidden" id="rating-val" value="5">
+            </div>
 
-        showAIStatus(`Валидация успешна!\nОтчет готов.\nНик: ${nickname}\nВерсия: ${version}\nОценка: ${stars}/5`);
-    }
+            <label>Подробный отзыв и детали</label>
+            <textarea id="reason" placeholder="Что вам понравилось больше всего или что стоит улучшить?" maxlength="500" oninput="updateCounter(this); saveDraft();" required></textarea>
+            <div id="counter" class="char-counter">0/500</div>
 
-    // Финальный перехват отправки формы
-    document.getElementById('review-form').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const btn = document.getElementById('submit-btn');
-        const nicknameVal = document.getElementById('nickname').value.trim();
-        
-        // Синхронизируем никнейм автора в общий кэш
-        localStorage.setItem('lmsh-author', nicknameVal);
+            <div class="action-bar">
+                <button type="button" class="btn btn-check" onclick="checkReport()">Проверить</button>
+                <button type="submit" class="btn btn-send" id="submit-btn">Отправить отчет</button>
+            </div>
+        </form>
+    </div>
 
-        btn.disabled = true;
-        btn.innerText = "СИНХРОНИЗАЦИЯ...";
+    <!-- AI-Помощник -->
+    <div class="ai-overlay">
+        <div id="ai-bar" onclick="toggleAIBar()">
+            <span class="material-symbols-rounded" style="color:var(--accent);">smart_toy</span>
+            <span class="ai-text">Помощник ЛМСХ</span>
+        </div>
+    </div>
 
-        const starsValue = document.querySelector('input[name="stars"]:checked').value;
+    <!-- Модальное окно -->
+    <div id="custom-modal">
+        <div class="modal-card">
+            <h3 id="modal-title">Уведомление</h3>
+            <p id="modal-msg"></p>
+            <button onclick="closeModal()">Понятно</button>
+        </div>
+    </div>
 
-        const data = {
-            nickname: nicknameVal,
-            version: document.getElementById('version').value,
-            stars: starsValue,
-            reason: document.getElementById('reason').value
-        };
+    <script>
+        let userName = "";
+        let userEmail = "";
+        const ratingTexts = { 1: "Критично 😞", 2: "Требуются доработки 🙁", 3: "Нормально 😐", 4: "Хороший пак 🙂", 5: "Отличный пак! 🔥" };
 
-        fetch(SCRIPT_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(data)
-        }).then(() => {
-            document.getElementById('review-form').style.display = 'none';
-            document.getElementById('success').style.display = 'block';
-        }).catch(() => {
-            showAIStatus("Ошибка TITAN:\nКанал связи заблокирован шлюзом.");
-            btn.disabled = false;
-            btn.innerText = "ОТПРАВИТЬ ОТЧЕТ";
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => { document.getElementById('status-text').innerText = 'СИНХРОНИЗАЦИЯ С ШЛЮЗОМ...'; }, 800);
+
+            userName = localStorage.getItem('lmsh-author') || 'Гость';
+            userEmail = localStorage.getItem('lmsh-email') || 'Не указан';
+
+            document.getElementById('display-user-name').innerText = userName;
+            document.getElementById('display-user-email').innerText = userEmail;
+            document.getElementById('avatar-icon').innerText = userName.charAt(0).toUpperCase() || '👤';
+
+            // Восстановление черновика
+            if(localStorage.getItem('pack_review_draft')) {
+                const txt = localStorage.getItem('pack_review_draft');
+                document.getElementById('reason').value = txt;
+                updateCounter(document.getElementById('reason'));
+            }
+
+            // Авто-сворачивание Помощника
+            setTimeout(() => {
+                const aiBar = document.getElementById('ai-bar');
+                if (aiBar) aiBar.classList.add('collapsed');
+            }, 3000);
         });
-    });
-</script>
 
+        function saveDraft() {
+            localStorage.setItem('pack_review_draft', document.getElementById('reason').value);
+        }
+
+        function clearDraft() {
+            localStorage.removeItem('pack_review_draft');
+        }
+
+        function updateCounter(el) {
+            document.getElementById('counter').innerText = `${el.value.length}/${el.maxLength}`;
+        }
+
+        function selectType(chip) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            document.getElementById('review-type').value = chip.getAttribute('data-type');
+        }
+
+        // Звезды
+        const stars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('rating-val');
+        const ratingLabel = document.getElementById('rating-label');
+
+        stars.forEach(star => {
+            star.addEventListener('click', function() {
+                const val = parseInt(this.getAttribute('data-value'));
+                ratingInput.value = val;
+                ratingLabel.innerText = ratingTexts[val];
+                
+                stars.forEach(s => {
+                    if(parseInt(s.getAttribute('data-value')) <= val) {
+                        s.classList.add('selected');
+                    } else {
+                        s.classList.remove('selected');
+                    }
+                });
+            });
+        });
+
+        function toggleAIBar() {
+            const aiBar = document.getElementById('ai-bar');
+            if (aiBar.classList.contains('collapsed')) {
+                aiBar.classList.remove('collapsed');
+                setTimeout(() => { aiBar.classList.add('collapsed'); }, 4000);
+            } else {
+                checkReport();
+            }
+        }
+
+        function showAIStatus(msg, title = "🤖 Помощник ЛМСХ") {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
+        async function checkReport() {
+            const reason = document.getElementById('reason').value.trim();
+            const rating = document.getElementById('rating-val').value;
+            const version = document.getElementById('version').value;
+
+            showAIStatus("Интеллектуальная проверка отчета...", "🔍 Анализ");
+            await new Promise(r => setTimeout(r, 800));
+
+            if (rating <= 3 && reason.length < 10) {
+                showAIStatus(`${userName}, при низкой оценке добавьте чуть больше деталей, чтобы Штаб знал, что необходимо исправить в сборке.`, "⚠️ Мало деталей");
+            } else {
+                showAIStatus(`Отчет по версии ${version} готов!\nАвтор: ${userName}\nОценка: ${rating}/5`, "✅ Все отлично");
+            }
+        }
+
+        // Отправка формы в Telegram
+        document.getElementById('review-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerText = "Отправка...";
+
+            const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
+            const chatId = "5365364862";
+            
+            const type = document.getElementById('review-type').value;
+            const version = document.getElementById('version').value;
+            const rating = document.getElementById('rating-val').value;
+            const starsText = "⭐".repeat(rating);
+            const reason = document.getElementById('reason').value.trim();
+
+            const msg = `⚙️ *Отчет по паку Early Access (${type})*\n\n🌟 *Оценка:* ${starsText} (${rating}/5)\n👤 *Автор:* ${userName} (${userEmail})\n📦 *Версия:* Kosmo ${version}\n\n💬 *Детали и замечания:*\n${reason}`;
+
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: msg, parse_mode: 'Markdown' })
+                });
+
+                if (res.ok) {
+                    showAIStatus("Отчет по паку успешно доставлен в Штаб ЛМСХ!", "🎉 Отправлено");
+                    clearDraft();
+                    this.reset();
+                    document.getElementById('counter').innerText = "0/500";
+                    document.getElementById('rating-val').value = 5;
+                    ratingLabel.innerText = ratingTexts[5];
+                    stars.forEach(s => s.classList.add('selected'));
+                } else {
+                    showAIStatus("Ошибка записи отчета в Штабе.", "❌ Ошибка");
+                }
+            } catch (err) {
+                showAIStatus("Ошибка сети при отправке отчета.", "❌ Ошибка сети");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Отправить отчет";
+            }
+        });
+    </script>
 </body>
 </html>
