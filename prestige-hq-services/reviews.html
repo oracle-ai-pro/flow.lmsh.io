@@ -6,44 +6,77 @@
     <title>Prestige HQ | Отзывы</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <style>
-        :root { --accent: #ffc107; --bg: #050505; --card: #0a0a0a; --text: #fff; }
+        :root { --accent: #ffc107; --bg: #050505; --card: #0a0a0a; --text: #fff; --border: #222; }
+        * { box-sizing: border-box; }
         body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; }
 
-        /* Живой лоадер (Золотая инициализация) */
-        #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; animation: fadeOut 0.3s forwards 2.0s; }
-        .loader-glow { width: 80px; height: 80px; border: 2px solid var(--accent); border-radius: 20px; box-shadow: 0 0 20px rgba(255, 193, 7, 0.5); animation: pulse 1.5s infinite; }
-        .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 14px; letter-spacing: 2px; }
+        /* Лоадер */
+        #lmsh-loader { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; animation: fadeOut 0.3s forwards 1.8s; }
+        .loader-glow { width: 70px; height: 70px; border: 2px solid var(--accent); border-radius: 20px; box-shadow: 0 0 20px rgba(255, 193, 7, 0.5); animation: pulse 1.5s infinite; }
+        .loader-text { margin-top: 20px; color: var(--accent); font-family: monospace; font-size: 13px; letter-spacing: 2px; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
 
-        /* Форма и контейнер */
-        .container { padding: 40px 20px; max-width: 600px; margin: auto; display: none; }
-        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; font-family: inherit; }
+        .container { padding: 24px 20px; max-width: 520px; margin: auto; }
+        .back-btn { background: transparent; color: #888; border: 1px solid #333; padding: 8px 18px; border-radius: 20px; cursor: pointer; margin-bottom: 20px; transition: 0.3s; font-size: 13px; }
         .back-btn:hover { border-color: var(--accent); color: var(--accent); }
-        
-        input, textarea, select { width: 100%; margin: 10px 0; padding: 15px; background: var(--card); border: 1px solid #222; color: white; border-radius: 20px; outline: none; transition: 0.3s; box-sizing: border-box; font-family: inherit; }
-        input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(255, 193, 7, 0.2); }
-        .char-counter { font-size: 12px; color: #666; text-align: right; margin-top: -5px; margin-bottom: 10px; }
-        h2 { color: var(--accent); margin-bottom: 20px; text-align: center; }
 
-        /* Интерактивные звезды */
-        .star-rating { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; cursor: pointer; }
+        /* Профиль и конфиденциальность */
+        .user-info-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 16px; margin-bottom: 20px; }
+        .user-profile-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: rgba(255, 193, 7, 0.15); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: bold; }
+        .user-details h4 { margin: 0; font-size: 15px; color: #fff; }
+        .user-details p { margin: 2px 0 0 0; font-size: 12px; color: #888; }
+        .privacy-notice { background: rgba(255, 193, 7, 0.08); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 12px; padding: 10px 14px; font-size: 12px; color: #ffc107; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+
+        h2 { color: var(--accent); margin: 0 0 15px 0; font-size: 20px; text-align: center; }
+
+        /* Чипсы типа отзыва */
+        .type-chips { display: flex; gap: 8px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
+        .chip { background: #111; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: 0.2s; color: #aaa; }
+        .chip.active { border-color: var(--accent); background: rgba(255, 193, 7, 0.1); color: var(--accent); font-weight: bold; }
+
+        /* Звезды */
+        .star-rating-wrapper { text-align: center; margin-bottom: 20px; }
+        .star-rating { display: flex; gap: 10px; justify-content: center; cursor: pointer; }
         .star { font-size: 40px; color: #333; transition: 0.2s; user-select: none; }
         .star.selected { color: var(--accent); text-shadow: 0 0 15px rgba(255, 193, 7, 0.6); }
+        .rating-label { font-size: 13px; color: #888; margin-top: 5px; height: 18px; }
 
-        /* Фейковая кнопка медиа */
-        .file-upload-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px; background: transparent; border: 1px dashed #444; color: #888; border-radius: 20px; cursor: pointer; margin: 10px 0; transition: 0.3s; font-family: inherit; }
+        /* Поля ввода */
+        label { font-size: 12px; color: #aaa; display: block; margin: 12px 0 4px 6px; }
+        input, textarea, select { width: 100%; padding: 14px 16px; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 16px; outline: none; transition: 0.3s; font-family: inherit; font-size: 14px; }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 10px rgba(255, 193, 7, 0.2); }
+        .char-counter { font-size: 12px; color: #666; text-align: right; margin-top: 4px; }
+
+        /* Медиа-загрузка */
+        .file-upload-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px; background: transparent; border: 1px dashed #444; color: #888; border-radius: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s; font-family: inherit; font-size: 13px; }
         .file-upload-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(255, 193, 7, 0.05); }
+        .image-preview { display: none; position: relative; margin-top: 10px; border-radius: 16px; overflow: hidden; border: 1px solid var(--accent); max-height: 200px; }
+        .image-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .remove-img { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #fff; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-weight: bold; }
 
-        /* Двухъядерная панель */
+        /* Панель кнопок */
         .action-bar { display: flex; gap: 10px; margin-top: 20px; }
-        button { border: none; padding: 15px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: inherit; }
-        .btn-check { background: #1a1a1a; border: 1px solid #444; flex: 1; color: white; }
-        .btn-check:hover { border-color: #666; }
+        button.btn { border: none; padding: 14px; border-radius: 50px; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .btn-check { background: #1a1a1a; border: 1px solid #444; flex: 1; }
+        .btn-check:hover { background: #252525; }
         .btn-send { background: var(--accent); flex: 2; color: #000; }
         .btn-send:hover { box-shadow: 0 0 15px rgba(255, 193, 7, 0.4); }
 
+        /* Помощник */
+        .ai-overlay { position: fixed; bottom: 24px; right: 24px; z-index: 900; }
+        #ai-bar { background: #0a0a0a; border: 1px solid var(--accent); padding: 12px; border-radius: 30px; display: flex; align-items: center; gap: 10px; cursor: pointer; color: white; box-shadow: 0 8px 25px rgba(0,0,0,0.7); max-width: 220px; overflow: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        #ai-bar.collapsed { max-width: 48px; border-radius: 50%; }
+        #ai-bar .ai-text { font-size: 13px; font-weight: 600; white-space: nowrap; }
+        #ai-bar.collapsed .ai-text { display: none; }
+
+        /* Модальное окно */
+        #custom-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        .modal-card { background: #0a0a0a; border: 1px solid var(--accent); width: 88%; max-width: 360px; padding: 24px; border-radius: 20px; text-align: center; }
+        .modal-card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 18px; }
+        .modal-card p { font-size: 13px; color: #ccc; line-height: 1.5; margin-bottom: 20px; }
+        .modal-card button { width: 100%; padding: 12px; background: var(--accent); border: none; color: #000; font-weight: bold; border-radius: 50px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -53,24 +86,51 @@
         <div class="loader-text" id="status-text">ИНИЦИАЛИЗАЦИЯ ОТЗЫВОВ...</div>
     </div>
 
-    <div class="container" id="main-form">
+    <div class="container">
         <button class="back-btn" onclick="location.href='select-service.html'">← Назад</button>
-        
+
+        <!-- КАРТОЧКА ДАННЫХ И ПРЕДУПРЕЖДЕНИЕ -->
+        <div class="user-info-card">
+            <div class="user-profile-header">
+                <div class="user-avatar" id="avatar-icon">👤</div>
+                <div class="user-details">
+                    <h4 id="display-user-name">Загрузка...</h4>
+                    <p id="display-user-email">...</p>
+                </div>
+            </div>
+            <div class="privacy-notice">
+                <span class="material-symbols-rounded" style="font-size: 18px;">lock</span>
+                <span>Ваши данные используются только для идентификации авторов разработчиками. Третьим лицам не передаются.</span>
+            </div>
+        </div>
+
         <h2>Оцените Prestige HQ</h2>
         
         <form id="review-form">
-            <!-- Звездный рейтинг -->
-            <div class="star-rating" id="stars-container">
-                <span class="star selected" data-value="1">★</span>
-                <span class="star selected" data-value="2">★</span>
-                <span class="star selected" data-value="3">★</span>
-                <span class="star selected" data-value="4">★</span>
-                <span class="star selected" data-value="5">★</span>
+            <!-- Чипсы фокуса отзыва -->
+            <div class="type-chips">
+                <div class="chip active" data-type="Благодарность" onclick="selectType(this)">❤️ Похвала</div>
+                <div class="chip" data-type="Предложение" onclick="selectType(this)">💡 Предложение</div>
+                <div class="chip" data-type="Замечание" onclick="selectType(this)">⚠️ Замечание</div>
             </div>
-            <input type="hidden" id="rating-val" value="5">
+            <input type="hidden" id="review-type" value="Благодарность">
 
+            <!-- Звездный рейтинг -->
+            <div class="star-rating-wrapper">
+                <div class="star-rating" id="stars-container">
+                    <span class="star selected" data-value="1">★</span>
+                    <span class="star selected" data-value="2">★</span>
+                    <span class="star selected" data-value="3">★</span>
+                    <span class="star selected" data-value="4">★</span>
+                    <span class="star selected" data-value="5">★</span>
+                </div>
+                <div class="rating-label" id="rating-label">Превосходно! 🌟</div>
+                <input type="hidden" id="rating-val" value="5">
+            </div>
+
+            <label>Категория отзыва</label>
             <select id="category" required>
-                <option value="" disabled selected>Выберите категорию отзыва...</option>
+                <option value="" disabled selected>Выберите категорию...</option>
                 <option value="Дизайн и интерфейс">🎨 Дизайн и интерфейс</option>
                 <option value="Функционал и фичи">⚙️ Функционал и фичи</option>
                 <option value="Скорость работы">⚡ Скорость работы</option>
@@ -78,6 +138,7 @@
                 <option value="Другое">💡 Другое</option>
             </select>
 
+            <label>Опыт использования</label>
             <select id="time-used" required>
                 <option value="" disabled selected>Как долго используете систему?</option>
                 <option value="Менее недели">Менее недели</option>
@@ -85,54 +146,107 @@
                 <option value="Больше полугода">Давно и уверенно</option>
             </select>
 
-            <input type="text" id="user-name" placeholder="Ваше имя" required>
-            <input type="email" id="user-email" placeholder="Ваш Email" required>
-            
-            <textarea id="feedback" placeholder="Расскажите подробнее о вашем опыте..." rows="5" maxlength="600" oninput="updateCounter(this)" required></textarea>
+            <label>Ваш отзыв</label>
+            <textarea id="feedback" placeholder="Расскажите подробнее о вашем опыте..." rows="5" maxlength="600" oninput="updateCounter(this); saveDraft();" required></textarea>
             <div id="counter" class="char-counter">0/600</div>
 
-            <!-- Имитация прикрепления файла -->
-            <div class="file-upload-btn" onclick="mockFileUpload()">
+            <!-- Загрузка изображения -->
+            <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="handleFileSelect(this)">
+            <div class="file-upload-btn" onclick="document.getElementById('file-input').click()">
                 <span class="material-symbols-rounded">image</span>
-                <span>Прикрепить скриншот (Опционально)</span>
+                <span id="upload-btn-text">Прикрепить скриншот (Опционально)</span>
+            </div>
+
+            <div class="image-preview" id="img-preview-box">
+                <img id="img-preview" src="" alt="Превью">
+                <button type="button" class="remove-img" onclick="removeImage()">✕</button>
             </div>
 
             <div class="action-bar">
-                <button type="button" class="btn-check" onclick="checkReview()">Проверить</button>
-                <button type="submit" class="btn-send">Опубликовать</button>
+                <button type="button" class="btn btn-check" onclick="checkReview()">Проверить</button>
+                <button type="submit" class="btn btn-send" id="submit-btn">Опубликовать</button>
             </div>
         </form>
     </div>
 
     <!-- AI-Помощник -->
     <div class="ai-overlay">
-        <div id="ai-bar" onclick="checkReview()" style="position:fixed; bottom:20px; right:20px; background:#0a0a0a; border:1px solid var(--accent); padding:12px 20px; border-radius:30px; display:flex; align-items:center; gap:10px; cursor:pointer; color:white; box-shadow:0 10px 20px rgba(0,0,0,0.5); z-index: 100;">
-            <span class="material-symbols-rounded" style="color: var(--accent);">smart_toy</span>
-            <span>Помощник ЛМСХ</span>
+        <div id="ai-bar" onclick="toggleAIBar()">
+            <span class="material-symbols-rounded" style="color:var(--accent);">smart_toy</span>
+            <span class="ai-text">Помощник ЛМСХ</span>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="custom-modal">
+        <div class="modal-card">
+            <h3 id="modal-title">Уведомление</h3>
+            <p id="modal-msg"></p>
+            <button onclick="closeModal()">Понятно</button>
         </div>
     </div>
 
     <script>
-    // 1. Управление счетчиком символов
+    let userName = "";
+    let userEmail = "";
+    let selectedFile = null;
+    const ratingTexts = { 1: "Ужасно 😞", 2: "Плохо 🙁", 3: "Нормально 😐", 4: "Хорошо 🙂", 5: "Превосходно! 🌟" };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => { document.getElementById('status-text').innerText = 'ПОДКЛЮЧЕНИЕ К КАНАЛУ REVIEWS...'; }, 800);
+
+        userName = localStorage.getItem('lmsh-author') || 'Гость';
+        userEmail = localStorage.getItem('lmsh-email') || 'Не указан';
+
+        document.getElementById('display-user-name').innerText = userName;
+        document.getElementById('display-user-email').innerText = userEmail;
+        document.getElementById('avatar-icon').innerText = userName.charAt(0).toUpperCase() || '👤';
+
+        // Восстановление черновика
+        if(localStorage.getItem('review_draft_text')) {
+            const txt = localStorage.getItem('review_draft_text');
+            document.getElementById('feedback').value = txt;
+            updateCounter(document.getElementById('feedback'));
+        }
+
+        // Автоматическое сворачивание Помощника
+        setTimeout(() => {
+            const aiBar = document.getElementById('ai-bar');
+            if (aiBar) aiBar.classList.add('collapsed');
+        }, 3000);
+    });
+
+    function saveDraft() {
+        localStorage.setItem('review_draft_text', document.getElementById('feedback').value);
+    }
+
+    function clearDraft() {
+        localStorage.removeItem('review_draft_text');
+    }
+
     function updateCounter(el) {
         document.getElementById('counter').innerText = `${el.value.length}/${el.maxLength}`;
     }
 
-    // 2. Инициализация системы (лоадер)
-    setTimeout(() => { document.getElementById('status-text').innerText = 'ПОДКЛЮЧЕНИЕ К СИСТЕМЕ...'; }, 1000);
-    setTimeout(() => { document.getElementById('main-form').style.display = 'block'; }, 2100);
+    function selectType(chip) {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        document.getElementById('review-type').value = chip.getAttribute('data-type');
+    }
 
-    // 3. Логика интерактивных звезд
+    // Звезды
     const stars = document.querySelectorAll('.star');
     const ratingInput = document.getElementById('rating-val');
+    const ratingLabel = document.getElementById('rating-label');
 
     stars.forEach(star => {
         star.addEventListener('click', function() {
-            const val = this.getAttribute('data-value');
+            const val = parseInt(this.getAttribute('data-value'));
             ratingInput.value = val;
+            ratingLabel.innerText = ratingTexts[val];
             
             stars.forEach(s => {
-                if(parseInt(s.getAttribute('data-value')) <= parseInt(val)) {
+                if(parseInt(s.getAttribute('data-value')) <= val) {
                     s.classList.add('selected');
                 } else {
                     s.classList.remove('selected');
@@ -141,84 +255,121 @@
         });
     });
 
-    // 4. Мок для кнопки медиа
-    function mockFileUpload() {
-        showAIStatus("Интеграция облачного хранилища в разработке! Пока принимаем отзывы текстом.");
+    // Медиа
+    function handleFileSelect(input) {
+        if (input.files && input.files[0]) {
+            selectedFile = input.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('img-preview').src = e.target.result;
+                document.getElementById('img-preview-box').style.display = 'block';
+                document.getElementById('upload-btn-text').innerText = 'Заменить скриншот';
+            }
+            reader.readAsDataURL(selectedFile);
+        }
     }
 
-    // 5. Интеллект Помощника (Валидация + Анализ)
+    function removeImage() {
+        selectedFile = null;
+        document.getElementById('file-input').value = '';
+        document.getElementById('img-preview-box').style.display = 'none';
+        document.getElementById('upload-btn-text').innerText = 'Прикрепить скриншот (Опционально)';
+    }
+
+    // AI Помощник и Модалки
+    function toggleAIBar() {
+        const aiBar = document.getElementById('ai-bar');
+        if (aiBar.classList.contains('collapsed')) {
+            aiBar.classList.remove('collapsed');
+            setTimeout(() => { aiBar.classList.add('collapsed'); }, 4000);
+        } else {
+            checkReview();
+        }
+    }
+
+    function showAIStatus(msg, title = "🤖 Помощник ЛМСХ") {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-msg').innerText = msg;
+        document.getElementById('custom-modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('custom-modal').style.display = 'none';
+    }
+
     async function checkReview() {
         const feedback = document.getElementById('feedback').value.trim();
         const rating = document.getElementById('rating-val').value;
-        const email = document.getElementById('user-email').value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        showAIStatus("Анализ тональности...");
-        await new Promise(r => setTimeout(r, 1200));
 
-        if (email.length > 0 && !emailRegex.test(email)) {
-            showAIStatus("Шеф, кажется, в адресе почты ошибка. Проверь синтаксис!");
-            return;
-        }
+        showAIStatus("Анализ тональности и содержания...", "🔍 Анализ");
+        await new Promise(r => setTimeout(r, 1000));
 
-        if (feedback.length < 20) {
-            showAIStatus("Отзыв слишком короткий! Добавь конкретики, чтобы мы поняли, что именно тебе понравилось (или нет).");
+        if (feedback.length < 15) {
+            showAIStatus(`${userName}, отзыв слишком короткий! Добавьте чуть больше деталей о вашем опыте.`, "⚠️ Нужны подробности");
         } else if (rating < 4) {
-            showAIStatus("Принято. Мы внимательно изучим критику и исправим недочеты!");
+            showAIStatus(`${userName}, мы приняли замечание. Штаб внимательно изучит проблему!`, "📝 Принято");
         } else {
-            showAIStatus("Отлично! Этот золотой отзыв вдохновит весь Штаб ЛМСХ.");
+            showAIStatus(`${userName}, отличный отзыв! Ваша оценка вдохновит команду.`, "✅ Все отлично");
         }
     }
 
-    // 6. Фирменный AI-баббл (никаких стандартных alert)
-    function showAIStatus(msg) {
-        let bubble = document.getElementById('ai-bubble');
-        if (!bubble) {
-            bubble = document.createElement('div');
-            bubble.id = 'ai-bubble';
-            bubble.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); border:1px solid var(--accent); padding:20px; border-radius:20px; z-index:10000; color:white; font-weight:bold; text-align:center; box-shadow:0 0 30px rgba(255,193,7,0.4); animation:fadeIn 0.3s; width:80%; max-width:320px;";
-            document.body.appendChild(bubble);
-        }
-        bubble.innerText = msg;
-        bubble.style.display = 'block';
-        setTimeout(() => { bubble.style.display = 'none'; }, 4000);
-    }
-
-    // 7. Основная логика отправки в Telegram
+    // Отправка в Telegram
     document.getElementById('review-form').addEventListener('submit', async function(e) {
         e.preventDefault();
+        const sendBtn = document.getElementById('submit-btn');
+        sendBtn.disabled = true;
+        sendBtn.innerText = "Отправка...";
+
         const token = "8608018012:AAGXq5u1vgW3tbuq5bKB2p2gM5ubJFn_01A";
         const chatId = "5365364862";
         
+        const type = document.getElementById('review-type').value;
         const rating = document.getElementById('rating-val').value;
         const starsText = "⭐".repeat(rating);
         const category = document.getElementById('category').value;
         const timeUsed = document.getElementById('time-used').value;
-        const name = document.getElementById('user-name').value;
-        const email = document.getElementById('user-email').value;
-        const feedback = document.getElementById('feedback').value;
+        const feedback = document.getElementById('feedback').value.trim();
 
-        const text = `🏆 *Новый отзыв о Prestige HQ*\n\n🌟 *Оценка:* ${starsText} (${rating}/5)\n📁 *Категория:* ${category}\n⏳ *Опыт использования:* ${timeUsed}\n\n👤 *Имя:* ${name}\n📧 *Email:* ${email}\n\n📝 *Текст отзыва:*\n${feedback}`;
-        
+        const captionText = `🏆 *Новый отзыв (${type})*\n\n🌟 *Оценка:* ${starsText} (${rating}/5)\n👤 *Автор:* ${userName} (${userEmail})\n📁 *Категория:* ${category}\n⏳ *Опыт:* ${timeUsed}\n\n📝 *Текст отзыва:*\n${feedback}`;
+
         try {
-            const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: 'Markdown' })
-            });
+            let res;
+            if (selectedFile) {
+                const formData = new FormData();
+                formData.append('chat_id', chatId);
+                formData.append('photo', selectedFile);
+                formData.append('caption', captionText);
+                formData.append('parse_mode', 'Markdown');
+
+                res = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+                    method: 'POST',
+                    body: formData
+                });
+            } else {
+                res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: captionText, parse_mode: 'Markdown' })
+                });
+            }
             
             if(res.ok) { 
-                showAIStatus("Золотой отзыв успешно доставлен в Штаб ЛМСХ!");
+                showAIStatus("Золотой отзыв успешно доставлен в Штаб ЛМСХ!", "🎉 Отправлено");
+                clearDraft();
                 this.reset();
+                removeImage();
                 document.getElementById('counter').innerText = "0/600";
-                // Сброс звезд
                 document.getElementById('rating-val').value = 5;
+                ratingLabel.innerText = ratingTexts[5];
                 stars.forEach(s => s.classList.add('selected'));
             } else { 
-                showAIStatus("Ошибка связи со Штабом."); 
+                showAIStatus("Ошибка связи со Штабом.", "❌ Ошибка"); 
             }
         } catch(err) { 
-            showAIStatus("Критическая ошибка соединения."); 
+            showAIStatus("Ошибка соединения при отправке.", "❌ Ошибка сети"); 
+        } finally {
+            sendBtn.disabled = false;
+            sendBtn.innerText = "Опубликовать";
         }
     });
 </script>
