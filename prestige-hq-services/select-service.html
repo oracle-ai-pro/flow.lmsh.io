@@ -4,185 +4,867 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Prestige HQ | Dashboard</title>
+    <!-- Material Symbols Outlined -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
-        :root { --accent: #ffc107; }
-        body { margin: 0; background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; padding: 20px; transition: 0.3s; box-sizing: border-box; }
-        
-        .logo { width: 120px; margin-bottom: 30px; border-radius: 20px; border: 2px solid #333; box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); }
-        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; width: 100%; max-width: 700px; }
-        
-        .card { padding: 25px; border-radius: 20px; text-align: center; cursor: pointer; transition: all 0.4s ease; background: #0a0a0a; border: 1px solid #222; position: relative; overflow: hidden; }
-        .card:hover { transform: translateY(-5px); }
-        .card.blurred { filter: blur(6px); opacity: 0.4; pointer-events: none; }
+        :root { 
+            --accent: #ffc107; 
+            --bg-dark: #050505;
+            --card-bg: #0a0a0a;
+            --border-color: #222;
+        }
 
-        /* Градиентные неоновые эффекты */
-        .card-blue:hover { border-color: #007bff; box-shadow: 0 0 20px #007bff; background: linear-gradient(145deg, #0a0a0a, #001f3f); }
-        .card-green:hover { border-color: #28a745; box-shadow: 0 0 20px #28a745; background: linear-gradient(145deg, #0a0a0a, #002d13); }
-        .card-gold:hover { border-color: #ffc107; box-shadow: 0 0 20px #ffc107; background: linear-gradient(145deg, #0a0a0a, #3f3000); }
-        .card-purple:hover { border-color: #7C3AED; box-shadow: 0 0 20px #7C3AED; background: linear-gradient(145deg, #0a0a0a, #2a154a); }
-        .card-gray:hover { border-color: #555; box-shadow: 0 0 15px #333; background: #111; }
+        * { box-sizing: border-box; }
+
+        body { 
+            margin: 0; 
+            background: var(--bg-dark); 
+            color: #fff; 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            transition: all 0.3s ease;
+        }
+
+        /* ОСНОВНАЯ ОБЛАСТЬ (ЛЕВАЯ ЧАСТЬ) */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 20px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
         
-        #context-menu { position: absolute; background: #1a1a1a; border: 1px solid #444; border-radius: 12px; display: none; z-index: 1000; padding: 5px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .menu-item { padding: 10px 15px; cursor: pointer; font-size: 13px; border-radius: 8px; transition: 0.2s; }
+        .logo { 
+            width: 95px; 
+            margin-bottom: 16px; 
+            border-radius: 18px; 
+            border: 1px solid #333; 
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05); 
+        }
+
+        /* БЛОК ПРОФИЛЯ ПО ЦЕНТРУ */
+        .user-profile-center {
+            width: 100%;
+            max-width: 680px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .user-profile-card {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .user-profile-card:hover {
+            border-color: #00d2ff;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.25);
+            background: linear-gradient(145deg, #0a0a0a, #002b3d);
+            transform: translateY(-2px);
+        }
+
+        /* СЕТКА ИЗ 6 КАРТОЧЕК */
+        .dashboard { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 16px; 
+            width: 100%; 
+            max-width: 680px; 
+        }
+        
+        .card { 
+            padding: 16px 18px; 
+            border-radius: 18px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            position: relative; 
+            overflow: hidden; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .card-icon {
+            font-size: 28px;
+        }
+
+        .card-info h3 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .card-info p {
+            margin: 3px 0 0 0;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .card-arrow {
+            font-size: 20px;
+            color: #444;
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .card:hover { transform: translateY(-2px); }
+        .card:hover .card-arrow { transform: translateX(3px); color: #fff; }
+        .card.blurred, .user-profile-card.blurred { filter: blur(4px); opacity: 0.3; pointer-events: none; }
+
+        /* Градиенты карточек */
+        .card-blue:hover { border-color: #007bff; box-shadow: 0 0 18px rgba(0, 123, 255, 0.25); background: linear-gradient(145deg, #0a0a0a, #00152b); }
+        .card-green:hover { border-color: #28a745; box-shadow: 0 0 18px rgba(40, 167, 69, 0.25); background: linear-gradient(145deg, #0a0a0a, #001f0d); }
+        .card-gold:hover { border-color: #ffc107; box-shadow: 0 0 18px rgba(255, 193, 7, 0.25); background: linear-gradient(145deg, #0a0a0a, #2b2100); }
+        .card-purple:hover { border-color: #7C3AED; box-shadow: 0 0 18px rgba(124, 58, 237, 0.25); background: linear-gradient(145deg, #0a0a0a, #1c0e33); }
+        .card-orange:hover { border-color: #ff9800; box-shadow: 0 0 18px rgba(255, 152, 0, 0.25); background: linear-gradient(145deg, #0a0a0a, #331f00); }
+        .card-gray:hover { border-color: #555; box-shadow: 0 0 14px #222; background: #111; }
+        
+        /* КОНТЕКСТНОЕ МЕНЮ */
+        #context-menu { 
+            position: absolute; 
+            background: #141414; 
+            border: 1px solid #333; 
+            border-radius: 12px; 
+            display: none; 
+            z-index: 1000; 
+            padding: 6px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.8); 
+        }
+        .menu-item { 
+            padding: 10px 16px; 
+            cursor: pointer; 
+            font-size: 13px; 
+            border-radius: 8px; 
+            transition: 0.2s; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         .menu-item:hover { background: var(--accent); color: #000; }
         
-        #assistant-btn { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: #111; border: 1px solid #444; border-radius: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 1000; transition: 0.3s; font-weight: bold; color: var(--accent); }
-        #assistant-btn:hover { border-color: var(--accent); transform: scale(1.1); text-shadow: 0 0 10px var(--accent); }
+        /* КНОПКА ПОМОЩНИКА */
+        #assistant-btn { 
+            position: fixed; 
+            bottom: 24px; 
+            right: 24px; 
+            width: 56px; 
+            height: 56px; 
+            background: #111; 
+            border: 1px solid #333; 
+            border-radius: 18px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 4px 16px rgba(0,0,0,0.6); 
+            z-index: 900; 
+            transition: 0.3s; 
+            color: var(--accent); 
+        }
+        #assistant-btn:hover { border-color: var(--accent); transform: scale(1.08); }
         
-        /* ПРОКАЧАННОЕ ЧАТ ОКНО ИИ */
-        #chat-window { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; height: 500px; background: #0a0a0a; border: 1px solid var(--accent); border-radius: 24px; display: none; flex-direction: column; z-index: 2000; box-shadow: 0 0 40px rgba(0,0,0,0.9); overflow: hidden; font-family: sans-serif; }
-        #chat-header { padding: 18px 25px; border-bottom: 1px solid #1a1a1a; font-weight: bold; background: #000; display: flex; justify-content: space-between; align-items: center; }
-        #chat-title { color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; font-size: 13px; }
-        
-        #chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: radial-gradient(circle at top, #0f172a00, #000000); }
-        
-        /* Капсульные бабблы */
-        .msg-bubble { max-width: 75%; padding: 12px 18px; font-size: 14px; line-height: 1.4; word-wrap: break-word; animation: bubbleAppear 0.25s ease forwards; }
-        .msg-user { background: linear-gradient(135deg, #0055ff, #0088ff); color: #fff; align-self: flex-end; border-radius: 20px 20px 4px 20px; box-shadow: 0 4px 15px rgba(0, 85, 255, 0.2); }
-        .msg-ai { background: #111; color: #f0f0f0; align-self: flex-start; border-radius: 20px 20px 20px 4px; border: 1px solid #222; }
-        
-        #chat-input { padding: 15px; border-top: 1px solid #1a1a1a; display: flex; gap: 10px; background: #000; }
-        #chat-input input { flex: 1; background: #111; border: 1px solid #222; color: white; padding: 12px 20px; border-radius: 50px; outline: none; transition: 0.3s; }
-        #chat-input input:focus { border-color: var(--accent); }
-        #chat-input button { background: var(--accent); border: none; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; color: black; font-weight: bold; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        #chat-input button:hover { transform: scale(1.05); filter: brightness(1.2); }
+        /* ПРАВАЯ БОКОВАЯ ПАНЕЛЬ С ВКЛАДКАМИ (ИИ / DEV CHAT) */
+        #side-panel { 
+            width: 0;
+            opacity: 0;
+            background: #0a0a0a; 
+            border-left: 1px solid #222; 
+            display: flex; 
+            flex-direction: column; 
+            z-index: 2000; 
+            transition: all 0.3s ease;
+            overflow: hidden;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
 
-        #chat-body::-webkit-scrollbar { width: 4px; }
-        #chat-body::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+        body.split-active #side-panel {
+            width: 440px;
+            opacity: 1;
+        }
 
-        @keyframes bubbleAppear { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
+        .panel-header { 
+            background: #000; 
+            border-bottom: 1px solid #1a1a1a; 
+            padding: 12px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-tabs {
+            display: flex;
+            background: #111;
+            border-radius: 12px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 8px 14px;
+            border: none;
+            background: transparent;
+            color: #888;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #222;
+            color: var(--accent);
+        }
+
+        #chat-body { 
+            flex: 1; 
+            padding: 18px; 
+            overflow-y: auto; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 14px; 
+            background: radial-gradient(circle at top, #0f172a00, #000000); 
+        }
+        
+        .msg-bubble { 
+            max-width: 85%; 
+            padding: 12px 16px; 
+            font-size: 14px; 
+            line-height: 1.4; 
+            word-wrap: break-word; 
+            animation: bubbleAppear 0.25s ease forwards; 
+        }
+        .msg-user { 
+            background: linear-gradient(135deg, #0055ff, #0088ff); 
+            color: #fff; 
+            align-self: flex-end; 
+            border-radius: 18px 18px 2px 18px; 
+        }
+        .msg-ai { 
+            background: #111; 
+            color: #f0f0f0; 
+            align-self: flex-start; 
+            border-radius: 18px 18px 18px 2px; 
+            border: 1px solid #222; 
+        }
+        .msg-dev {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid #28a745;
+            color: #85e39d;
+            align-self: flex-start;
+            border-radius: 18px 18px 18px 2px;
+        }
+        
+        #chat-input { 
+            padding: 14px; 
+            border-top: 1px solid #1a1a1a; 
+            display: flex; 
+            gap: 10px; 
+            background: #000; 
+        }
+        #chat-input input { 
+            flex: 1; 
+            background: #111; 
+            border: 1px solid #222; 
+            color: white; 
+            padding: 12px 18px; 
+            border-radius: 50px; 
+            outline: none; 
+            font-size: 14px;
+        }
+        #chat-input button { 
+            background: var(--accent); 
+            border: none; 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            color: black; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+
+        /* МОДАЛЬНЫЕ ОКНА И ТУТОРИАЛ */
+        #auth-modal, #status-modal, #tutorial-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .modal-card {
+            background: #0a0a0a;
+            border: 1px solid var(--accent);
+            width: 90%;
+            max-width: 420px;
+            padding: 28px;
+            border-radius: 22px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .modal-card input {
+            width: 100%;
+            padding: 12px 18px;
+            background: #111;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 50px;
+            outline: none;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .modal-card button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            border: none;
+            color: black;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: filter 0.2s;
+            margin-top: 8px;
+        }
+
+        .modal-card button:hover {
+            filter: brightness(1.2);
+        }
+
+        /* ЭЛЕМЕНТЫ ТУТОРИАЛА СО СТРЕЛОЧКАМИ И БАББЛАМИ */
+        #tutorial-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 9999;
+            display: none;
+            pointer-events: auto;
+        }
+
+        .tutorial-highlight {
+            position: relative;
+            z-index: 10001 !important;
+            box-shadow: 0 0 25px var(--accent) !important;
+            border-color: var(--accent) !important;
+        }
+
+        .tutorial-bubble {
+            position: absolute;
+            background: #141414;
+            border: 2px solid var(--accent);
+            border-radius: 18px;
+            padding: 16px 20px;
+            width: 280px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+            z-index: 10002;
+            display: none;
+            animation: bubbleAppear 0.3s ease;
+        }
+
+        .tutorial-bubble p {
+            margin: 0 0 12px 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #ddd;
+        }
+
+        .tutorial-bubble .step-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tutorial-bubble button {
+            background: var(--accent);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .pointer-arrow {
+            position: absolute;
+            font-size: 36px;
+            color: var(--accent);
+            z-index: 10002;
+            animation: bounce 1s infinite alternate;
+            display: none;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        @keyframes bubbleAppear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            body.split-active #side-panel { position: fixed; inset: 0; width: 100%; height: 100vh; }
+            .dashboard { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <img src="image.png" alt="LMSH Logo" class="logo">
-
-    <div class="dashboard">
-        <div class="card card-blue" onclick="location.href='questions.html'" data-link="questions.html" data-color="#007bff"><h3>Вопросы</h3><p>Техподдержка</p></div>
-        <div class="card card-green" onclick="location.href='ideas.html'" data-link="ideas.html" data-color="#28a745" data-ideas="true"><h3>Идеи</h3><p>Инновации</p></div>
-        <div class="card card-gold" onclick="location.href='reviews.html'" data-link="reviews.html" data-color="#ffc107"><h3>Отзывы</h3><p>Оцените нас</p></div>
-        <div class="card card-purple" onclick="showAIStatus('Домен kosmo level installer не вышел. Публикация паков пока невозможна!')" data-link="upload_pack.html" data-color="#7C3AED"><h3>Пак</h3><p>Ваш контент</p></div>
-        <div class="card card-gray" onclick="showAIStatus('Недоступно!')" data-link="preregistration.html" data-color="#555"><h3>Предрегистрация</h3><p>Оформите Предрегистрацию</p></div>
-        <div class="card card-gray" onclick="location.href='review_pack.html'" data-link="review_pack.html" data-color="#555"><h3>Оценить Пак</h3><p>Новая форма</p></div>
-    </div>
-
-    <div id="context-menu">
-        <div class="menu-item" id="ideas-view" style="display:none;" onclick="location.href='all-ideas.html'">Посмотреть идеи</div>
-        <div class="menu-item" onclick="discuss()">Обсудить с Assistant</div>
-    </div>
-
-    <div id="assistant-btn" onclick="openChat('Помощник ЛМСХ')"><span>AI</span></div>
-
-    <div id="chat-window">
-        <div id="chat-header">
-            <span id="chat-title">Помощник ЛМСХ</span>
-            <span onclick="closeChat()" style="cursor:pointer; color: #666;">✕</span>
+    <!-- ОВЕРЛЕЙ ДЛЯ ТУТОРИАЛА -->
+    <div id="tutorial-overlay"></div>
+    <div id="tutorial-bubble" class="tutorial-bubble">
+        <div id="tutorial-text"></div>
+        <div class="step-actions">
+            <span id="tutorial-step-num" style="font-size: 11px; color: #888;">Шаг 1 из 3</span>
+            <button id="tutorial-next-btn" onclick="nextTutorialStep()">Далее</button>
         </div>
+    </div>
+    <span id="tutorial-arrow" class="material-symbols-outlined pointer-arrow">south</span>
+
+    <!-- ЛЕВАЯ ЧАСТЬ DASHBOARD -->
+    <div id="main-content">
+        <img src="image.png" alt="LMSH Logo" class="logo">
+
+        <!-- КАРТОЧКА ИМЕНИ ПОЛЬЗОВАТЕЛЯ ПО ЦЕНТРУ -->
+        <div class="user-profile-center">
+            <div class="user-profile-card" id="target-profile" onclick="location.href='you.html'">
+                <div class="card-left">
+                    <span class="material-symbols-outlined card-icon" style="color: #00d2ff;">account_circle</span>
+                    <div class="card-info">
+                        <h3 id="user-card-name">Профиль (You)</h3>
+                        <p>Управление аккаунтом и история</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined card-arrow">chevron_right</span>
+            </div>
+        </div>
+
+        <!-- СЕТКА ИЗ 6 ФОРМ -->
+        <div class="dashboard">
+            <!-- 1. Вопросы -->
+            <div class="card card-blue" onclick="location.href='questions.html'" data-link="questions.html" data-color="#007bff">
+                <div class="card-left">
+                    <span class="material-symbols-outlined card-icon" style="color: #007bff;">help_center</span>
+                    <div class="card-info">
+                        <h3>Вопросы</h3>
+                        <p>Техподдержка</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined card-arrow">chevron_right</span>
+            </div>
+
+            <!-- 2. Идеи -->
+            <div class="card card-green" id="target-ideas" onclick="location.href='ideas.html'" data-link="ideas.html" data-color="#28a745" data-ideas="true">
+                <div class="card-left">
+                    <span class="material-symbols-outlined card-icon" style="color: #28a745;">lightbulb</span>
+                    <div class="card-info">
+                        <h3>Идеи</h3>
+                        <p>Инновации</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined card-arrow">chevron_right</span>
+            </div>
+
+            <!-- 3. Отзывы -->
+            <div class="card card-gold" onclick="location.href='reviews.html'" data-link="reviews.html" data-color="#ffc107" data-reviews="true">
+                <div class="card-left">
+                    <span class="material-symbols-outlined card-icon" style="color: #ffc107;">rate_review</span>
+                    <div class="card-info">
+                        <h3>Отзывы</h3>
+                        <p>Отзывы и оценка паков</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined card-arrow">chevron_right</span>
+            </div>
+
+            <!-- 4. Пак -->
+            <div class="card card-purple" onclick="showAIStatus('Домен kosmo level installer не вышел. Публикация паков пока невозможна!')" data-color="#7C3AED">
+                <div class="card-left">
+                    <span class="material-symbols-outlined card-icon" style="color: #7C3AED;">inventory_2</span>
+                    <div class="card-info">
+                        <h3>Пак</h3>
+                        <p>Ваш контент</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined card-arrow">chevron_right</span>
+            </div>
+
+            <!-- 5. Предрегистрация -->
+            <div class="card card-gray" onclick="location.href='preregistration.html'" data-link="preregistration.html" data-color="#888" data-prereg="true">
+                <div class="card-left">
+                    <span class="material-symbols-outlined card-icon" style="color: #888;">app_registration</span>
+                    <div class="card-info">
+                        <h3>Предрегистрация</h3>
+                        <p>Kosmo Level UI2</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined card-arrow">chevron_right</span>
+            </div>
+
+            <!-- 6. Настройки Страниц -->
+            <div class="card card-orange" onclick="location.href='settings.html'" data-color="#ff9800">
+                <div class="card-left">
+                    <span class="material-symbols-outlined card-icon" style="color: #ff9800;">settings</span>
+                    <div class="card-info">
+                        <h3>Настройки</h3>
+                        <p>Цвета и интерфейс</p>
+                    </div>
+                </div>
+                <span class="material-symbols-outlined card-arrow">chevron_right</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПРАВАЯ ЧАСТЬ (БОКОВАЯ ПАНЕЛЬ С ВКЛАДКАМИ) -->
+    <div id="side-panel">
+        <div class="panel-header">
+            <div class="header-top">
+                <span style="font-size: 13px; color: #888;">Бортовой Модуль</span>
+                <span onclick="closeChat()" class="material-symbols-outlined" style="cursor:pointer; color: #666; font-size: 22px;">close</span>
+            </div>
+            
+            <div class="panel-tabs">
+                <button class="tab-btn active" id="tab-ai" onclick="switchMode('ai')">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">smart_toy</span>
+                    AI Помощник
+                </button>
+                <button class="tab-btn" id="tab-dev" onclick="switchMode('dev')">
+                    <span class="material-symbols-outlined" style="font-size: 18px;">terminal</span>
+                    DEV Чат
+                </button>
+            </div>
+        </div>
+
         <div id="chat-body">
-            <div class="msg-bubble msg-ai">Привет! На связи бортовой ИИ Штаба ЛМСХ. Чем могу помочь тебе сегодня?</div>
+            <div class="msg-bubble msg-ai">Привет! Чем могу помочь тебе сегодня?</div>
         </div>
+
         <div id="chat-input">
-            <input type="text" id="chat-msg" placeholder="Введите..." onkeydown="if(event.key === 'Enter') sendMessage()">
-	<button onclick="sendMessage()">➤</button>
+            <input type="text" id="chat-msg" placeholder="Сообщение..." onkeydown="if(event.key === 'Enter') sendMessage()">
+            <button onclick="sendMessage()">
+                <span class="material-symbols-outlined" style="font-size: 20px;">send</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- КОНТЕКСТНОЕ МЕНЮ -->
+    <div id="context-menu">
+        <div class="menu-item" id="ideas-view" style="display:none;" onclick="location.href='all-ideas.html'">
+            <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span> Посмотреть идеи
+        </div>
+        <div class="menu-item" id="review-pack-view" style="display:none;" onclick="location.href='review_pack.html'">
+            <span class="material-symbols-outlined" style="font-size: 18px;">star_rate</span> Оценить Пак
+        </div>
+        <div class="menu-item" id="prereg-view" style="display:none;" onclick="location.href='preregistration.html'">
+            <span class="material-symbols-outlined" style="font-size: 18px;">rocket_launch</span> Бронь / Отмена Kosmo UI2
+        </div>
+        <div class="menu-item" onclick="discuss()">
+            <span class="material-symbols-outlined" style="font-size: 18px;">forum</span> Обсудить в чате
+        </div>
+    </div>
+
+    <!-- ПЛАВАЮЩАЯ КНОПКА ВЫЗОВА ПАНЕЛИ -->
+    <div id="assistant-btn" onclick="openChat('ai')">
+        <span class="material-symbols-outlined" style="font-size: 28px;">smart_toy</span>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ОБНОВЛЕНИЯ / ТУТОРИАЛА -->
+    <div id="tutorial-modal">
+        <div class="modal-card">
+            <h2 style="color:var(--accent); margin-top:0; font-size: 20px;">
+                <span class="material-symbols-outlined" style="vertical-align: middle;">rocket_launch</span>
+                Глобальное Обновление!
+            </h2>
+            <p style="font-size:13px; color:#aaa; margin-bottom: 20px; line-height: 1.5;">
+                Привет! Мы полностью переработали Главный Dashboard Prestige HQ. Хочешь быстрый интерактивный тур по новым функциям?
+            </p>
+            <button onclick="startInteractiveTutorial()">Пройти быстрый тур 🚀</button>
+            <button onclick="closeTutorialModal()" style="background:transparent; border:1px solid #333; color:#888;">Пропустить</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО РЕГИСТРАЦИИ -->
+    <div id="auth-modal">
+        <div class="modal-card">
+            <h2 style="color:var(--accent); margin-top:0; font-size: 20px;">
+                <span class="material-symbols-outlined" style="vertical-align: middle;">badge</span>
+                Авторизация
+            </h2>
+            <p style="font-size:13px; color:#aaa; margin-bottom: 20px;">Укажите данные для работы в системе.</p>
+            <input type="text" id="reg-name" placeholder="Ваше Имя">
+            <input type="email" id="reg-email" placeholder="Ваш Email">
+            <button onclick="registerUser()">Сохранить и войти</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО СТАТУСА/УВЕДОМЛЕНИЙ -->
+    <div id="status-modal">
+        <div class="modal-card">
+            <h2 style="color:var(--accent); margin-top:0; font-size: 20px;">
+                <span class="material-symbols-outlined" style="vertical-align: middle;">info</span>
+                Уведомление
+            </h2>
+            <p id="status-modal-msg" style="font-size:13px; color:#aaa; margin-bottom: 20px;"></p>
+            <button onclick="closeStatusModal()">Понятно</button>
         </div>
     </div>
 
     <script>
-        const menu = document.getElementById('context-menu');
+        let activeMode = 'ai';
         let activeCard = null;
+        let tutorialStep = 0;
 
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('contextmenu', e => {
-                e.preventDefault();
-                activeCard = card;
-                document.querySelectorAll('.card').forEach(c => { if(c !== card) c.classList.add('blurred'); });
-                document.documentElement.style.setProperty('--accent', card.dataset.color);
-                document.getElementById('ideas-view').style.display = card.dataset.ideas ? 'block' : 'none';
-                menu.style.top = e.pageY + 'px'; menu.style.left = e.pageX + 'px'; menu.style.display = 'block';
-            });
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedAccent = localStorage.getItem('lmsh-accent-color');
+            if (savedAccent) {
+                document.documentElement.style.setProperty('--accent', savedAccent);
+            }
+
+            const name = localStorage.getItem('lmsh-author');
+            const email = localStorage.getItem('lmsh-email');
+
+            if (!name || !email) {
+                document.getElementById('auth-modal').style.display = 'flex';
+            } else {
+                document.getElementById('user-card-name').innerText = name;
+                // Показываем тур при первой авторизованной сессии
+                if (!localStorage.getItem('lmsh-tutorial-passed')) {
+                    document.getElementById('tutorial-modal').style.display = 'flex';
+                }
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('openDevChat')) {
+                const postId = urlParams.get('openDevChat');
+                openChat('dev');
+                appendBubble(`[DEV System] Загружен контекст обращения #${postId}. Ожидайте ответа от Главного Инженера.`, 'dev');
+            }
         });
 
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('#context-menu')) menu.style.display = 'none';
-            if (!e.target.closest('#context-menu')) document.querySelectorAll('.card').forEach(c => c.classList.remove('blurred'));
-        });
+        function registerUser() {
+            const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
 
-        // Открытие/закрытие чата
-        function openChat(topic) { 
-            document.getElementById('chat-window').style.display = 'flex'; 
-            document.getElementById('chat-title').innerText = topic + " 🤖"; 
+            if (!name || !email) {
+                showAIStatus("Заполните оба поля!");
+                return;
+            }
+
+            localStorage.setItem('lmsh-author', name);
+            localStorage.setItem('lmsh-email', email);
+            document.getElementById('user-card-name').innerText = name;
+            document.getElementById('auth-modal').style.display = 'none';
+
+            // Предлагаем туториал сразу после авторизции
+            document.getElementById('tutorial-modal').style.display = 'flex';
+        }
+
+        /* ИНТЕРАКТИВНЫЙ ТУТОРИАЛ C СТРЕЛОЧКАМИ И БАББЛАМИ */
+        function closeTutorialModal() {
+            document.getElementById('tutorial-modal').style.display = 'none';
+            localStorage.setItem('lmsh-tutorial-passed', 'true');
+        }
+
+        function startInteractiveTutorial() {
+            closeTutorialModal();
+            document.getElementById('tutorial-overlay').style.display = 'block';
+            tutorialStep = 0;
+            nextTutorialStep();
+        }
+
+        function nextTutorialStep() {
+            // Сброс подсветок
+            document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
+            
+            const bubble = document.getElementById('tutorial-bubble');
+            const arrow = document.getElementById('tutorial-arrow');
+            const text = document.getElementById('tutorial-text');
+            const stepNum = document.getElementById('tutorial-step-num');
+
+            tutorialStep++;
+
+            if (tutorialStep === 1) {
+                const target = document.getElementById('target-profile');
+                target.classList.add('tutorial-highlight');
+                
+                const rect = target.getBoundingClientRect();
+                text.innerHTML = "<b>Карточка Профиля:</b> Теперь ваша персональная страница закреплена в центре верхней части экрана.";
+                stepNum.innerText = "Шаг 1 из 3";
+
+                bubble.style.top = (rect.bottom + 15) + 'px';
+                bubble.style.left = (rect.left + (rect.width/2) - 140) + 'px';
+                bubble.style.display = 'block';
+
+                arrow.style.top = (rect.bottom - 10) + 'px';
+                arrow.style.left = (rect.left + (rect.width/2) - 18) + 'px';
+                arrow.style.display = 'block';
+            }
+            else if (tutorialStep === 2) {
+                const target = document.getElementById('target-ideas');
+                target.classList.add('tutorial-highlight');
+
+                const rect = target.getBoundingClientRect();
+                text.innerHTML = "<b>Умное контекстное меню:</b> Нажмите <i>ПКМ</i> или зажмите любую карточку, чтобы открыть доп. действия.";
+                stepNum.innerText = "Шаг 2 из 3";
+
+                bubble.style.top = (rect.bottom + 15) + 'px';
+                bubble.style.left = Math.max(10, rect.left) + 'px';
+
+                arrow.style.top = (rect.bottom - 10) + 'px';
+                arrow.style.left = (rect.left + (rect.width/2) - 18) + 'px';
+            }
+            else if (tutorialStep === 3) {
+                const target = document.getElementById('assistant-btn');
+                target.classList.add('tutorial-highlight');
+
+                const rect = target.getBoundingClientRect();
+                text.innerHTML = "<b>Бортовой модуль:</b> Нажмите сюда, чтобы открыть чат с AI Помощником или перейти в DEV Чат с разработчиками.";
+                stepNum.innerText = "Шаг 3 из 3";
+
+                document.getElementById('tutorial-next-btn').innerText = "Завершить";
+
+                bubble.style.top = (rect.top - 140) + 'px';
+                bubble.style.left = (rect.left - 240) + 'px';
+
+                arrow.style.top = (rect.top - 35) + 'px';
+                arrow.style.left = (rect.left + 10) + 'px';
+            }
+            else {
+                // Завершение туториала
+                bubble.style.display = 'none';
+                arrow.style.display = 'none';
+                document.getElementById('tutorial-overlay').style.display = 'none';
+                localStorage.setItem('lmsh-tutorial-passed', 'true');
+                showAIStatus("Обучение завершено! Приятного использования новой версией Dashboard.");
+            }
+        }
+
+        function switchMode(mode) {
+            activeMode = mode;
+            document.getElementById('tab-ai').classList.toggle('active', mode === 'ai');
+            document.getElementById('tab-dev').classList.toggle('active', mode === 'dev');
+            
+            const chatBody = document.getElementById('chat-body');
+            if (mode === 'dev') {
+                chatBody.innerHTML = '<div class="msg-bubble msg-dev"><b>[DEV CHAT]</b> Соединение с Главным Инженером установлено. Задайте ваш вопрос напрямую.</div>';
+            } else {
+                chatBody.innerHTML = '<div class="msg-bubble msg-ai">Бортовой ИИ готов к диалогу. Выберите тему или задайте вопрос.</div>';
+            }
+        }
+
+        function openChat(mode = 'ai') { 
+            document.body.classList.add('split-active');
+            switchMode(mode);
         }
         
         function closeChat() { 
-            document.getElementById('chat-window').style.display = 'none'; 
+            document.body.classList.remove('split-active');
         }
 
-        // Рендеринг бабблов по разным сторонам
         function appendBubble(text, side) {
             const chatBody = document.getElementById('chat-body');
             const bubble = document.createElement('div');
             bubble.className = `msg-bubble msg-${side}`;
-            bubble.innerText = text;
+            bubble.innerHTML = text;
             chatBody.appendChild(bubble);
-            chatBody.scrollTop = chatBody.scrollHeight; // Скролл вниз
+            chatBody.scrollTop = chatBody.scrollHeight;
         }
 
-        // Интеллектуальная отправка и if-else парсинг ИИ
         function sendMessage() { 
             const input = document.getElementById('chat-msg'); 
             const query = input.value.trim();
-            
             if (!query) return; 
             
             appendBubble(query, 'user');
             input.value = ""; 
 
-            const lowerQuery = query.toLowerCase();
-
-            // Логика ответов ИИ Помощника
             setTimeout(() => {
-                if (lowerQuery.includes('привет') || lowerQuery.includes('ку')) {
-                    appendBubble("Приветствую в Главном Дашборде Штаба! Рад помочь.", "ai");
-                } 
-                else if (lowerQuery.includes('отзыв') || lowerQuery.includes('оценить')) {
-                    appendBubble("Секция отзывов обновлена. Ты можешь воспользоваться карточкой 'Оценить Пак' для перехода на форму TITAN REVIEWS.", "ai");
-                } 
-                else if (lowerQuery.includes('идеи') || lowerQuery.includes('инновац')) {
-                    appendBubble("Раздел идей открыт для генерации! Нажми правой кнопкой мыши по карточке 'Идеи', чтобы просмотреть архив предложений Штаба.", "ai");
+                if (activeMode === 'dev') {
+                    appendBubble("<b>Разработчик:</b> Ваш запрос передан. Сообщение сохранено в карточке истории на странице You.", 'dev');
+                } else {
+                    appendBubble("Запрос обработан бортовым ИИ. Для связи с командой переключитесь в DEV Чат.", "ai");
                 }
-                else if (lowerQuery.includes('пак') || lowerQuery.includes('публикация')) {
-                    appendBubble("Внимание! Публикация паков временно заблокирована, так как домен Kosmo Level Installer ещё не вышел в релиз.", "ai");
-                }
-                else if (lowerQuery.includes('вопрос') || lowerQuery.includes('поддержк')) {
-                    appendBubble("Проблемы с конфигурацией? Перейди в карточку 'Вопросы', чтобы связаться с техподдержкой ЛМСХ.", "ai");
-                }
-                else {
-                    appendBubble("Запрос обрабатывается ядром ИИ Штаба... Для выполнения конкретных операций используй контекстное меню карточек панели.", "ai");
-                }
-            }, 500);
+            }, 600);
         }
+
+        // КОНТЕКСТНОЕ МЕНЮ
+        document.querySelectorAll('.card, .user-profile-card').forEach(card => {
+            card.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                activeCard = card;
+                document.querySelectorAll('.card, .user-profile-card').forEach(c => { if(c !== card) c.classList.add('blurred'); });
+                
+                document.getElementById('ideas-view').style.display = card.dataset.ideas ? 'flex' : 'none';
+                document.getElementById('review-pack-view').style.display = card.dataset.reviews ? 'flex' : 'none';
+                document.getElementById('prereg-view').style.display = card.dataset.prereg ? 'flex' : 'none';
+                
+                const menu = document.getElementById('context-menu');
+                menu.style.top = e.pageY + 'px'; 
+                menu.style.left = e.pageX + 'px'; 
+                menu.style.display = 'block';
+            });
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#context-menu')) {
+                document.getElementById('context-menu').style.display = 'none';
+                document.querySelectorAll('.card, .user-profile-card').forEach(c => c.classList.remove('blurred'));
+            }
+        });
 
         function discuss() { 
-            menu.style.display = 'none'; 
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('blurred')); 
-            const topic = activeCard.querySelector('h3').innerText;
-            openChat("Обсуждение: " + topic); 
-            appendBubble(`Бортовой компьютер переведён в режим разбора модуля "${topic}". Задавай свои вопросы по этой теме!`, 'ai');
+            document.getElementById('context-menu').style.display = 'none'; 
+            document.querySelectorAll('.card, .user-profile-card').forEach(c => c.classList.remove('blurred')); 
+            openChat('ai'); 
         }
 
-        // Фирменный неоновый статус-баббл вместо alert
         function showAIStatus(msg) { 
-            let bubble = document.getElementById('ai-bubble');
-            if (!bubble) {
-                bubble = document.createElement('div');
-                bubble.id = 'ai-bubble';
-                bubble.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); border:1px solid var(--accent); padding:20px; border-radius:20px; z-index:10000; color:white; font-weight:bold; text-align:center; box-shadow:0 0 30px rgba(255, 193, 7, 0.4); animation:fadeIn 0.3s; width:80%; max-width:320px; line-height: 1.5;";
-                document.body.appendChild(bubble);
-            }
-            bubble.innerHTML = msg.replace(/\n/g, '<br>');
-            bubble.style.display = 'block';
-            setTimeout(() => { bubble.style.display = 'none'; }, 4000);
+            document.getElementById('status-modal-msg').innerText = msg;
+            document.getElementById('status-modal').style.display = 'flex';
+        }
+
+        function closeStatusModal() {
+            document.getElementById('status-modal').style.display = 'none';
         }
     </script>
 </body>
