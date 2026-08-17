@@ -6,41 +6,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
     <style>
-        :root { --accent: #28a745; --bg: #050505; --card: #0a0a0a; --text: #fff; }
+        :root { --accent: #28a745; --bg: #050505; --card: #0a0a0a; --text: #fff; --border: #222; }
+        * { box-sizing: border-box; }
         body { margin: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding: 20px; padding-bottom: 80px; }
 
-        .container { max-width: 800px; margin: auto; }
+        .container { max-width: 720px; margin: auto; }
         
-        /* Шапка и Управление */
-        .header-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
-        .back-btn { background: transparent; color: #666; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-family: inherit; }
+        .header-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+        .back-btn { background: transparent; color: #888; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 13px; }
         .back-btn:hover { border-color: var(--accent); color: var(--accent); }
-        .btn-create { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; font-family: inherit; transition: 0.3s; }
-        .btn-create:hover { box-shadow: 0 0 15px rgba(40, 167, 69, 0.4); }
+        .btn-create { background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 6px; font-size: 13px; transition: 0.3s; }
         
-        /* Поиск */
-        .filter-bar { display: flex; gap: 10px; margin-bottom: 30px; }
-        input[type="text"] { flex: 1; padding: 15px; background: var(--card); border: 1px solid #222; color: white; border-radius: 20px; outline: none; transition: 0.3s; font-family: inherit; }
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 24px; }
+        input[type="text"] { flex: 1; padding: 12px 16px; background: var(--card); border: 1px solid var(--border); color: white; border-radius: 16px; outline: none; transition: 0.3s; font-size: 14px; }
         input[type="text"]:focus { border-color: var(--accent); }
 
         /* Карточки Идей */
         .ideas-grid { display: grid; gap: 20px; }
-        .idea-card { background: #111; border: 1px solid #222; padding: 20px; border-radius: 20px; position: relative; overflow: hidden; transition: transform 0.2s; }
-        .idea-card:hover { transform: translateY(-2px); border-color: #333; }
+        .idea-card { background: #111; border: 1px solid var(--border); padding: 20px; border-radius: 20px; position: relative; overflow: hidden; }
         .idea-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--accent); }
         .idea-card.high-priority::before { background: #dc3545; }
         .idea-card.low-priority::before { background: #6c757d; }
         
-        .idea-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .idea-author { font-size: 12px; color: #888; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
-        .idea-desc { font-size: 14px; color: #ccc; line-height: 1.5; margin-bottom: 15px; }
-        .idea-benefit { background: rgba(40, 167, 69, 0.1); padding: 10px; border-radius: 10px; font-size: 13px; color: var(--accent); }
+        .idea-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+        .idea-title { font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 6px; }
+        .idea-author { font-size: 12px; color: #888; margin-bottom: 14px; display: flex; align-items: center; gap: 5px; }
+        .idea-desc { font-size: 14px; color: #ccc; line-height: 1.5; margin-bottom: 12px; }
+        .idea-benefit { background: rgba(40, 167, 69, 0.1); padding: 10px 12px; border-radius: 12px; font-size: 13px; color: var(--accent); margin-bottom: 15px; }
         
-        /* Кнопка Лайка */
-        .like-btn { background: transparent; border: 1px solid #333; color: #888; padding: 8px 15px; border-radius: 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; transition: 0.3s; font-family: inherit; font-weight: bold; }
+        /* Лайки и Подвал карточки */
+        .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 14px; }
+        .like-btn { background: transparent; border: 1px solid #333; color: #888; padding: 8px 16px; border-radius: 50px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; transition: 0.3s; font-weight: bold; }
         .like-btn:hover { border-color: var(--accent); color: var(--accent); }
         .like-btn.liked { background: rgba(40, 167, 69, 0.15); border-color: var(--accent); color: var(--accent); }
-        .like-btn.liked .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
+
+        /* Комментарии */
+        .comments-section { margin-top: 16px; border-top: 1px solid #1a1a1a; padding-top: 14px; }
+        .comments-title { font-size: 13px; font-weight: bold; color: #aaa; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .comment-item { background: #080808; border: 1px solid #1a1a1a; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; font-size: 13px; }
+        .comment-head { display: flex; justify-content: space-between; color: #777; font-size: 11px; margin-bottom: 4px; }
+        .comment-author { font-weight: bold; color: var(--accent); }
+        .comment-text { color: #ddd; line-height: 1.4; word-break: break-word; }
+        .delete-comment-btn { background: transparent; border: none; color: #dc3545; cursor: pointer; font-size: 11px; padding: 0; }
+        .delete-comment-btn:hover { text-decoration: underline; }
+
+        .add-comment-box { display: flex; gap: 8px; margin-top: 10px; }
+        .add-comment-box input { padding: 10px 14px; font-size: 13px; border-radius: 20px; }
+        .add-comment-box button { background: var(--accent); border: none; color: white; padding: 0 16px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 13px; }
+
+        /* Модалка */
+        #custom-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 10000; }
+        .modal-card { background: #0a0a0a; border: 1px solid var(--accent); width: 88%; max-width: 360px; padding: 24px; border-radius: 20px; text-align: center; }
+        .modal-card h3 { margin: 0 0 10px 0; color: var(--accent); font-size: 18px; }
+        .modal-card p { font-size: 13px; color: #ccc; line-height: 1.5; margin-bottom: 20px; }
+        .modal-card button { width: 100%; padding: 12px; background: var(--accent); border: none; color: white; font-weight: bold; border-radius: 50px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -48,40 +67,44 @@
     <div class="container">
         <div class="header-actions">
             <button class="back-btn" onclick="location.href='ideas.html'">← Назад</button>
-            <h2 style="margin: 0; color: var(--accent);">Архив Инноваций</h2>
-            <button class="btn-create" onclick="location.href='green-form.html'">
-                <span class="material-symbols-rounded">add</span> Предложить
+            <h2 style="margin: 0; color: var(--accent); font-size: 20px;">Архив Инноваций</h2>
+            <button class="btn-create" onclick="location.href='ideas.html'">
+                <span class="material-symbols-rounded" style="font-size: 18px;">add</span> Предложить
             </button>
         </div>
 
         <div class="filter-bar">
-            <input type="text" placeholder="Поиск по названию или автору..." id="search-input" onkeyup="renderIdeas()">
+            <input type="text" placeholder="Поиск идей по названию или автору..." id="search-input" onkeyup="renderIdeas()">
         </div>
 
-        <div class="ideas-grid" id="ideas-grid">
-            </div>
+        <div class="ideas-grid" id="ideas-grid"></div>
     </div>
 
-    <div class="ai-overlay">
-        <div id="ai-bar" onclick="showAIStatus('Шеф, здесь хранятся все разработки. Ставь лайки лучшим идеям, и они сохранятся в памяти системы!')" style="position:fixed; bottom:20px; right:20px; background:#0a0a0a; border:1px solid var(--accent); padding:12px 20px; border-radius:30px; display:flex; align-items:center; gap:10px; cursor:pointer; color:white; box-shadow:0 10px 20px rgba(0,0,0,0.5);">
-            <span class="material-symbols-rounded">smart_toy</span>
-            <span>Помощник ЛМСХ</span>
+    <!-- Модальное окно -->
+    <div id="custom-modal">
+        <div class="modal-card">
+            <h3 id="modal-title">Уведомление</h3>
+            <p id="modal-msg"></p>
+            <button onclick="closeModal()">Понятно</button>
         </div>
     </div>
 
     <script>
-        // Имитация базы данных (пока не привяжем реальное сохранение из формы)
+        const currentUser = localStorage.getItem('lmsh-author') || 'Гость';
+
         const defaultIdeas = [
-            { id: 101, title: "Интеграция LocalStorage", author: "Ламирк", date: "2 июля 2026", desc: "Сохранять историю отправленных логов и идей в локальную память браузера для быстрого доступа без интернета.", benefit: "Ускорит работу с архивом в 3 раза.", priority: "Высокий" },
-            { id: 102, title: "Умная валидация Email", author: "Мурзик", date: "1 июля 2026", desc: "Добавить регулярные выражения для проверки правильности ввода электронной почты в зеленой форме.", benefit: "Избавит Штаб от спама и некорректных данных.", priority: "Средний" },
-            { id: 103, title: "Редизайн кнопок навигации", author: "Хахми", date: "30 июня 2026", desc: "Сделать кнопки возврата более заметными, добавить им пульсацию при наведении.", benefit: "Улучшит UX на мобильных устройствах.", priority: "Низкий" }
+            { id: 101, title: "Интеграция LocalStorage", author: "Ламирк", date: "2 июля 2026", desc: "Сохранять историю отправленных логов и идей в локальную память браузера.", benefit: "Ускорит работу с архивом в 3 раза.", priority: "Высокий", likes: 12, comments: [{ id: 1, author: "Мурзик", text: "Отличная идея, поддержу!" }] },
+            { id: 102, title: "Умная валидация Email", author: "Мурзик", date: "1 июля 2026", desc: "Добавить регулярные выражения для проверки правильности ввода почты.", benefit: "Избавит Штаб от спама и некорректных данных.", priority: "Средний", likes: 8, comments: [] },
+            { id: 103, title: "Быстрые комментарии", author: "Хахми", date: "30 июня 2026", desc: "Обсуждение предложенных идей прямо в архиве.", benefit: "Улучшит обратную связь от команды.", priority: "Низкий", likes: 5, comments: [] }
         ];
 
         function getIdeas() {
-            // В будущем мы будем брать идеи из localStorage
-            // let stored = localStorage.getItem('hq_ideas');
-            // return stored ? JSON.parse(stored) : defaultIdeas;
-            return defaultIdeas;
+            let stored = localStorage.getItem('hq_ideas');
+            return stored ? JSON.parse(stored) : defaultIdeas;
+        }
+
+        function saveIdeas(ideas) {
+            localStorage.setItem('hq_ideas', JSON.stringify(ideas));
         }
 
         function renderIdeas() {
@@ -90,7 +113,16 @@
             grid.innerHTML = ''; 
 
             let ideas = getIdeas();
-            let likedIdeas = JSON.parse(localStorage.getItem('likedIdeas')) || [];
+            let likedIdeas = JSON.parse(localStorage.getItem('user_liked_ids')) || [];
+            let likesMap = JSON.parse(localStorage.getItem('idea_likes_count')) || {};
+
+            // Расчет реального количества лайков
+            ideas.forEach(idea => {
+                idea.currentLikes = likesMap[idea.id] !== undefined ? likesMap[idea.id] : (idea.likes || 0);
+            });
+
+            // СОРТИРОВКА: Лучшие (больше всего лайков) попадают на самый верх
+            ideas.sort((a, b) => b.currentLikes - a.currentLikes);
 
             // Фильтрация поиска
             if (searchStr) {
@@ -103,38 +135,48 @@
             }
 
             ideas.forEach(idea => {
-                const isLiked = likedIdeas.includes(idea.id) ? 'liked' : '';
+                const isLiked = likedIdeas.includes(idea.id);
                 
-                // Назначаем класс приоритета для полоски слева
-                let priorityClass = '';
-                let priorityIcon = 'check_circle';
-                let iconColor = 'var(--accent)';
+                let priorityClass = idea.priority === 'Высокий' ? 'high-priority' : (idea.priority === 'Низкий' ? 'low-priority' : '');
+                let priorityIcon = idea.priority === 'Высокий' ? 'local_fire_department' : 'check_circle';
+                let iconColor = idea.priority === 'Высокий' ? '#dc3545' : 'var(--accent)';
 
-                if (idea.priority === 'Высокий') {
-                    priorityClass = 'high-priority';
-                    priorityIcon = 'local_fire_department';
-                    iconColor = '#dc3545';
-                } else if (idea.priority === 'Низкий') {
-                    priorityClass = 'low-priority';
-                    priorityIcon = 'info';
-                    iconColor = '#6c757d';
-                }
-                
+                const commentsHTML = (idea.comments || []).map(c => `
+                    <div class="comment-item">
+                        <div class="comment-head">
+                            <span class="comment-author">${c.author}</span>
+                            ${c.author === currentUser ? `<button class="delete-comment-btn" onclick="deleteComment(${idea.id}, ${c.id})">Удалить</button>` : ''}
+                        </div>
+                        <div class="comment-text">${c.text}</div>
+                    </div>
+                `).join('');
+
                 const cardHTML = `
                     <div class="idea-card ${priorityClass}">
-                        <div class="idea-title">
-                            ${idea.title}
-                            <span class="material-symbols-rounded" style="color: ${iconColor};" title="Приоритет: ${idea.priority}">${priorityIcon}</span>
+                        <div class="idea-header">
+                            <div class="idea-title">${idea.title}</div>
+                            <span class="material-symbols-rounded" style="color: ${iconColor}; font-size: 20px;" title="Приоритет: ${idea.priority}">${priorityIcon}</span>
                         </div>
-                        <div class="idea-author"><span class="material-symbols-rounded" style="font-size: 16px;">person</span> ${idea.author} • ${idea.date}</div>
+                        <div class="idea-author"><span class="material-symbols-rounded" style="font-size: 15px;">person</span> ${idea.author} • ${idea.date}</div>
                         <div class="idea-desc">${idea.desc}</div>
                         <div class="idea-benefit">🚀 Польза: ${idea.benefit}</div>
                         
-                        <div style="margin-top: 15px; border-top: 1px solid #222; padding-top: 15px;">
-                            <button class="like-btn ${isLiked}" onclick="toggleLike(${idea.id}, this)">
-                                <span class="material-symbols-rounded">thumb_up</span> 
-                                <span>Голосовать</span>
+                        <div class="card-footer">
+                            <button class="like-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${idea.id})">
+                                <span class="material-symbols-rounded" style="font-size: 18px;">thumb_up</span> 
+                                <span>Голосовать (${idea.currentLikes})</span>
                             </button>
+                        </div>
+
+                        <div class="comments-section">
+                            <div class="comments-title">
+                                <span class="material-symbols-rounded" style="font-size: 16px;">chat</span> Комментарии (${(idea.comments || []).length})
+                            </div>
+                            <div id="comments-list-${idea.id}">${commentsHTML}</div>
+                            <div class="add-comment-box">
+                                <input type="text" id="input-comment-${idea.id}" placeholder="Написать комментарий...">
+                                <button onclick="addComment(${idea.id})">ОК</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -142,37 +184,73 @@
             });
         }
 
-        function toggleLike(ideaId, btnElement) {
-            let likedIdeas = JSON.parse(localStorage.getItem('likedIdeas')) || [];
-            
+        function toggleLike(ideaId) {
+            let likedIdeas = JSON.parse(localStorage.getItem('user_liked_ids')) || [];
+            let likesMap = JSON.parse(localStorage.getItem('idea_likes_count')) || {};
+            let ideas = getIdeas();
+
+            let target = ideas.find(i => i.id === ideaId);
+            let currentCount = likesMap[ideaId] !== undefined ? likesMap[ideaId] : (target ? target.likes || 0 : 0);
+
             if (likedIdeas.includes(ideaId)) {
-                // Убираем голос
                 likedIdeas = likedIdeas.filter(id => id !== ideaId);
-                btnElement.classList.remove('liked');
+                likesMap[ideaId] = Math.max(0, currentCount - 1);
             } else {
-                // Голосуем
                 likedIdeas.push(ideaId);
-                btnElement.classList.add('liked');
+                likesMap[ideaId] = currentCount + 1;
             }
-            
-            localStorage.setItem('likedIdeas', JSON.stringify(likedIdeas));
+
+            localStorage.setItem('user_liked_ids', JSON.stringify(likedIdeas));
+            localStorage.setItem('idea_likes_count', JSON.stringify(likesMap));
+
+            renderIdeas();
         }
 
-        // Помощник
-        function showAIStatus(msg) {
-            let bubble = document.getElementById('ai-bubble');
-            if (!bubble) {
-                bubble = document.createElement('div');
-                bubble.id = 'ai-bubble';
-                bubble.style.cssText = "position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.95); border:1px solid var(--accent); padding:20px; border-radius:20px; z-index:10000; color:white; font-weight:bold; text-align:center; box-shadow:0 0 30px rgba(40,167,69,0.4); width:80%; max-width:320px;";
-                document.body.appendChild(bubble);
+        function addComment(ideaId) {
+            const input = document.getElementById(`input-comment-${ideaId}`);
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            let ideas = getIdeas();
+            let idea = ideas.find(i => i.id === ideaId);
+
+            if (idea) {
+                if (!idea.comments) idea.comments = [];
+                idea.comments.push({
+                    id: Date.now(),
+                    author: currentUser,
+                    text: text
+                });
+
+                saveIdeas(ideas);
+                renderIdeas();
             }
-            bubble.innerText = msg;
-            bubble.style.display = 'block';
-            setTimeout(() => { bubble.style.display = 'none'; }, 4000);
         }
 
-        // Запуск
+        function deleteComment(ideaId, commentId) {
+    let ideas = getIdeas();
+    let idea = ideas.find(i => i.id === ideaId);
+
+    if (idea && idea.comments) {
+        // Удаляем строго ТОТ комментарий, у которого совпадает ID И автором является текущий пользователь
+        idea.comments = idea.comments.filter(c => !(c.id === commentId && c.author === currentUser));
+        
+        saveIdeas(ideas);
+        renderIdeas();
+    }
+}
+
+        function showModal(msg, title = "Информация") {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
         window.onload = renderIdeas;
     </script>
 </body>
