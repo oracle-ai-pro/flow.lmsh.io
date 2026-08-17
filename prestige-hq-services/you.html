@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Prestige HQ | Ваш Профиль</title>
+    <style>
+        :root {
+            --accent: #28a745; /* Акцентный цвет по умолчанию */
+            --accent-green: #28a745;
+            --accent-blue: #007bff;
+            --accent-red: #dc3545;
+            --accent-gold: #ffc107;
+            --bg-card: #0a0a0a;
+            --border-color: #222;
+        }
+
+        body {
+            margin: 0;
+            background: #050505;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* КАРТОЧКА ПРОФИЛЯ */
+        .profile-card {
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            padding: 25px;
+            border-radius: 24px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            background: #111;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 12px;
+        }
+
+        label {
+            font-size: 12px;
+            color: #aaa;
+            display: block;
+            margin-bottom: 5px;
+            margin-left: 10px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 20px;
+            background: #111;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 50px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: filter 0.2s, background-color 0.3s;
+        }
+
+        .btn-save { background: var(--accent); color: white; }
+        .btn-back { background: #222; color: #ccc; }
+        .btn:hover { filter: brightness(1.2); }
+
+        /* СЕКЦИЯ ВОПРОСОВ И ПОСТОВ */
+        .posts-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: #fff;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .post-card {
+            background: #111;
+            border: 1px solid #222;
+            border-radius: 16px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .post-text {
+            font-size: 14px;
+            color: #eee;
+            line-height: 1.4;
+        }
+
+        .dev-reply {
+            background: rgba(0, 123, 255, 0.1);
+            border-left: 3px solid var(--accent-blue);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #79bac8;
+        }
+
+        /* КНОПКИ ДЕЙСТВИЙ В ПОСТАХ */
+        .post-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .action-btn {
+            padding: 8px 14px;
+            border-radius: 20px;
+            border: 1px solid #333;
+            background: #1a1a1a;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover { background: #333; }
+        .action-btn.edit:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+        .action-btn.delete:hover { border-color: var(--accent-red); color: var(--accent-red); }
+        .action-btn.dialog { background: var(--accent-blue); border-color: var(--accent-blue); }
+        .action-btn.dialog:hover { filter: brightness(1.2); }
+
+        .empty-msg {
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            padding: 20px;
+        }
+
+        /* НЕЗАКРЫВАЕМОЕ МОДАЛЬНОЕ ОКНО РЕГИСТРАЦИИ И УВЕДОМЛЕНИЙ */
+        #auth-modal, #custom-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .modal-card {
+            background: #0a0a0a;
+            border: 2px solid var(--accent);
+            width: 90%;
+            max-width: 380px;
+            padding: 30px;
+            border-radius: 24px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-card h2 {
+            margin-top: 0;
+            color: var(--accent);
+            font-size: 20px;
+        }
+
+        .modal-card p {
+            font-size: 13px;
+            color: #ccc;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- КАРТОЧКА ГЛОБАЛЬНЫХ ДАННЫХ -->
+        <div class="profile-card">
+            <div class="avatar">👤</div>
+            <h2 style="margin: 0 0 5px 0; color: var(--accent);" id="profile-heading">Основной Профиль</h2>
+            <p style="color: #666; font-size: 12px; margin-bottom: 20px;">
+                Эти данные используются по умолчанию во всех формах Штаба.
+            </p>
+
+            <div class="form-group">
+                <label>Имя пользователя</label>
+                <input type="text" id="prof-name" placeholder="Введите имя...">
+            </div>
+
+            <div class="form-group">
+                <label>Электронная почта</label>
+                <input type="email" id="prof-email" placeholder="Введите email...">
+            </div>
+
+            <button class="btn btn-save" onclick="saveGlobalProfile()">Сохранить профиль</button>
+            <button class="btn btn-back" onclick="location.href='select-service.html'">Назад на Главную</button>
+        </div>
+
+        <!-- СЕКЦИЯ РЕАЛЬНЫХ ПОСТОВ ПОЛЬЗОВАТЕЛЯ -->
+        <div class="posts-section">
+            <h3 class="section-title">Ваши публикации и вопросы</h3>
+            <div id="posts-list"></div>
+        </div>
+    </div>
+
+    <!-- БЛОКИРУЮЩЕЕ МОДАЛЬНОЕ ОКНО -->
+    <div id="auth-modal">
+        <div class="modal-card">
+            <h2>🔑 Идентификация</h2>
+            <p>Укажите ваше имя и email один раз. Это нужно, чтобы больше не вводить их вручную в формах!</p>
+            <div class="form-group">
+                <input type="text" id="modal-name" placeholder="Ваше Имя">
+            </div>
+            <div class="form-group">
+                <input type="email" id="modal-email" placeholder="Ваш Email">
+            </div>
+            <button class="btn btn-save" onclick="registerUser()">Войти в систему</button>
+        </div>
+    </div>
+
+    <!-- КАСТОМНОЕ МОДАЛЬНОЕ ОКНО ДЛЯ УВЕДОМЛЕНИЙ -->
+    <div id="custom-modal">
+        <div class="modal-card">
+            <h2 id="custom-modal-title">Уведомление</h2>
+            <p id="custom-modal-text"></p>
+            <div class="modal-actions" id="custom-modal-actions">
+                <button class="btn btn-save" id="custom-modal-ok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Применение сохраненного акцентного цвета из localStorage
+            const savedAccent = localStorage.getItem('lmsh-accent-color');
+            if (savedAccent) {
+                document.documentElement.style.setProperty('--accent', savedAccent);
+            }
+
+            checkAuth();
+            renderUserPosts();
+        });
+
+        // УНИВЕРСАЛЬНАЯ МОДАЛКА УВЕДОМЛЕНИЙ И ПОДТВЕРЖДЕНИЙ
+        function showCustomModal(title, text, isConfirm = false, onConfirm = null) {
+            const modal = document.getElementById('custom-modal');
+            document.getElementById('custom-modal-title').innerText = title;
+            document.getElementById('custom-modal-text').innerText = text;
+
+            const actionsDiv = document.getElementById('custom-modal-actions');
+            actionsDiv.innerHTML = '';
+
+            if (isConfirm) {
+                const btnYes = document.createElement('button');
+                btnYes.className = 'btn btn-save';
+                btnYes.innerText = 'Да';
+                btnYes.onclick = () => {
+                    modal.style.display = 'none';
+                    if (onConfirm) onConfirm();
+                };
+
+                const btnNo = document.createElement('button');
+                btnNo.className = 'btn btn-back';
+                btnNo.innerText = 'Отмена';
+                btnNo.onclick = () => { modal.style.display = 'none'; };
+
+                actionsDiv.appendChild(btnYes);
+                actionsDiv.appendChild(btnNo);
+            } else {
+                const btnOk = document.createElement('button');
+                btnOk.className = 'btn btn-save';
+                btnOk.innerText = 'OK';
+                btnOk.onclick = () => { modal.style.display = 'none'; };
+                actionsDiv.appendChild(btnOk);
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        // ПРОВЕРКА АВТОРИЗАЦИИ
+        function checkAuth() {
+            const name = localStorage.getItem('lmsh-author');
+            const email = localStorage.getItem('lmsh-email');
+
+            if (!name || !email) {
+                document.getElementById('auth-modal').style.display = 'flex';
+            } else {
+                document.getElementById('auth-modal').style.display = 'none';
+                document.getElementById('prof-name').value = name;
+                document.getElementById('prof-email').value = email;
+            }
+        }
+
+        // РЕГИСТРАЦИЯ ИЗ МОДАЛКИ
+        function registerUser() {
+            const name = document.getElementById('modal-name').value.trim();
+            const email = document.getElementById('modal-email').value.trim();
+
+            if (!name || !email) {
+                showCustomModal("⚠️ Ошибка", "Заполните оба поля!");
+                return;
+            }
+
+            localStorage.setItem('lmsh-author', name);
+            localStorage.setItem('lmsh-email', email);
+
+            document.getElementById('auth-modal').style.display = 'none';
+            document.getElementById('prof-name').value = name;
+            document.getElementById('prof-email').value = email;
+        }
+
+        // СОХРАНЕНИЕ ИЗ ПРОФИЛЯ
+        function saveGlobalProfile() {
+            const name = document.getElementById('prof-name').value.trim();
+            const email = document.getElementById('prof-email').value.trim();
+
+            if (!name || !email) {
+                showCustomModal("⚠️ Ошибка", "Поля не могут быть пустыми!");
+                return;
+            }
+
+            localStorage.setItem('lmsh-author', name);
+            localStorage.setItem('lmsh-email', email);
+            showCustomModal("✅ Успешно", "Профиль сохранен!");
+        }
+
+        // РЕНДЕР РЕАЛЬНЫХ ПОСТОВ ИЗ LOCALSTORAGE
+        function renderUserPosts() {
+            const postsContainer = document.getElementById('posts-list');
+            const userPosts = JSON.parse(localStorage.getItem('lmsh-user-posts')) || [];
+
+            if (userPosts.length === 0) {
+                postsContainer.innerHTML = '<div class="empty-msg">У вас пока нет активных публикаций.</div>';
+                return;
+            }
+
+            postsContainer.innerHTML = userPosts.map(post => {
+                const hasReply = Boolean(post.devReply);
+                return `
+                    <div class="post-card" id="post-${post.id}">
+                        <div class="post-header">
+                            <span>Категория: <b>${post.type}</b></span>
+                            <span>${post.date}</span>
+                        </div>
+                        <div class="post-text">${post.text}</div>
+                        
+                        ${hasReply ? `<div class="dev-reply"><b>Ответ Разработчика:</b> ${post.devReply}</div>` : ''}
+
+                        <div class="post-actions">
+                            <button class="action-btn edit" onclick="editPost(${post.id})">Изменить сообщение</button>
+                            <button class="action-btn delete" onclick="deletePost(${post.id})">Удалить пост</button>
+                            ${hasReply ? `<button class="action-btn dialog" onclick="openChatDialog(${post.id})">Открыть диалог</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editPost(id) {
+            let userPosts = JSON.parse(localStorage.getItem('lmsh-user-posts')) || [];
+            const post = userPosts.find(p => p.id === id);
+            if (!post) return;
+
+            const newText = prompt("Изменить текст сообщения:", post.text);
+            if (newText !== null && newText.trim() !== "") {
+                post.text = newText.trim();
+                localStorage.setItem('lmsh-user-posts', JSON.stringify(userPosts));
+                renderUserPosts();
+            }
+        }
+
+        function deletePost(id) {
+            showCustomModal("🗑️ Удаление", "Удалить эту публикацию?", true, () => {
+                let userPosts = JSON.parse(localStorage.getItem('lmsh-user-posts')) || [];
+                userPosts = userPosts.filter(p => p.id !== id);
+                localStorage.setItem('lmsh-user-posts', JSON.stringify(userPosts));
+                renderUserPosts();
+            });
+        }
+
+        function openChatDialog(id) {
+            location.href = `select-service.html?openDevChat=${id}`;
+        }
+    </script>
+</body>
+</html>
