@@ -27,7 +27,7 @@
             transition: all 0.3s ease;
         }
 
-        /* ОСНОВНАЯ ОБЛАСТЬ (ЛЕВАЯ ЧАСТЬ) */
+        /* ОСНОВНАЯ ОБЛАСТЬ */
         #main-content {
             flex: 1;
             display: flex;
@@ -38,12 +38,82 @@
             transition: all 0.3s ease;
         }
         
-        .logo { 
-            width: 95px; 
-            margin-bottom: 16px; 
-            border-radius: 18px; 
-            border: 1px solid #333; 
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.05); 
+        /* СТИЛИ ЖИВОГО И ЗАЩИЩЕННОГО SVG-ЛОГОТИПА */
+        .logo-wrapper {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .logo-glow-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 26px;
+            background: conic-gradient(from 0deg, #007bff, #28a745, #7C3AED, #ffc107, #007bff);
+            filter: blur(12px);
+            opacity: 0.6;
+            animation: rotateGlow 6s linear infinite;
+            transition: opacity 0.3s ease, filter 0.3s ease;
+        }
+
+        .logo-svg {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            z-index: 2;
+            pointer-events: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.9);
+            transition: transform 0.2s ease-out;
+            background: #08080c;
+        }
+
+        .logo-wrapper:hover .logo-glow-ring {
+            opacity: 1;
+            filter: blur(18px);
+        }
+
+        /* ОБЛЕГЧЕННЫЙ РЕЖИМ ДЛЯ СЛАБЫХ ПК */
+        body.light-mode-active .logo-glow-ring { display: none !important; }
+        body.light-mode-active .logo-svg { filter: none !important; box-shadow: none !important; }
+        body.light-mode-active .flying-arrow,
+        body.light-mode-active .neon-blue,
+        body.light-mode-active .neon-green,
+        body.light-mode-active .neon-purple,
+        body.light-mode-active .neon-yellow { animation: none !important; stroke-dashoffset: 0 !important; }
+
+        /* SVG Анимация свечения неона */
+        @keyframes neonPulse {
+            0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 2px currentColor); }
+            50% { opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+        }
+
+        .neon-blue { color: #0088ff; animation: neonPulse 3s ease-in-out infinite; }
+        .neon-green { color: #20e040; animation: neonPulse 3s ease-in-out infinite 0.75s; }
+        .neon-purple { color: #a040ff; animation: neonPulse 3s ease-in-out infinite 1.5s; }
+        .neon-yellow { color: #ffcc00; animation: neonPulse 3s ease-in-out infinite 2.25s; }
+
+        /* АНИМАЦИЯ ЛЕТАЮЩИХ СТРЕЛОК ПО КОНТУРУ СЕКЦИЙ */
+        .flying-arrow {
+            stroke-dasharray: 40 200;
+            animation: moveArrow 2.5s linear infinite;
+        }
+
+        @keyframes moveArrow {
+            from { stroke-dashoffset: 240; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        @keyframes rotateGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* БЛОК ПРОФИЛЯ ПО ЦЕНТРУ */
@@ -76,7 +146,7 @@
             transform: translateY(-2px);
         }
 
-        /* СЕТКА ИЗ 6 КАРТОЧЕК */
+        /* СЕТКА КАРТОЧЕК */
         .dashboard { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
@@ -99,39 +169,16 @@
             justify-content: space-between;
         }
 
-        .card-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .card-icon {
-            font-size: 28px;
-        }
-
-        .card-info h3 {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .card-info p {
-            margin: 3px 0 0 0;
-            font-size: 12px;
-            color: #888;
-        }
-
-        .card-arrow {
-            font-size: 20px;
-            color: #444;
-            transition: transform 0.2s, color 0.2s;
-        }
+        .card-left { display: flex; align-items: center; gap: 14px; }
+        .card-icon { font-size: 28px; }
+        .card-info h3 { margin: 0; font-size: 15px; font-weight: 600; }
+        .card-info p { margin: 3px 0 0 0; font-size: 12px; color: #888; }
+        .card-arrow { font-size: 20px; color: #444; transition: transform 0.2s, color 0.2s; }
 
         .card:hover { transform: translateY(-2px); }
         .card:hover .card-arrow { transform: translateX(3px); color: #fff; }
         .card.blurred, .user-profile-card.blurred { filter: blur(4px); opacity: 0.3; pointer-events: none; }
 
-        /* Градиенты карточек */
         .card-blue:hover { border-color: #007bff; box-shadow: 0 0 18px rgba(0, 123, 255, 0.25); background: linear-gradient(145deg, #0a0a0a, #00152b); }
         .card-green:hover { border-color: #28a745; box-shadow: 0 0 18px rgba(40, 167, 69, 0.25); background: linear-gradient(145deg, #0a0a0a, #001f0d); }
         .card-gold:hover { border-color: #ffc107; box-shadow: 0 0 18px rgba(255, 193, 7, 0.25); background: linear-gradient(145deg, #0a0a0a, #2b2100); }
@@ -183,7 +230,7 @@
         }
         #assistant-btn:hover { border-color: var(--accent); transform: scale(1.08); }
         
-        /* ПРАВАЯ БОКОВАЯ ПАНЕЛЬ С ВКЛАДКАМИ (ИИ / DEV CHAT) */
+        /* ПРАВАЯ БОКОВАЯ ПАНЕЛЬ С ВКЛАДКАМИ */
         #side-panel { 
             width: 0;
             opacity: 0;
@@ -199,10 +246,7 @@
             top: 0;
         }
 
-        body.split-active #side-panel {
-            width: 440px;
-            opacity: 1;
-        }
+        body.split-active #side-panel { width: 440px; opacity: 1; }
 
         .panel-header { 
             background: #000; 
@@ -213,11 +257,7 @@
             gap: 12px;
         }
 
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .header-top { display: flex; justify-content: space-between; align-items: center; }
 
         .panel-tabs {
             display: flex;
@@ -244,10 +284,7 @@
             transition: 0.2s;
         }
 
-        .tab-btn.active {
-            background: #222;
-            color: var(--accent);
-        }
+        .tab-btn.active { background: #222; color: var(--accent); }
 
         #chat-body { 
             flex: 1; 
@@ -267,33 +304,38 @@
             word-wrap: break-word; 
             animation: bubbleAppear 0.25s ease forwards; 
         }
-        .msg-user { 
-            background: linear-gradient(135deg, #0055ff, #0088ff); 
-            color: #fff; 
-            align-self: flex-end; 
-            border-radius: 18px 18px 2px 18px; 
-        }
-        .msg-ai { 
-            background: #111; 
-            color: #f0f0f0; 
-            align-self: flex-start; 
-            border-radius: 18px 18px 18px 2px; 
-            border: 1px solid #222; 
-        }
-        .msg-dev {
-            background: rgba(40, 167, 69, 0.1);
-            border: 1px solid #28a745;
-            color: #85e39d;
-            align-self: flex-start;
-            border-radius: 18px 18px 18px 2px;
-        }
+        .msg-user { background: linear-gradient(135deg, #0055ff, #0088ff); color: #fff; align-self: flex-end; border-radius: 18px 18px 2px 18px; }
+        .msg-ai { background: #111; color: #f0f0f0; align-self: flex-start; border-radius: 18px 18px 18px 2px; border: 1px solid #222; }
+        .msg-dev { background: rgba(40, 167, 69, 0.1); border: 1px solid #28a745; color: #85e39d; align-self: flex-start; border-radius: 18px 18px 18px 2px; }
         
+        /* Превью прикрепленного файла в чате */
+        .chat-attachment-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 12px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #aaa;
+        }
+        .chat-attachment-preview img, .chat-attachment-preview svg {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        #chat-input-wrapper {
+            border-top: 1px solid #1a1a1a;
+            padding: 14px;
+            background: #000;
+        }
+
         #chat-input { 
-            padding: 14px; 
-            border-top: 1px solid #1a1a1a; 
             display: flex; 
             gap: 10px; 
-            background: #000; 
         }
         #chat-input input { 
             flex: 1; 
@@ -368,18 +410,14 @@
             margin-top: 8px;
         }
 
-        .modal-card button:hover {
-            filter: brightness(1.2);
-        }
+        .modal-card button:hover { filter: brightness(1.2); }
 
-        /* ЭЛЕМЕНТЫ ТУТОРИАЛА СО СТРЕЛОЧКАМИ И БАББЛАМИ */
         #tutorial-overlay {
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.75);
             z-index: 9999;
             display: none;
-            pointer-events: auto;
         }
 
         .tutorial-highlight {
@@ -402,18 +440,8 @@
             animation: bubbleAppear 0.3s ease;
         }
 
-        .tutorial-bubble p {
-            margin: 0 0 12px 0;
-            font-size: 13px;
-            line-height: 1.5;
-            color: #ddd;
-        }
-
-        .tutorial-bubble .step-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        .tutorial-bubble p { margin: 0 0 12px 0; font-size: 13px; line-height: 1.5; color: #ddd; }
+        .tutorial-bubble .step-actions { display: flex; justify-content: space-between; align-items: center; }
 
         .tutorial-bubble button {
             background: var(--accent);
@@ -455,7 +483,7 @@
     <div id="tutorial-bubble" class="tutorial-bubble">
         <div id="tutorial-text"></div>
         <div class="step-actions">
-            <span id="tutorial-step-num" style="font-size: 11px; color: #888;">Шаг 1 из 3</span>
+            <span id="tutorial-step-num" style="font-size: 11px; color: #888;">Шаг 1 из 4</span>
             <button id="tutorial-next-btn" onclick="nextTutorialStep()">Далее</button>
         </div>
     </div>
@@ -463,7 +491,83 @@
 
     <!-- ЛЕВАЯ ЧАСТЬ DASHBOARD -->
     <div id="main-content">
-        <img src="image.png" alt="LMSH Logo" class="logo">
+        <!-- ЖИВОЙ И АНИМИРОВАННЫЙ SVG ЛОГОТИП С ПКМ -->
+        <div class="logo-wrapper" id="live-logo">
+            <div class="logo-glow-ring"></div>
+            <svg class="logo-svg" id="main-logo-svg" viewBox="0 0 300 300" draggable="false" ondragstart="return false;">
+                <defs>
+                    <!-- Градиенты Свечения -->
+                    <filter id="glow-b" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                    <filter id="glow-g" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                    <filter id="glow-p" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+                    <filter id="glow-y" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                    </filter>
+
+                    <!-- Текстура Печатной Платы -->
+                    <pattern id="circuit-pattern" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <path d="M 10 10 L 30 10 L 40 20 M 60 10 L 80 10 M 10 40 L 25 40 L 35 50 L 35 70 M 80 40 L 65 40 L 55 50 M 20 80 L 40 80 M 70 80 L 90 80" 
+                              stroke="#1e293b" stroke-width="1.5" fill="none" opacity="0.6" stroke-linecap="round"/>
+                        <circle cx="40" cy="20" r="2" fill="#1e293b" opacity="0.8"/>
+                        <circle cx="35" cy="70" r="2" fill="#1e293b" opacity="0.8"/>
+                        <circle cx="55" cy="50" r="2" fill="#1e293b" opacity="0.8"/>
+                    </pattern>
+                </defs>
+
+                <!-- Задний Фон с Печатной Платой -->
+                <rect x="0" y="0" width="300" height="300" rx="40" fill="#090a0f"/>
+                <rect x="0" y="0" width="300" height="300" rx="40" fill="url(#circuit-pattern)"/>
+
+                <rect x="10" y="10" width="280" height="280" rx="32" fill="none" stroke="#111827" stroke-width="3"/>
+
+                <!-- ВНУТРЕННИЕ НЕОНОВЫЕ СЕКЦИИ И ЛЕТАЮЩИЕ СТРЕЛКИ -->
+                <!-- 1. Синяя Секция (Сверху-Слева) -->
+                <path class="neon-blue" d="M 30 135 L 30 50 A 20 20 0 0 1 50 30 L 135 30 L 135 75 L 75 75 L 75 135 Z" 
+                      fill="none" stroke="#0088ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-b)"/>
+                
+                <!-- 2. Зелёная Секция (Сверху-Справа) -->
+                <path class="neon-green" d="M 165 30 L 250 30 A 20 20 0 0 1 270 50 L 270 135 L 225 135 L 225 75 L 165 75 Z" 
+                      fill="none" stroke="#20e040" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-g)"/>
+
+                <!-- 3. Фиолетовая Секция (Снизу-Справа) -->
+                <path class="neon-purple" d="M 270 165 L 270 250 A 20 20 0 0 1 250 270 L 165 270 L 165 225 L 225 225 L 225 165 Z" 
+                      fill="none" stroke="#a040ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-p)"/>
+
+                <!-- 4. Жёлтая Секция (Снизу-Слева) -->
+                <path class="neon-yellow" d="M 135 270 L 50 270 A 20 20 0 0 1 30 250 L 30 165 L 75 165 L 75 225 L 135 225 Z" 
+                      fill="none" stroke="#ffcc00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-y)"/>
+
+                <!-- ЛЕТАЮЩИЕ ПО КОНТУРУ СТРЕЛКИ (БЕГУЩИЙ НЕОН) -->
+                <path class="flying-arrow" d="M 20 20 L 280 20 L 280 280 L 20 280 Z" 
+                      fill="none" stroke="#00d2ff" stroke-width="4" stroke-linecap="round" filter="url(#glow-b)"/>
+
+                <!-- ЦЕНТРАЛЬНАЯ ПЛАТА "LMSH" -->
+                <rect x="88" y="88" width="124" height="124" rx="18" fill="#030407" stroke="#334155" stroke-width="2"/>
+                <rect x="92" y="92" width="116" height="116" rx="14" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+
+                <!-- Дорожки платы -->
+                <path d="M 98 110 L 108 110 M 98 190 L 108 190 M 202 110 L 192 110 M 202 190 L 192 190" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="108" cy="110" r="2" fill="#0088ff"/>
+                <circle cx="108" cy="190" r="2" fill="#ffcc00"/>
+                <circle cx="192" cy="110" r="2" fill="#20e040"/>
+                <circle cx="192" cy="190" r="2" fill="#a040ff"/>
+
+                <!-- ТЕКСТ LMSH -->
+                <text x="150" y="162" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="34" 
+                      fill="#ffffff" text-anchor="middle" letter-spacing="2.5" 
+                      style="filter: drop-shadow(0 0 8px rgba(255,255,255,0.8));">LMSH</text>
+            </svg>
+        </div>
 
         <!-- КАРТОЧКА ИМЕНИ ПОЛЬЗОВАТЕЛЯ ПО ЦЕНТРУ -->
         <div class="user-profile-center">
@@ -541,8 +645,8 @@
                 <span class="material-symbols-outlined card-arrow">chevron_right</span>
             </div>
 
-            <!-- 6. Настройки Страниц -->
-            <div class="card card-orange" onclick="location.href='settings.html'" data-color="#ff9800">
+            <!-- 6. Настройки -->
+            <div class="card card-orange" id="target-settings" onclick="location.href='settings.html'" data-color="#ff9800">
                 <div class="card-left">
                     <span class="material-symbols-outlined card-icon" style="color: #ff9800;">settings</span>
                     <div class="card-info">
@@ -579,16 +683,34 @@
             <div class="msg-bubble msg-ai">Привет! Чем могу помочь тебе сегодня?</div>
         </div>
 
-        <div id="chat-input">
-            <input type="text" id="chat-msg" placeholder="Сообщение..." onkeydown="if(event.key === 'Enter') sendMessage()">
-            <button onclick="sendMessage()">
-                <span class="material-symbols-outlined" style="font-size: 20px;">send</span>
-            </button>
+        <div id="chat-input-wrapper">
+            <!-- Блок прикрепленного изображения -->
+            <div id="attached-preview" class="chat-attachment-preview" style="display: none;">
+                <span class="material-symbols-outlined" style="color: var(--accent); font-size: 18px;">image</span>
+                <span id="attached-name">LMSH_Logo.svg</span>
+                <span onclick="removeAttachment()" class="material-symbols-outlined" style="cursor: pointer; margin-left: auto; font-size: 16px;">close</span>
+            </div>
+
+            <div id="chat-input">
+                <input type="text" id="chat-msg" placeholder="Сообщение..." onkeydown="if(event.key === 'Enter') sendMessage()">
+                <button onclick="sendMessage()">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">send</span>
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- КОНТЕКСТНОЕ МЕНЮ -->
+    <!-- КОНТЕКСТНОЕ МЕНЮ (ДЛЯ КАРТОЧЕК И ДЛЯ ЛОГОТИПА) -->
     <div id="context-menu">
+        <!-- Варианты для Логотипа -->
+        <div class="menu-item" id="logo-attach" style="display:none;" onclick="attachLogoToChat()">
+            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent);">attach_file</span> Прикрепить Изображение к чату с ИИ
+        </div>
+        <div class="menu-item" id="logo-toggle-light" style="display:none;" onclick="toggleLightMode()">
+            <span class="material-symbols-outlined" style="font-size: 18px; color: #00d2ff;">speed</span> <span id="light-mode-text">Заменить на облегчённое лого</span>
+        </div>
+
+        <!-- Варианты для Карточек -->
         <div class="menu-item" id="ideas-view" style="display:none;" onclick="location.href='all-ideas.html'">
             <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span> Посмотреть идеи
         </div>
@@ -598,7 +720,7 @@
         <div class="menu-item" id="prereg-view" style="display:none;" onclick="location.href='preregistration.html'">
             <span class="material-symbols-outlined" style="font-size: 18px;">rocket_launch</span> Бронь / Отмена Kosmo UI2
         </div>
-        <div class="menu-item" onclick="discuss()">
+        <div class="menu-item" id="card-discuss" style="display:none;" onclick="discuss()">
             <span class="material-symbols-outlined" style="font-size: 18px;">forum</span> Обсудить в чате
         </div>
     </div>
@@ -608,7 +730,7 @@
         <span class="material-symbols-outlined" style="font-size: 28px;">smart_toy</span>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ОБНОВЛЕНИЯ / ТУТОРИАЛА -->
+    <!-- МОДАЛЬНЫЕ ОКНА -->
     <div id="tutorial-modal">
         <div class="modal-card">
             <h2 style="color:var(--accent); margin-top:0; font-size: 20px;">
@@ -623,7 +745,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО РЕГИСТРАЦИИ -->
     <div id="auth-modal">
         <div class="modal-card">
             <h2 style="color:var(--accent); margin-top:0; font-size: 20px;">
@@ -637,7 +758,6 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО СТАТУСА/УВЕДОМЛЕНИЙ -->
     <div id="status-modal">
         <div class="modal-card">
             <h2 style="color:var(--accent); margin-top:0; font-size: 20px;">
@@ -653,11 +773,18 @@
         let activeMode = 'ai';
         let activeCard = null;
         let tutorialStep = 0;
+        let isLogoAttached = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedAccent = localStorage.getItem('lmsh-accent-color');
             if (savedAccent) {
                 document.documentElement.style.setProperty('--accent', savedAccent);
+            }
+
+            // Проверка сохраненного облегченного режима
+            if (localStorage.getItem('lmsh-light-mode') === 'true') {
+                document.body.classList.add('light-mode-active');
+                document.getElementById('light-mode-text').innerText = "Включить живое лого (Анимации)";
             }
 
             const name = localStorage.getItem('lmsh-author');
@@ -667,19 +794,70 @@
                 document.getElementById('auth-modal').style.display = 'flex';
             } else {
                 document.getElementById('user-card-name').innerText = name;
-                // Показываем тур при первой авторизованной сессии
                 if (!localStorage.getItem('lmsh-tutorial-passed')) {
                     document.getElementById('tutorial-modal').style.display = 'flex';
                 }
             }
 
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('openDevChat')) {
-                const postId = urlParams.get('openDevChat');
-                openChat('dev');
-                appendBubble(`[DEV System] Загружен контекст обращения #${postId}. Ожидайте ответа от Главного Инженера.`, 'dev');
-            }
+            // JS 3D-Tilt эффект для SVG Логотипа
+            const logoWrapper = document.getElementById('live-logo');
+            const logoSvg = logoWrapper.querySelector('.logo-svg');
+
+            logoWrapper.addEventListener('mousemove', (e) => {
+                if (document.body.classList.contains('light-mode-active')) return;
+                const rect = logoWrapper.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                logoSvg.style.transform = `scale(1.08) rotateX(${-y / 3}deg) rotateY(${x / 3}deg)`;
+            });
+
+            logoWrapper.addEventListener('mouseleave', () => {
+                logoSvg.style.transform = 'scale(1) rotateX(0deg) rotateY(0deg)';
+            });
+
+            // ПКМ ПО ЛОГОТИПУ
+            logoWrapper.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                hideAllContextMenuItems();
+
+                document.getElementById('logo-attach').style.display = 'flex';
+                document.getElementById('logo-toggle-light').style.display = 'flex';
+
+                const menu = document.getElementById('context-menu');
+                menu.style.top = e.pageY + 'px'; 
+                menu.style.left = e.pageX + 'px'; 
+                menu.style.display = 'block';
+            });
         });
+
+        /* ФУНКЦИИ ЛОГОТИПА И КЛИКА ПКМ */
+        function hideAllContextMenuItems() {
+            document.querySelectorAll('#context-menu .menu-item').forEach(item => item.style.display = 'none');
+        }
+
+        function attachLogoToChat() {
+            document.getElementById('context-menu').style.display = 'none';
+            openChat('ai');
+            isLogoAttached = true;
+            document.getElementById('attached-preview').style.display = 'flex';
+        }
+
+        function removeAttachment() {
+            isLogoAttached = false;
+            document.getElementById('attached-preview').style.display = 'none';
+        }
+
+        function toggleLightMode() {
+            document.getElementById('context-menu').style.display = 'none';
+            const isActive = document.body.classList.toggle('light-mode-active');
+            localStorage.setItem('lmsh-light-mode', isActive ? 'true' : 'false');
+            
+            document.getElementById('light-mode-text').innerText = isActive 
+                ? "Включить живое лого (Анимации)" 
+                : "Заменить на облегчённое лого";
+
+            showAIStatus(isActive ? "Включен облегчённый режим. Фильтры и анимации отключены." : "Живой режим логотипа с анимацией и неон-свечением восстановлен!");
+        }
 
         function registerUser() {
             const name = document.getElementById('reg-name').value.trim();
@@ -694,12 +872,9 @@
             localStorage.setItem('lmsh-email', email);
             document.getElementById('user-card-name').innerText = name;
             document.getElementById('auth-modal').style.display = 'none';
-
-            // Предлагаем туториал сразу после авторизции
             document.getElementById('tutorial-modal').style.display = 'flex';
         }
 
-        /* ИНТЕРАКТИВНЫЙ ТУТОРИАЛ C СТРЕЛОЧКАМИ И БАББЛАМИ */
         function closeTutorialModal() {
             document.getElementById('tutorial-modal').style.display = 'none';
             localStorage.setItem('lmsh-tutorial-passed', 'true');
@@ -713,7 +888,6 @@
         }
 
         function nextTutorialStep() {
-            // Сброс подсветок
             document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
             
             const bubble = document.getElementById('tutorial-bubble');
@@ -728,8 +902,8 @@
                 target.classList.add('tutorial-highlight');
                 
                 const rect = target.getBoundingClientRect();
-                text.innerHTML = "<b>Карточка Профиля:</b> Теперь ваша персональная страница закреплена в центре верхней части экрана.";
-                stepNum.innerText = "Шаг 1 из 3";
+                text.innerHTML = "<b>Карточка Профиля:</b> Ваша персональная страница теперь зафиксирована по центру.";
+                stepNum.innerText = "Шаг 1 из 4";
 
                 bubble.style.top = (rect.bottom + 15) + 'px';
                 bubble.style.left = (rect.left + (rect.width/2) - 140) + 'px';
@@ -744,8 +918,8 @@
                 target.classList.add('tutorial-highlight');
 
                 const rect = target.getBoundingClientRect();
-                text.innerHTML = "<b>Умное контекстное меню:</b> Нажмите <i>ПКМ</i> или зажмите любую карточку, чтобы открыть доп. действия.";
-                stepNum.innerText = "Шаг 2 из 3";
+                text.innerHTML = "<b>Умное контекстное меню:</b> Нажмите <i>ПКМ</i> или зажмите карточку для вызова быстрых действий.";
+                stepNum.innerText = "Шаг 2 из 4";
 
                 bubble.style.top = (rect.bottom + 15) + 'px';
                 bubble.style.left = Math.max(10, rect.left) + 'px';
@@ -758,10 +932,8 @@
                 target.classList.add('tutorial-highlight');
 
                 const rect = target.getBoundingClientRect();
-                text.innerHTML = "<b>Бортовой модуль:</b> Нажмите сюда, чтобы открыть чат с AI Помощником или перейти в DEV Чат с разработчиками.";
-                stepNum.innerText = "Шаг 3 из 3";
-
-                document.getElementById('tutorial-next-btn').innerText = "Завершить";
+                text.innerHTML = "<b>Бортовой модуль:</b> Отсюда вызывается чат с AI Помощником или DEV Чат с разработчиками.";
+                stepNum.innerText = "Шаг 3 из 4";
 
                 bubble.style.top = (rect.top - 140) + 'px';
                 bubble.style.left = (rect.left - 240) + 'px';
@@ -769,13 +941,28 @@
                 arrow.style.top = (rect.top - 35) + 'px';
                 arrow.style.left = (rect.left + 10) + 'px';
             }
+            else if (tutorialStep === 4) {
+                const target = document.getElementById('target-settings');
+                target.classList.add('tutorial-highlight');
+
+                const rect = target.getBoundingClientRect();
+                text.innerHTML = "<b>Настройки интерфейса:</b> Меняйте темы, акцентные цвета и вид дашборда.";
+                stepNum.innerText = "Шаг 4 из 4";
+
+                document.getElementById('tutorial-next-btn').innerText = "Завершить";
+
+                bubble.style.top = (rect.top - 140) + 'px';
+                bubble.style.left = (rect.left - 40) + 'px';
+
+                arrow.style.top = (rect.top - 35) + 'px';
+                arrow.style.left = (rect.left + (rect.width/2) - 18) + 'px';
+            }
             else {
-                // Завершение туториала
                 bubble.style.display = 'none';
                 arrow.style.display = 'none';
                 document.getElementById('tutorial-overlay').style.display = 'none';
                 localStorage.setItem('lmsh-tutorial-passed', 'true');
-                showAIStatus("Обучение завершено! Приятного использования новой версией Dashboard.");
+                showAIStatus("Обучение завершено! Приятного использования обновлённого Dashboard.");
             }
         }
 
@@ -812,31 +999,39 @@
 
         function sendMessage() { 
             const input = document.getElementById('chat-msg'); 
-            const query = input.value.trim();
-            if (!query) return; 
+            let query = input.value.trim();
+            if (!query && !isLogoAttached) return; 
+
+            if (isLogoAttached) {
+                query = `[Прикреплено изображение: LMSH_Logo.svg] ` + query;
+                removeAttachment();
+            }
             
             appendBubble(query, 'user');
             input.value = ""; 
 
             setTimeout(() => {
                 if (activeMode === 'dev') {
-                    appendBubble("<b>Разработчик:</b> Ваш запрос передан. Сообщение сохранено в карточке истории на странице You.", 'dev');
+                    appendBubble("<b>Разработчик:</b> Ваш запрос принят. Все вложения переданы команде инженеров.", 'dev');
                 } else {
-                    appendBubble("Запрос обработан бортовым ИИ. Для связи с командой переключитесь в DEV Чат.", "ai");
+                    appendBubble("Запрос с вложением обработан бортовым ИИ. Векторная графика LMSH загружена успешно.", "ai");
                 }
             }, 600);
         }
 
-        // КОНТЕКСТНОЕ МЕНЮ
+        /* КОНТЕКСТНОЕ МЕНЮ КАРТОЧЕК */
         document.querySelectorAll('.card, .user-profile-card').forEach(card => {
             card.addEventListener('contextmenu', e => {
                 e.preventDefault();
                 activeCard = card;
+                hideAllContextMenuItems();
+
                 document.querySelectorAll('.card, .user-profile-card').forEach(c => { if(c !== card) c.classList.add('blurred'); });
                 
                 document.getElementById('ideas-view').style.display = card.dataset.ideas ? 'flex' : 'none';
                 document.getElementById('review-pack-view').style.display = card.dataset.reviews ? 'flex' : 'none';
                 document.getElementById('prereg-view').style.display = card.dataset.prereg ? 'flex' : 'none';
+                document.getElementById('card-discuss').style.display = 'flex';
                 
                 const menu = document.getElementById('context-menu');
                 menu.style.top = e.pageY + 'px'; 
