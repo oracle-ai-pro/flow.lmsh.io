@@ -361,7 +361,7 @@
         }
 
         /* МОДАЛЬНЫЕ ОКНА И ТУТОРИАЛ */
-        #auth-modal, #status-modal, #tutorial-modal {
+        #auth-modal, #status-modal, #tutorial-modal, #survey-modal {
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.92);
@@ -470,9 +470,125 @@
 
         @keyframes bubbleAppear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* ========= СТИЛИ НОВОГО ОПРОСНИКА ========= */
+        .survey-card {
+            background: #0f0f14;
+            border: 1px solid #2a2a35;
+            width: 90%;
+            max-width: 460px;
+            padding: 28px;
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+            text-align: left;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .survey-title {
+            color: #fff;
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        .survey-step { display: none; }
+        .survey-step.active { display: block; }
+
+        .survey-actions { display: flex; gap: 12px; margin-top: 24px; }
+        .survey-actions button { margin-top: 0; }
+        
+        .btn-survey {
+            flex: 1; padding: 12px 18px; border-radius: 14px; border: none; font-size: 14px;
+            font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+        }
+
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-primary:hover { filter: brightness(1.15); }
+        .btn-secondary { background: #1a1a22; color: #ccc; border: 1px solid #333; }
+        .btn-secondary:hover { background: #252530; color: #fff; filter: none; }
+
+        .radio-group { display: flex; flex-direction: column; gap: 10px; }
+        .radio-option {
+            display: flex; align-items: center; padding: 12px 16px;
+            background: #15151c; border: 1px solid #262633; border-radius: 14px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .radio-option:hover { border-color: var(--accent); background: #1c1c26; }
+        .radio-option input { display: none; }
+        .radio-custom {
+            width: 18px; height: 18px; border: 2px solid #555; border-radius: 50%;
+            margin-right: 12px; position: relative; transition: 0.2s;
+        }
+        .radio-option input:checked + .radio-custom { border-color: var(--accent); }
+        .radio-option input:checked + .radio-custom::after {
+            content: ''; position: absolute; inset: 3px; background: var(--accent); border-radius: 50%;
+        }
+
+        .survey-textarea-wrapper { position: relative; }
+        .survey-textarea {
+            width: 100%; min-height: 110px; background: #15151c; border: 1px solid #262633;
+            border-radius: 14px; padding: 14px; color: #fff; font-family: inherit; font-size: 14px;
+            outline: none; overflow-y: auto;
+        }
+        .survey-textarea:focus { border-color: var(--accent); }
+        .survey-textarea[placeholder]:empty:before { content: attr(placeholder); color: #666; }
+
+        #format-toolbar {
+            position: absolute; display: none; background: #22222e; border: 1px solid #444455;
+            border-radius: 10px; padding: 4px; gap: 4px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); z-index: 10005;
+        }
+        .format-btn {
+            background: transparent; border: none; color: #fff; width: 28px; height: 28px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center;
+        }
+        .format-btn:hover { background: var(--accent); color: #000; }
+
+        .later-view { text-align: center; padding: 10px 0; }
+        .later-clock { font-size: 54px; color: var(--accent); animation: pulseClock 2s infinite alternate; }
+        @keyframes pulseClock { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; } }
+
+        .success-view { text-align: center; padding: 15px 0; }
+        .animated-check {
+            width: 70px; height: 70px; background: rgba(40, 167, 69, 0.15); border: 2px solid #28a745;
+            color: #28a745; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px auto; animation: checkPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .animated-check span { font-size: 42px; }
+        @keyframes checkPop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* ПОЛЗУНОК ИЗМЕНЕНИЯ РАЗМЕРА (RESIZER) */
+        #resizer {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: rgba(255, 255, 255, 0.03); /* Почти невидимая линия */
+            cursor: ew-resize; /* Курсор изменения ширины */
+            z-index: 2005;
+            transition: background 0.2s ease;
+        }
+
+        #resizer:hover, #resizer.active {
+            background: var(--accent); /* Подсвечивается при наведении и перетаскивании */
+        }
+
         @media (max-width: 768px) {
             body.split-active #side-panel { position: fixed; inset: 0; width: 100%; height: 100vh; }
             .dashboard { grid-template-columns: 1fr; }
+        }
+@media (max-width: 768px) {
+            body.split-active #side-panel { position: fixed; inset: 0; width: 100%; height: 100vh; }
+            .dashboard { grid-template-columns: 1fr; }
+            #resizer { display: none; } /* Скрываем ползунок на мобилках */
         }
     </style>
 </head>
@@ -531,31 +647,18 @@
                 <rect x="10" y="10" width="280" height="280" rx="32" fill="none" stroke="#111827" stroke-width="3"/>
 
                 <!-- ВНУТРЕННИЕ НЕОНОВЫЕ СЕКЦИИ И ЛЕТАЮЩИЕ СТРЕЛКИ -->
-                <!-- 1. Синяя Секция (Сверху-Слева) -->
-                <path class="neon-blue" d="M 30 135 L 30 50 A 20 20 0 0 1 50 30 L 135 30 L 135 75 L 75 75 L 75 135 Z" 
-                      fill="none" stroke="#0088ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-b)"/>
-                
-                <!-- 2. Зелёная Секция (Сверху-Справа) -->
-                <path class="neon-green" d="M 165 30 L 250 30 A 20 20 0 0 1 270 50 L 270 135 L 225 135 L 225 75 L 165 75 Z" 
-                      fill="none" stroke="#20e040" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-g)"/>
+                <path class="neon-blue" d="M 30 135 L 30 50 A 20 20 0 0 1 50 30 L 135 30 L 135 75 L 75 75 L 75 135 Z" fill="none" stroke="#0088ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-b)"/>
+                <path class="neon-green" d="M 165 30 L 250 30 A 20 20 0 0 1 270 50 L 270 135 L 225 135 L 225 75 L 165 75 Z" fill="none" stroke="#20e040" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-g)"/>
+                <path class="neon-purple" d="M 270 165 L 270 250 A 20 20 0 0 1 250 270 L 165 270 L 165 225 L 225 225 L 225 165 Z" fill="none" stroke="#a040ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-p)"/>
+                <path class="neon-yellow" d="M 135 270 L 50 270 A 20 20 0 0 1 30 250 L 30 165 L 75 165 L 75 225 L 135 225 Z" fill="none" stroke="#ffcc00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-y)"/>
 
-                <!-- 3. Фиолетовая Секция (Снизу-Справа) -->
-                <path class="neon-purple" d="M 270 165 L 270 250 A 20 20 0 0 1 250 270 L 165 270 L 165 225 L 225 225 L 225 165 Z" 
-                      fill="none" stroke="#a040ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-p)"/>
-
-                <!-- 4. Жёлтая Секция (Снизу-Слева) -->
-                <path class="neon-yellow" d="M 135 270 L 50 270 A 20 20 0 0 1 30 250 L 30 165 L 75 165 L 75 225 L 135 225 Z" 
-                      fill="none" stroke="#ffcc00" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow-y)"/>
-
-                <!-- ЛЕТАЮЩИЕ ПО КОНТУРУ СТРЕЛКИ (БЕГУЩИЙ НЕОН) -->
-                <path class="flying-arrow" d="M 20 20 L 280 20 L 280 280 L 20 280 Z" 
-                      fill="none" stroke="#00d2ff" stroke-width="4" stroke-linecap="round" filter="url(#glow-b)"/>
+                <!-- ЛЕТАЮЩИЕ ПО КОНТУРУ СТРЕЛКИ -->
+                <path class="flying-arrow" d="M 20 20 L 280 20 L 280 280 L 20 280 Z" fill="none" stroke="#00d2ff" stroke-width="4" stroke-linecap="round" filter="url(#glow-b)"/>
 
                 <!-- ЦЕНТРАЛЬНАЯ ПЛАТА "LMSH" -->
                 <rect x="88" y="88" width="124" height="124" rx="18" fill="#030407" stroke="#334155" stroke-width="2"/>
                 <rect x="92" y="92" width="116" height="116" rx="14" fill="none" stroke="#1e293b" stroke-width="1.5"/>
 
-                <!-- Дорожки платы -->
                 <path d="M 98 110 L 108 110 M 98 190 L 108 190 M 202 110 L 192 110 M 202 190 L 192 190" stroke="#334155" stroke-width="2" stroke-linecap="round"/>
                 <circle cx="108" cy="110" r="2" fill="#0088ff"/>
                 <circle cx="108" cy="190" r="2" fill="#ffcc00"/>
@@ -569,7 +672,7 @@
             </svg>
         </div>
 
-        <!-- КАРТОЧКА ИМЕНИ ПОЛЬЗОВАТЕЛЯ ПО ЦЕНТРУ -->
+        <!-- КАРТОЧКА ИМЕНИ ПОЛЬЗОВАТЕЛЯ -->
         <div class="user-profile-center">
             <div class="user-profile-card" id="target-profile" onclick="location.href='you.html'">
                 <div class="card-left">
@@ -585,74 +688,51 @@
 
         <!-- СЕТКА ИЗ 6 ФОРМ -->
         <div class="dashboard">
-            <!-- 1. Вопросы -->
-            <div class="card card-blue" onclick="location.href='questions.html'" data-link="questions.html" data-color="#007bff">
+            <!-- Здесь добавлены функции trackAndGo для опроса -->
+            <div class="card card-blue" onclick="trackAndGo('Вопросы', 'questions.html')" data-link="questions.html" data-color="#007bff">
                 <div class="card-left">
                     <span class="material-symbols-outlined card-icon" style="color: #007bff;">help_center</span>
-                    <div class="card-info">
-                        <h3>Вопросы</h3>
-                        <p>Техподдержка</p>
-                    </div>
+                    <div class="card-info"><h3>Вопросы</h3><p>Техподдержка</p></div>
                 </div>
                 <span class="material-symbols-outlined card-arrow">chevron_right</span>
             </div>
 
-            <!-- 2. Идеи -->
-            <div class="card card-green" id="target-ideas" onclick="location.href='ideas.html'" data-link="ideas.html" data-color="#28a745" data-ideas="true">
+            <div class="card card-green" id="target-ideas" onclick="trackAndGo('Идеи', 'ideas.html')" data-link="ideas.html" data-color="#28a745" data-ideas="true">
                 <div class="card-left">
                     <span class="material-symbols-outlined card-icon" style="color: #28a745;">lightbulb</span>
-                    <div class="card-info">
-                        <h3>Идеи</h3>
-                        <p>Инновации</p>
-                    </div>
+                    <div class="card-info"><h3>Идеи</h3><p>Инновации</p></div>
                 </div>
                 <span class="material-symbols-outlined card-arrow">chevron_right</span>
             </div>
 
-            <!-- 3. Отзывы -->
-            <div class="card card-gold" onclick="location.href='reviews.html'" data-link="reviews.html" data-color="#ffc107" data-reviews="true">
+            <div class="card card-gold" onclick="trackAndGo('Отзывы', 'reviews.html')" data-link="reviews.html" data-color="#ffc107" data-reviews="true">
                 <div class="card-left">
                     <span class="material-symbols-outlined card-icon" style="color: #ffc107;">rate_review</span>
-                    <div class="card-info">
-                        <h3>Отзывы</h3>
-                        <p>Отзывы и оценка паков</p>
-                    </div>
+                    <div class="card-info"><h3>Отзывы</h3><p>Отзывы и оценка паков</p></div>
                 </div>
                 <span class="material-symbols-outlined card-arrow">chevron_right</span>
             </div>
 
-            <!-- 4. Пак -->
             <div class="card card-purple" onclick="showAIStatus('Домен kosmo level installer не вышел. Публикация паков пока невозможна!')" data-color="#7C3AED">
                 <div class="card-left">
                     <span class="material-symbols-outlined card-icon" style="color: #7C3AED;">inventory_2</span>
-                    <div class="card-info">
-                        <h3>Пак</h3>
-                        <p>Ваш контент</p>
-                    </div>
+                    <div class="card-info"><h3>Пак</h3><p>Ваш контент</p></div>
                 </div>
                 <span class="material-symbols-outlined card-arrow">chevron_right</span>
             </div>
 
-            <!-- 5. Предрегистрация -->
-            <div class="card card-gray" onclick="location.href='preregistration.html'" data-link="preregistration.html" data-color="#888" data-prereg="true">
+            <div class="card card-gray" onclick="trackAndGo('Предрегистрация', 'preregistration.html')" data-link="preregistration.html" data-color="#888" data-prereg="true">
                 <div class="card-left">
                     <span class="material-symbols-outlined card-icon" style="color: #888;">app_registration</span>
-                    <div class="card-info">
-                        <h3>Предрегистрация</h3>
-                        <p>Kosmo Level UI2</p>
-                    </div>
+                    <div class="card-info"><h3>Предрегистрация</h3><p>Kosmo Level UI2</p></div>
                 </div>
                 <span class="material-symbols-outlined card-arrow">chevron_right</span>
             </div>
 
-            <!-- 6. Настройки -->
             <div class="card card-orange" id="target-settings" onclick="location.href='settings.html'" data-color="#ff9800">
                 <div class="card-left">
                     <span class="material-symbols-outlined card-icon" style="color: #ff9800;">settings</span>
-                    <div class="card-info">
-                        <h3>Настройки</h3>
-                        <p>Цвета и интерфейс</p>
-                    </div>
+                    <div class="card-info"><h3>Настройки</h3><p>Цвета и интерфейс</p></div>
                 </div>
                 <span class="material-symbols-outlined card-arrow">chevron_right</span>
             </div>
@@ -661,6 +741,7 @@
 
     <!-- ПРАВАЯ ЧАСТЬ (БОКОВАЯ ПАНЕЛЬ С ВКЛАДКАМИ) -->
     <div id="side-panel">
+	<div id="resizer"></div>
         <div class="panel-header">
             <div class="header-top">
                 <span style="font-size: 13px; color: #888;">Бортовой Модуль</span>
@@ -684,7 +765,6 @@
         </div>
 
         <div id="chat-input-wrapper">
-            <!-- Блок прикрепленного изображения -->
             <div id="attached-preview" class="chat-attachment-preview" style="display: none;">
                 <span class="material-symbols-outlined" style="color: var(--accent); font-size: 18px;">image</span>
                 <span id="attached-name">LMSH_Logo.svg</span>
@@ -700,17 +780,14 @@
         </div>
     </div>
 
-    <!-- КОНТЕКСТНОЕ МЕНЮ (ДЛЯ КАРТОЧЕК И ДЛЯ ЛОГОТИПА) -->
+    <!-- КОНТЕКСТНОЕ МЕНЮ -->
     <div id="context-menu">
-        <!-- Варианты для Логотипа -->
         <div class="menu-item" id="logo-attach" style="display:none;" onclick="attachLogoToChat()">
-            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent);">attach_file</span> Прикрепить Изображение к чату с ИИ
+            <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent);">attach_file</span> Прикрепить Изображение
         </div>
         <div class="menu-item" id="logo-toggle-light" style="display:none;" onclick="toggleLightMode()">
-            <span class="material-symbols-outlined" style="font-size: 18px; color: #00d2ff;">speed</span> <span id="light-mode-text">Заменить на облегчённое лого</span>
+            <span class="material-symbols-outlined" style="font-size: 18px; color: #00d2ff;">speed</span> <span id="light-mode-text">Облегчённое лого</span>
         </div>
-
-        <!-- Варианты для Карточек -->
         <div class="menu-item" id="ideas-view" style="display:none;" onclick="location.href='all-ideas.html'">
             <span class="material-symbols-outlined" style="font-size: 18px;">visibility</span> Посмотреть идеи
         </div>
@@ -718,7 +795,7 @@
             <span class="material-symbols-outlined" style="font-size: 18px;">star_rate</span> Оценить Пак
         </div>
         <div class="menu-item" id="prereg-view" style="display:none;" onclick="location.href='preregistration.html'">
-            <span class="material-symbols-outlined" style="font-size: 18px;">rocket_launch</span> Бронь / Отмена Kosmo UI2
+            <span class="material-symbols-outlined" style="font-size: 18px;">rocket_launch</span> Бронь Kosmo UI2
         </div>
         <div class="menu-item" id="card-discuss" style="display:none;" onclick="discuss()">
             <span class="material-symbols-outlined" style="font-size: 18px;">forum</span> Обсудить в чате
@@ -730,15 +807,14 @@
         <span class="material-symbols-outlined" style="font-size: 28px;">smart_toy</span>
     </div>
 
-    <!-- МОДАЛЬНЫЕ ОКНА -->
+    <!-- МОДАЛЬНЫЕ ОКНА И ОПРОС -->
     <div id="tutorial-modal">
         <div class="modal-card">
             <h2 style="color:var(--accent); margin-top:0; font-size: 20px;">
-                <span class="material-symbols-outlined" style="vertical-align: middle;">rocket_launch</span>
-                Глобальное Обновление!
+                <span class="material-symbols-outlined" style="vertical-align: middle;">rocket_launch</span> Глобальное Обновление!
             </h2>
             <p style="font-size:13px; color:#aaa; margin-bottom: 20px; line-height: 1.5;">
-                Привет! Мы полностью переработали Главный Dashboard Prestige HQ. Хочешь быстрый интерактивный тур по новым функциям?
+                Привет! Мы полностью переработали Главный Dashboard Prestige HQ. Хочешь быстрый тур по новым функциям?
             </p>
             <button onclick="startInteractiveTutorial()">Пройти быстрый тур 🚀</button>
             <button onclick="closeTutorialModal()" style="background:transparent; border:1px solid #333; color:#888;">Пропустить</button>
@@ -748,8 +824,7 @@
     <div id="auth-modal">
         <div class="modal-card">
             <h2 style="color:var(--accent); margin-top:0; font-size: 20px;">
-                <span class="material-symbols-outlined" style="vertical-align: middle;">badge</span>
-                Авторизация
+                <span class="material-symbols-outlined" style="vertical-align: middle;">badge</span> Авторизация
             </h2>
             <p style="font-size:13px; color:#aaa; margin-bottom: 20px;">Укажите данные для работы в системе.</p>
             <input type="text" id="reg-name" placeholder="Ваше Имя">
@@ -761,12 +836,90 @@
     <div id="status-modal">
         <div class="modal-card">
             <h2 style="color:var(--accent); margin-top:0; font-size: 20px;">
-                <span class="material-symbols-outlined" style="vertical-align: middle;">info</span>
-                Уведомление
+                <span class="material-symbols-outlined" style="vertical-align: middle;">info</span> Уведомление
             </h2>
             <p id="status-modal-msg" style="font-size:13px; color:#aaa; margin-bottom: 20px;"></p>
             <button onclick="closeStatusModal()">Понятно</button>
         </div>
+    </div>
+
+    <!-- ИНТЕРАКТИВНОЕ ОКНО ОПРОСА -->
+    <div id="survey-modal">
+        <div class="survey-card">
+            <div id="survey-step-0" class="survey-step active">
+                <div class="survey-title"><span class="surveyUserName"></span>, у нас к вам есть два вопроса, ответьте пожалуйста!</div>
+                <p style="color: #888; font-size: 13px; line-height: 1.5; margin-bottom: 0;">Это займет не больше 30 секунд и поможет нам улучшить сервис.</p>
+                <div class="survey-actions">
+                    <button class="btn-survey btn-secondary" onclick="showLaterScreen()">Позже</button>
+                    <button class="btn-survey btn-primary" onclick="goToStep(1)">Далее</button>
+                </div>
+            </div>
+
+            <div id="survey-step-later" class="survey-step">
+                <div class="later-view">
+                    <span class="material-symbols-outlined later-clock">schedule</span>
+                    <h3 style="margin: 14px 0 6px 0; font-size: 16px;">Хорошо, не будем отвлекать!</h3>
+                    <p style="color: #888; font-size: 13px; margin: 0;">Мы напомним вам эти вопросы позже.</p>
+                </div>
+            </div>
+
+            <div id="survey-step-1" class="survey-step">
+                <div class="survey-title"><span class="surveyUserName"></span>, как вам последнее заполнение в форме <span id="last-form-name" style="color: var(--accent);">"Идеи"</span>?</div>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="form_rating" value="Шикарно" checked>
+                        <span class="radio-custom"></span><span>😍 Шикарно</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="form_rating" value="Отлично">
+                        <span class="radio-custom"></span><span>😊 Отлично</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="form_rating" value="Нейтрально">
+                        <span class="radio-custom"></span><span>😐 Нейтрально</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="form_rating" value="Плохо">
+                        <span class="radio-custom"></span><span>🙁 Плохо</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="form_rating" value="Ужасно">
+                        <span class="radio-custom"></span><span>😡 Ужасно</span>
+                    </label>
+                </div>
+                <div class="survey-actions">
+                    <button class="btn-survey btn-secondary" onclick="goToStep(0)">Назад</button>
+                    <button class="btn-survey btn-primary" onclick="goToStep(2)">Далее</button>
+                </div>
+            </div>
+
+            <div id="survey-step-2" class="survey-step">
+                <div class="survey-title"><span class="surveyUserName"></span>, напишите пару слов, почему вы выбрали именно эту оценку? <span style="font-weight: normal; color: #666; font-size: 12px;">(Необязательно)</span></div>
+                <div class="survey-textarea-wrapper">
+                    <div id="survey-feedback-input" class="survey-textarea" contenteditable="true" placeholder="Ваше мнение..."></div>
+                </div>
+                <div class="survey-actions">
+                    <button class="btn-survey btn-secondary" onclick="finishSurvey(true)">Пропустить</button>
+                    <button class="btn-survey btn-primary" onclick="finishSurvey(false)">Далее</button>
+                </div>
+            </div>
+
+            <div id="survey-step-3" class="survey-step">
+                <div class="success-view">
+                    <div class="animated-check">
+                        <span class="material-symbols-outlined">check</span>
+                    </div>
+                    <div class="survey-title" style="margin-bottom: 0;">Спасибо, <span class="surveyUserName"></span>, что поделились отзывом!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ТУЛБАР ФОРМАТИРОВАНИЯ ТЕКСТА (B, I, U) -->
+    <div id="format-toolbar">
+        <button class="format-btn" onclick="applyFormat('bold')"><b>B</b></button>
+        <button class="format-btn" onclick="applyFormat('italic')"><i>I</i></button>
+        <button class="format-btn" onclick="applyFormat('underline')"><u>U</u></button>
     </div>
 
     <script>
@@ -774,14 +927,12 @@
         let activeCard = null;
         let tutorialStep = 0;
         let isLogoAttached = false;
+        let currentUser = 'Пользователь';
 
         document.addEventListener('DOMContentLoaded', () => {
             const savedAccent = localStorage.getItem('lmsh-accent-color');
-            if (savedAccent) {
-                document.documentElement.style.setProperty('--accent', savedAccent);
-            }
+            if (savedAccent) document.documentElement.style.setProperty('--accent', savedAccent);
 
-            // Проверка сохраненного облегченного режима
             if (localStorage.getItem('lmsh-light-mode') === 'true') {
                 document.body.classList.add('light-mode-active');
                 document.getElementById('light-mode-text').innerText = "Включить живое лого (Анимации)";
@@ -793,16 +944,17 @@
             if (!name || !email) {
                 document.getElementById('auth-modal').style.display = 'flex';
             } else {
+                currentUser = name;
                 document.getElementById('user-card-name').innerText = name;
                 if (!localStorage.getItem('lmsh-tutorial-passed')) {
                     document.getElementById('tutorial-modal').style.display = 'flex';
+                } else {
+                    initSurvey(); // Инициируем опрос, если всё уже пройдено
                 }
             }
 
-            // JS 3D-Tilt эффект для SVG Логотипа
             const logoWrapper = document.getElementById('live-logo');
             const logoSvg = logoWrapper.querySelector('.logo-svg');
-
             logoWrapper.addEventListener('mousemove', (e) => {
                 if (document.body.classList.contains('light-mode-active')) return;
                 const rect = logoWrapper.getBoundingClientRect();
@@ -810,19 +962,15 @@
                 const y = e.clientY - rect.top - rect.height / 2;
                 logoSvg.style.transform = `scale(1.08) rotateX(${-y / 3}deg) rotateY(${x / 3}deg)`;
             });
-
             logoWrapper.addEventListener('mouseleave', () => {
                 logoSvg.style.transform = 'scale(1) rotateX(0deg) rotateY(0deg)';
             });
 
-            // ПКМ ПО ЛОГОТИПУ
             logoWrapper.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 hideAllContextMenuItems();
-
                 document.getElementById('logo-attach').style.display = 'flex';
                 document.getElementById('logo-toggle-light').style.display = 'flex';
-
                 const menu = document.getElementById('context-menu');
                 menu.style.top = e.pageY + 'px'; 
                 menu.style.left = e.pageX + 'px'; 
@@ -830,46 +978,105 @@
             });
         });
 
-        /* ФУНКЦИИ ЛОГОТИПА И КЛИКА ПКМ */
+        /* ================== ЛОГИКА ОПРОСНИКА ================== */
+        function initSurvey() {
+            document.querySelectorAll('.surveyUserName').forEach(el => el.innerText = currentUser);
+            
+            const lastForm = localStorage.getItem('lmsh-last-visited-form') || 'Идеи';
+            document.getElementById('last-form-name').innerText = `"${lastForm}"`;
+
+            const isSurveyPassed = localStorage.getItem('lmsh-survey-passed');
+            const surveyLaterTime = localStorage.getItem('lmsh-survey-later');
+
+            if (!isSurveyPassed) {
+                if (!surveyLaterTime || Date.now() > parseInt(surveyLaterTime)) {
+                    setTimeout(() => {
+                        document.getElementById('survey-modal').style.display = 'flex';
+                    }, 1500); // Небольшая задержка перед показом
+                }
+            }
+
+            // Слушатель для тулбара форматирования
+            const editor = document.getElementById('survey-feedback-input');
+            const toolbar = document.getElementById('format-toolbar');
+
+            document.addEventListener('selectionchange', () => {
+                const selection = window.getSelection();
+                if (!selection.rangeCount || selection.isCollapsed) {
+                    toolbar.style.display = 'none'; return;
+                }
+                const range = selection.getRangeAt(0);
+                if (editor.contains(range.commonAncestorContainer)) {
+                    const rect = range.getBoundingClientRect();
+                    toolbar.style.top = (rect.top - 40 + window.scrollY) + 'px';
+                    toolbar.style.left = (rect.left + (rect.width / 2) - 50 + window.scrollX) + 'px';
+                    toolbar.style.display = 'flex';
+                } else {
+                    toolbar.style.display = 'none';
+                }
+            });
+        }
+
+        function trackAndGo(formName, url) {
+            localStorage.setItem('lmsh-last-visited-form', formName);
+            location.href = url;
+        }
+
+        function goToStep(stepIndex) {
+            document.querySelectorAll('.survey-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`survey-step-${stepIndex}`).classList.add('active');
+        }
+
+        function showLaterScreen() {
+            goToStep('later');
+            localStorage.setItem('lmsh-survey-later', Date.now() + 3600000); // Откладываем на 1 час
+            setTimeout(() => { document.getElementById('survey-modal').style.display = 'none'; }, 2500);
+        }
+
+        function applyFormat(command) { document.execCommand(command, false, null); }
+
+        function finishSurvey(isSkipped) {
+            const selectedRating = document.querySelector('input[name="form_rating"]:checked')?.value;
+            const feedbackText = isSkipped ? '' : document.getElementById('survey-feedback-input').innerHTML;
+            
+            localStorage.setItem('lmsh-survey-result', JSON.stringify({ user: currentUser, rating: selectedRating, feedback: feedbackText }));
+            localStorage.setItem('lmsh-survey-passed', 'true');
+            
+            goToStep(3);
+            setTimeout(() => { document.getElementById('survey-modal').style.display = 'none'; }, 3000);
+        }
+
+        /* ================== ОСНОВНЫЕ ФУНКЦИИ DASHBOARD ================== */
         function hideAllContextMenuItems() {
             document.querySelectorAll('#context-menu .menu-item').forEach(item => item.style.display = 'none');
         }
 
         function attachLogoToChat() {
             document.getElementById('context-menu').style.display = 'none';
-            openChat('ai');
-            isLogoAttached = true;
+            openChat('ai'); isLogoAttached = true;
             document.getElementById('attached-preview').style.display = 'flex';
         }
 
         function removeAttachment() {
-            isLogoAttached = false;
-            document.getElementById('attached-preview').style.display = 'none';
+            isLogoAttached = false; document.getElementById('attached-preview').style.display = 'none';
         }
 
         function toggleLightMode() {
             document.getElementById('context-menu').style.display = 'none';
             const isActive = document.body.classList.toggle('light-mode-active');
             localStorage.setItem('lmsh-light-mode', isActive ? 'true' : 'false');
-            
-            document.getElementById('light-mode-text').innerText = isActive 
-                ? "Включить живое лого (Анимации)" 
-                : "Заменить на облегчённое лого";
-
-            showAIStatus(isActive ? "Включен облегчённый режим. Фильтры и анимации отключены." : "Живой режим логотипа с анимацией и неон-свечением восстановлен!");
+            document.getElementById('light-mode-text').innerText = isActive ? "Включить живое лого (Анимации)" : "Заменить на облегчённое лого";
+            showAIStatus(isActive ? "Включен облегчённый режим." : "Живой режим логотипа восстановлен!");
         }
 
         function registerUser() {
             const name = document.getElementById('reg-name').value.trim();
             const email = document.getElementById('reg-email').value.trim();
-
-            if (!name || !email) {
-                showAIStatus("Заполните оба поля!");
-                return;
-            }
-
+            if (!name || !email) { showAIStatus("Заполните оба поля!"); return; }
+            
             localStorage.setItem('lmsh-author', name);
             localStorage.setItem('lmsh-email', email);
+            currentUser = name;
             document.getElementById('user-card-name').innerText = name;
             document.getElementById('auth-modal').style.display = 'none';
             document.getElementById('tutorial-modal').style.display = 'flex';
@@ -878,37 +1085,32 @@
         function closeTutorialModal() {
             document.getElementById('tutorial-modal').style.display = 'none';
             localStorage.setItem('lmsh-tutorial-passed', 'true');
+            initSurvey(); // Вызываем опросник после пропуска
         }
 
         function startInteractiveTutorial() {
-            closeTutorialModal();
+            document.getElementById('tutorial-modal').style.display = 'none';
             document.getElementById('tutorial-overlay').style.display = 'block';
-            tutorialStep = 0;
-            nextTutorialStep();
+            tutorialStep = 0; nextTutorialStep();
         }
 
         function nextTutorialStep() {
             document.querySelectorAll('.tutorial-highlight').forEach(el => el.classList.remove('tutorial-highlight'));
-            
             const bubble = document.getElementById('tutorial-bubble');
             const arrow = document.getElementById('tutorial-arrow');
             const text = document.getElementById('tutorial-text');
             const stepNum = document.getElementById('tutorial-step-num');
-
             tutorialStep++;
 
             if (tutorialStep === 1) {
                 const target = document.getElementById('target-profile');
                 target.classList.add('tutorial-highlight');
-                
                 const rect = target.getBoundingClientRect();
                 text.innerHTML = "<b>Карточка Профиля:</b> Ваша персональная страница теперь зафиксирована по центру.";
                 stepNum.innerText = "Шаг 1 из 4";
-
                 bubble.style.top = (rect.bottom + 15) + 'px';
                 bubble.style.left = (rect.left + (rect.width/2) - 140) + 'px';
                 bubble.style.display = 'block';
-
                 arrow.style.top = (rect.bottom - 10) + 'px';
                 arrow.style.left = (rect.left + (rect.width/2) - 18) + 'px';
                 arrow.style.display = 'block';
@@ -916,53 +1118,43 @@
             else if (tutorialStep === 2) {
                 const target = document.getElementById('target-ideas');
                 target.classList.add('tutorial-highlight');
-
                 const rect = target.getBoundingClientRect();
-                text.innerHTML = "<b>Умное контекстное меню:</b> Нажмите <i>ПКМ</i> или зажмите карточку для вызова быстрых действий.";
+                text.innerHTML = "<b>Умное контекстное меню:</b> Нажмите <i>ПКМ</i> для вызова быстрых действий.";
                 stepNum.innerText = "Шаг 2 из 4";
-
                 bubble.style.top = (rect.bottom + 15) + 'px';
                 bubble.style.left = Math.max(10, rect.left) + 'px';
-
                 arrow.style.top = (rect.bottom - 10) + 'px';
                 arrow.style.left = (rect.left + (rect.width/2) - 18) + 'px';
             }
             else if (tutorialStep === 3) {
                 const target = document.getElementById('assistant-btn');
                 target.classList.add('tutorial-highlight');
-
                 const rect = target.getBoundingClientRect();
-                text.innerHTML = "<b>Бортовой модуль:</b> Отсюда вызывается чат с AI Помощником или DEV Чат с разработчиками.";
+                text.innerHTML = "<b>Бортовой модуль:</b> Отсюда вызывается чат с AI Помощником или DEV Чат.";
                 stepNum.innerText = "Шаг 3 из 4";
-
                 bubble.style.top = (rect.top - 140) + 'px';
                 bubble.style.left = (rect.left - 240) + 'px';
-
                 arrow.style.top = (rect.top - 35) + 'px';
                 arrow.style.left = (rect.left + 10) + 'px';
             }
             else if (tutorialStep === 4) {
                 const target = document.getElementById('target-settings');
                 target.classList.add('tutorial-highlight');
-
                 const rect = target.getBoundingClientRect();
                 text.innerHTML = "<b>Настройки интерфейса:</b> Меняйте темы, акцентные цвета и вид дашборда.";
                 stepNum.innerText = "Шаг 4 из 4";
-
                 document.getElementById('tutorial-next-btn').innerText = "Завершить";
-
                 bubble.style.top = (rect.top - 140) + 'px';
                 bubble.style.left = (rect.left - 40) + 'px';
-
                 arrow.style.top = (rect.top - 35) + 'px';
                 arrow.style.left = (rect.left + (rect.width/2) - 18) + 'px';
             }
             else {
-                bubble.style.display = 'none';
-                arrow.style.display = 'none';
+                bubble.style.display = 'none'; arrow.style.display = 'none';
                 document.getElementById('tutorial-overlay').style.display = 'none';
                 localStorage.setItem('lmsh-tutorial-passed', 'true');
-                showAIStatus("Обучение завершено! Приятного использования обновлённого Dashboard.");
+                showAIStatus("Обучение завершено! Приятного использования.");
+                setTimeout(initSurvey, 2000); // Запускаем опрос через пару секунд после туториала
             }
         }
 
@@ -970,22 +1162,16 @@
             activeMode = mode;
             document.getElementById('tab-ai').classList.toggle('active', mode === 'ai');
             document.getElementById('tab-dev').classList.toggle('active', mode === 'dev');
-            
             const chatBody = document.getElementById('chat-body');
-            if (mode === 'dev') {
-                chatBody.innerHTML = '<div class="msg-bubble msg-dev"><b>[DEV CHAT]</b> Соединение с Главным Инженером установлено. Задайте ваш вопрос напрямую.</div>';
-            } else {
-                chatBody.innerHTML = '<div class="msg-bubble msg-ai">Бортовой ИИ готов к диалогу. Выберите тему или задайте вопрос.</div>';
-            }
+            if (mode === 'dev') chatBody.innerHTML = '<div class="msg-bubble msg-dev"><b>[DEV CHAT]</b> Соединение с Главным Инженером установлено. Задайте ваш вопрос напрямую.</div>';
+            else chatBody.innerHTML = '<div class="msg-bubble msg-ai">Бортовой ИИ готов к диалогу. Выберите тему или задайте вопрос.</div>';
         }
 
-        function openChat(mode = 'ai') { 
-            document.body.classList.add('split-active');
-            switchMode(mode);
-        }
-        
+        function openChat(mode = 'ai') { document.body.classList.add('split-active'); switchMode(mode); }
         function closeChat() { 
-            document.body.classList.remove('split-active');
+            document.body.classList.remove('split-active'); 
+            // Очищаем инлайн-стиль ширины, чтобы сайдбар мог сжаться до 0
+            document.getElementById('side-panel').style.width = ''; 
         }
 
         function appendBubble(text, side) {
@@ -1001,42 +1187,25 @@
             const input = document.getElementById('chat-msg'); 
             let query = input.value.trim();
             if (!query && !isLogoAttached) return; 
-
-            if (isLogoAttached) {
-                query = `[Прикреплено изображение: LMSH_Logo.svg] ` + query;
-                removeAttachment();
-            }
-            
-            appendBubble(query, 'user');
-            input.value = ""; 
-
+            if (isLogoAttached) { query = `[Прикреплено изображение: LMSH_Logo.svg] ` + query; removeAttachment(); }
+            appendBubble(query, 'user'); input.value = ""; 
             setTimeout(() => {
-                if (activeMode === 'dev') {
-                    appendBubble("<b>Разработчик:</b> Ваш запрос принят. Все вложения переданы команде инженеров.", 'dev');
-                } else {
-                    appendBubble("Запрос с вложением обработан бортовым ИИ. Векторная графика LMSH загружена успешно.", "ai");
-                }
+                if (activeMode === 'dev') appendBubble("<b>Разработчик:</b> Ваш запрос принят. Все вложения переданы команде инженеров.", 'dev');
+                else appendBubble("Запрос с вложением обработан бортовым ИИ. Векторная графика LMSH загружена успешно.", "ai");
             }, 600);
         }
 
-        /* КОНТЕКСТНОЕ МЕНЮ КАРТОЧЕК */
         document.querySelectorAll('.card, .user-profile-card').forEach(card => {
             card.addEventListener('contextmenu', e => {
-                e.preventDefault();
-                activeCard = card;
-                hideAllContextMenuItems();
-
+                e.preventDefault(); activeCard = card; hideAllContextMenuItems();
                 document.querySelectorAll('.card, .user-profile-card').forEach(c => { if(c !== card) c.classList.add('blurred'); });
-                
                 document.getElementById('ideas-view').style.display = card.dataset.ideas ? 'flex' : 'none';
                 document.getElementById('review-pack-view').style.display = card.dataset.reviews ? 'flex' : 'none';
                 document.getElementById('prereg-view').style.display = card.dataset.prereg ? 'flex' : 'none';
                 document.getElementById('card-discuss').style.display = 'flex';
                 
                 const menu = document.getElementById('context-menu');
-                menu.style.top = e.pageY + 'px'; 
-                menu.style.left = e.pageX + 'px'; 
-                menu.style.display = 'block';
+                menu.style.top = e.pageY + 'px'; menu.style.left = e.pageX + 'px'; menu.style.display = 'block';
             });
         });
 
@@ -1047,20 +1216,65 @@
             }
         });
 
-        function discuss() { 
-            document.getElementById('context-menu').style.display = 'none'; 
-            document.querySelectorAll('.card, .user-profile-card').forEach(c => c.classList.remove('blurred')); 
-            openChat('ai'); 
-        }
+        function discuss() { document.getElementById('context-menu').style.display = 'none'; document.querySelectorAll('.card, .user-profile-card').forEach(c => c.classList.remove('blurred')); openChat('ai'); }
+        function showAIStatus(msg) { document.getElementById('status-modal-msg').innerText = msg; document.getElementById('status-modal').style.display = 'flex'; }
+        function closeStatusModal() { document.getElementById('status-modal').style.display = 'none'; }
+/* ================== СЕКРЕТНАЯ ПАСХАЛКА ================== */
+window.review = function() {
+    // Сбрасываем шаг на начало, на случай если он уже был пройден
+    goToStep(0); 
+    
+    // Принудительно показываем окно опроса
+    document.getElementById('survey-modal').style.display = 'flex';
+    
+    // Выводим сообщение в консоль разработчика
+    console.log("%c[Prestige HQ] Внимание! Обнаружен несанкционированный доступ к модулю опроса 👾", "color: #ffc107; font-size: 14px; font-weight: bold;");
+    
+    return "Пасхалка активирована. Удачи!";
+};
+/* ================== ЛОГИКА ПОЛЗУНКА (САЙДБАРА) ================== */
+        const sidePanel = document.getElementById('side-panel');
+        const resizer = document.getElementById('resizer');
+        let isResizing = false;
 
-        function showAIStatus(msg) { 
-            document.getElementById('status-modal-msg').innerText = msg;
-            document.getElementById('status-modal').style.display = 'flex';
-        }
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            resizer.classList.add('active');
+            
+            // Временно отключаем плавную анимацию, чтобы ползунок не отставал от мыши
+            sidePanel.style.transition = 'none'; 
+            
+            // Запрещаем выделение текста на странице во время свайпа
+            document.body.style.userSelect = 'none'; 
+        });
 
-        function closeStatusModal() {
-            document.getElementById('status-modal').style.display = 'none';
-        }
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+
+            // Считаем новую ширину (ширина окна минус положение мыши по X)
+            let newWidth = window.innerWidth - e.clientX;
+            
+            const minWidth = 440; // Оригинальный (минимальный) размер
+            const maxWidth = window.innerWidth / 2; // Максимум - половина экрана
+
+            // Ограничиваем размер панели
+            if (newWidth < minWidth) newWidth = minWidth;
+            if (newWidth > maxWidth) newWidth = maxWidth;
+
+            // Применяем ширину
+            sidePanel.style.width = newWidth + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                resizer.classList.remove('active');
+                
+                // Возвращаем плавную анимацию и выделение текста
+                sidePanel.style.transition = 'all 0.3s ease'; 
+                document.body.style.userSelect = '';
+            }
+        });
     </script>
 </body>
 </html>
