@@ -202,7 +202,39 @@
             </div>
         </div>
     </div>
+<!-- Модальное окно #aiPrivacyModal -->
+<div class="modal-overlay" id="aiPrivacyModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <div>
+                <span style="font-size: 0.75em; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Event Overview: AI in Action Showcase</span>
+                <h3>FutureSync: AI & Immersive Experiences</h3>
+            </div>
+            <span class="material-symbols-outlined" onclick="closeModal('aiPrivacyModal')">close</span>
+        </div>
+        
+        <div style="font-size: 0.85em; background: var(--bg-color); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
+            <strong>Date & Format:</strong> Hybrid Global Event (Online & Interactive Hubs)
+        </div>
 
+        <div>
+            <strong style="font-size: 0.95em;">Core Concept</strong>
+            <p style="font-size: 0.88em; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
+                A dynamic event exploring how artificial intelligence is transforming modern digital experiences, community interaction, and automated workflows.
+            </p>
+        </div>
+
+        <div>
+            <strong style="font-size: 0.95em; color: var(--accent-color);">Role of AI in the Event</strong>
+            <ul style="font-size: 0.85em; color: var(--text-secondary); padding-left: 18px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+                <li><strong>Intelligent Personalization:</strong> AI algorithms analyze participant preferences to curate customized schedules and recommend relevant panel discussions.</li>
+                <li><strong>Real-Time Analytics:</strong> Machine learning models track live engagement metrics to dynamically adapt event content and interactive voting outcomes.</li>
+                <li><strong>Automated Assistance:</strong> Smart virtual assistants provide instant multi-language support, answering attendee queries and guiding them through the event ecosystem.</li>
+                <li><strong>Content Generation:</strong> AI-powered tools assist in creating immersive visual assets, dynamic summaries, and automated highlights for global participants.</li>
+            </ul>
+        </div>
+    </div>
+</div>
     <script>
         let currentEventData = null;
         let lmshTimerId = null;
@@ -379,9 +411,16 @@
             }
 
             document.getElementById('modalActionBtn').href = ev.links ? ev.links.action_url || '#' : '#';
-            document.getElementById('aiPrivacyLink').href = ev.links ? ev.links.ai_privacy_url || '#' : '#';
-            document.getElementById('aiFrame').src = `ask_events.html?id=${ev.id}`;
-            document.getElementById('eventModal').style.display = 'flex';
+
+// Настройка открытия модального окна ИИ-конфиденциальности
+const privacyBtn = document.getElementById('aiPrivacyLink');
+privacyBtn.onclick = (e) => {
+    e.preventDefault();
+    document.getElementById('aiPrivacyModal').style.display = 'flex';
+};
+
+document.getElementById('aiFrame').src = `ask_events.html?id=${ev.id}`;
+document.getElementById('eventModal').style.display = 'flex';
         }
 
         function closeModal(id) {
