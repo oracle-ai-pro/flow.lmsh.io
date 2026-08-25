@@ -3,219 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Штаб ЛМСХ - Панель управления</title>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <title>Штаб ЛМСХ - Notification System v1.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
-        .main-btn { padding: 10px 20px; border-radius: 20px; border: none; cursor: pointer; font-weight: 600; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.3s; }
-        .main-btn:hover { background: #e0e0e0; }
-        
-        .req-auth-btn { background: #007bff; color: white; display: none; margin-bottom: 20px; }
-        .req-auth-btn:hover { background: #0056b3; }
+        /* Переменные Android Material You & Авто-тема */
+        :root {
+            color-scheme: light dark;
+            --bg-color: #f6f8fa;
+            --card-bg: #ffffff;
+            --text-primary: #1d1b20;
+            --text-secondary: #49454f;
+            --accent-color: #6750a4; /* Fallback Material Purple */
+            --accent-light: #e8def8;
+            --border-color: #e7e0ec;
+            --active-red: #b3261e;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --modal-bg: rgba(0, 0, 0, 0.5);
+        }
 
-        .category-title { width: 340px; margin: 20px 0 5px 0; font-size: 1.1em; color: #444; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-        
-        .card { background: white; padding: 20px; border-radius: 20px; width: 300px; margin: 10px auto; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .event-card { flex-direction: column; align-items: flex-start; gap: 10px; }
-        
-        .material-symbols-outlined { font-size: 28px; cursor: pointer; color: #6e8efb; transition: 0.3s; }
-        .material-symbols-outlined.active { color: #f44336; }
-        .timer-info { font-size: 0.75em; color: #888; margin-top: 5px; }
-        input { width: 40px; border: 1px solid #ccc; border-radius: 5px; padding: 2px; text-align: center; }
-        
-        .btn-group { display: flex; gap: 8px; width: 100%; margin-top: 10px; }
-        .action-btn { flex: 1; padding: 8px 10px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85em; transition: 0.2s; text-align: center; text-decoration: none; }
-        .btn-purple { background: #2d1b4e; color: white; }
-        .btn-gray { background: #f0f0f0; color: #333; border: 1px solid #ccc; }
-        .btn-outline-blue { background: #eef6ff; color: #007bff; border: 1px solid #007bff; display: flex; align-items: center; justify-content: center; gap: 4px; }
-        .btn-outline-blue:hover { background: #007bff; color: white; }
-        .btn-outline-blue.subscribed { background: #28a745; color: white; border-color: #28a745; }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #141218;
+                --card-bg: #211f26;
+                --text-primary: #e6e1e5;
+                --text-secondary: #cac4d0;
+                --accent-color: #d0bcff;
+                --accent-light: #4a4458;
+                --border-color: #49454f;
+                --active-red: #f2b8b5;
+                --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                --modal-bg: rgba(0, 0, 0, 0.75);
+            }
+        }
 
-        .info-section { margin-top: 20px; width: 300px; background: white; padding: 15px; border-radius: 15px; font-size: 0.9em; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        /* Системные цвета Android (если поддерживаются браузером) */
+        @supports (color: AccentColor) {
+            :root {
+                --accent-color: AccentColor;
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); color: var(--text-primary); padding: 20px; display: flex; flex-direction: column; align-items: center; transition: background 0.3s, color 0.3s; }
+
+        .controls { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .main-btn { padding: 10px 16px; border-radius: 20px; border: 1px solid var(--border-color); cursor: pointer; font-weight: 600; background: var(--card-bg); color: var(--text-primary); box-shadow: var(--card-shadow); transition: 0.2s; display: flex; align-items: center; gap: 6px; font-size: 0.85em; }
+        .main-btn:hover { background: var(--accent-light); }
+        .req-auth-btn { background: var(--accent-color); color: white; border: none; display: none; }
+
+        .category-title { width: 100%; max-width: 400px; margin: 20px 0 8px 0; font-size: 1.05em; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: space-between; }
+        
+        .card { background: var(--card-bg); padding: 18px; border-radius: 20px; width: 100%; max-width: 400px; margin: 8px 0; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); transition: transform 0.2s, border-color 0.2s; cursor: pointer; }
+        .card:hover { transform: translateY(-2px); }
+        .card.active-notify { border: 2px solid var(--accent-color); background: var(--accent-light); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: center; }
+        .material-symbols-outlined { font-size: 26px; cursor: pointer; color: var(--text-secondary); transition: 0.3s; }
+        .material-symbols-outlined.active { color: var(--active-red); font-variation-settings: 'FILL' 1; }
+        .material-symbols-outlined.subscribed { color: var(--accent-color); font-variation-settings: 'FILL' 1; }
+
+        .group-box { border-left: 4px solid var(--group-color, var(--accent-color)); padding-left: 12px; margin-bottom: 12px; }
+
+        /* Модальные окна */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
+        .modal-content { background: var(--card-bg); border-radius: 24px; padding: 20px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+
+        .iframe-container { width: 100%; height: 380px; border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; }
+        iframe { width: 100%; height: 100%; border: none; }
+
+        .tab-btn { padding: 6px 12px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); cursor: pointer; font-size: 0.8em; }
+        .tab-btn.active { background: var(--accent-color); color: white; }
+        .guide-section { display: none; margin-top: 10px; font-size: 0.9em; line-height: 1.5; }
+        .guide-section.active { display: block; }
+
+        .date-strike { text-decoration: line-through; color: var(--active-red); margin-right: 6px; }
+        .date-new { color: #10b981; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- Кнопка запроса прав, если они не выданы -->
+    <!-- Запрос прав -->
     <button id="requestPermissionBtn" class="main-btn req-auth-btn" onclick="requestNotificationPermission()">
-        Разрешить уведомления
+        <span class="material-symbols-outlined">notifications</span> Разрешить уведомления
     </button>
 
     <div class="controls">
-        <button class="main-btn" onclick="setAll(false)">Отключить все</button>
-        <button class="main-btn" onclick="setAll(true)">Включить все</button>
+        <button class="main-btn" onclick="setAll(false)"><span class="material-symbols-outlined">notifications_off</span> Отключить все</button>
+        <button class="main-btn" onclick="setAll(true)"><span class="material-symbols-outlined">notifications_active</span> Включить все</button>
+        <button class="main-btn" onclick="openGuideModal()"><span class="material-symbols-outlined">help</span> Как настроить пуши</button>
     </div>
 
-    <!-- Категория: События -->
+    <!-- Категории -->
     <div class="category-title">📅 События</div>
-    <div class="card event-card">
-        <div>
-            <strong style="font-size: 1.1em; color: #2d1b4e;">Релиз Traitor Level 2.2 Beta 2</strong>
-            <p style="font-size: 0.85em; color: #555; margin: 8px 0;">
-                Добро пожаловать в <b>Traitor Level 2.2 Beta 2</b>. Сегодня вышла!<br>
-                А значит вы можете её ещё быстрее скачать.<br>
-                Нажмите на "Перейти" чтобы получить эту версию Первым!
-            </p>
-            <p style="font-size: 0.8em; color: #2d1b4e; font-weight: bold; text-align: center; margin: 12px 0 6px 0;">
-                Заканчивается это Событие: 23 Августа 2026
-            </p>
-        </div>
-        <div class="btn-group">
-            <a href="https://sites.google.com/view/kosmo-level-store/link/kosmo-level-unofficial-packs/version-traitor-level-2-2" class="action-btn btn-purple" style="width: 100%; text-align: center; padding: 10px 0;">Перейти</a>
+    <div id="events-container"></div>
+
+    <div class="category-title">
+        <span>📁 Группы Уведомлений</span>
+        <span class="material-symbols-outlined" title="Настроить цвет группы" onclick="openGroupSettings()">palette</span>
+    </div>
+    <div id="groups-container"></div>
+
+    <!-- Модалка: Подробности События -->
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Событие</h3>
+                <span class="material-symbols-outlined" onclick="closeModal('eventModal')">close</span>
+            </div>
+            
+            <!-- Ask Events AI Assistant iframe -->
+            <div>
+                <strong style="font-size: 0.85em; color: var(--accent-color);">Ask Event (new)</strong>
+                <div class="iframe-container" style="margin-top: 5px;">
+                    <iframe id="aiFrame" src="about:blank"></iframe>
+                </div>
+            </div>
+
+            <!-- Детали события -->
+            <div style="background: var(--bg-color); padding: 12px; border-radius: 12px; font-size: 0.9em;">
+                <strong>Информация о Событии:</strong>
+                <p id="modalDescription" style="margin: 6px 0; color: var(--text-secondary);"></p>
+                <div id="modalDates" style="margin-top: 6px; font-size: 0.85em;"></div>
+            </div>
+
+            <!-- Прикрепленные файлы -->
+            <div>
+                <strong>Прикрепленные файлы:</strong>
+                <ul id="modalFiles" style="font-size: 0.85em; color: var(--text-secondary); padding-left: 18px; margin-top: 4px;"></ul>
+            </div>
+
+            <!-- Действия -->
+            <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between;">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <span class="material-symbols-outlined" id="likeBtn" onclick="toggleEventLike()">favorite</span>
+                    <a id="aiPrivacyLink" href="#" target="_blank" style="font-size: 0.75em; color: var(--text-secondary);">Конфиденциальность ИИ</a>
+                </div>
+                <a id="modalActionBtn" href="#" class="main-btn" style="background: var(--accent-color); color: white; text-decoration: none;">Перейти</a>
+            </div>
         </div>
     </div>
-    <!-- Категория: Тест Пуш уведомление -->
-    <div class="category-title">🧪 Тест Пуш уведомление</div>
-    <div id="cards-container"></div>
 
-    <div class="info-section">
-        <details>
-            <summary>Как сделать, чтобы уведомления приходили</summary>
-            <ul style="padding-left: 20px; margin: 8px 0 0 0;">
-                <li>Разрешите уведомления в браузере.</li>
-                <li>Если у вас слабый флагман/телефон/планшет, то выберите браузер и нажмите на "О приложении" и в разделе "Экономия Энергии" выберите "Без Ограничений"</li>
-                <li>Если у вас не работают уведомления, убедитесь, что у вас последняя версия браузера</li>
-            </ul>
-        </details>
+    <!-- Модалка: Группа и Настройки -->
+    <div class="modal-overlay" id="groupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Настройки Акцентного Цвета Группы</h3>
+                <span class="material-symbols-outlined" onclick="closeModal('groupModal')">close</span>
+            </div>
+            <p style="font-size: 0.85em; color: var(--text-secondary);">Выберите персональный цвет подсветки для вашей группы уведомлений:</p>
+            <input type="color" id="groupColorPicker" value="#6750a4" style="width: 100%; height: 40px; border: none; cursor: pointer; border-radius: 8px;">
+            <button class="main-btn" onclick="saveGroupColor()" style="background: var(--accent-color); color: white; justify-content: center;">Сохранить цвет</button>
+        </div>
+    </div>
+
+    <!-- Модалка: Инструкция по Уведомлениям -->
+    <div class="modal-overlay" id="guideModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Инструкция: Как включить пуши</h3>
+                <span class="material-symbols-outlined" onclick="closeModal('guideModal')">close</span>
+            </div>
+            
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <button class="tab-btn active" onclick="switchGuide('xiaomi')">Xiaomi / MIUI</button>
+                <button class="tab-btn" onclick="switchGuide('samsung')">Samsung</button>
+                <button class="tab-btn" onclick="switchGuide('realme')">Realme / Oppo</button>
+                <button class="tab-btn" onclick="switchGuide('huawei')">Honor / Huawei</button>
+                <button class="tab-btn" onclick="switchGuide('ios')">iPhone (iOS)</button>
+                <button class="tab-btn" onclick="switchGuide('pc')">ПК (Chrome/Edge)</button>
+            </div>
+
+            <div id="guide-xiaomi" class="guide-section active">
+                1. Перейдите в <b>Настройки</b> -> <b>Приложения</b> -> <b>Все приложения</b> -> Выберите Ваш Браузер.<br>
+                2. Раздел <b>Уведомления</b> -> Включите «Разрешить всплывающие уведомления».<br>
+                3. Раздел <b>Экономия энергии</b> -> Поставьте режим <b>«Без ограничений»</b>.
+            </div>
+
+            <div id="guide-samsung" class="guide-section">
+                1. Перейдите в <b>Настройки</b> -> <b>Приложения</b> -> Выберите Браузер.<br>
+                2. В разделе <b>Батарея</b> выберите режим <b>«Не ограничено»</b>.<br>
+                3. Убедитесь, что переключатель «Разрешить уведомления» включен.
+            </div>
+
+            <div id="guide-realme" class="guide-section">
+                1. Зажмите иконку браузера на рабочем столе -> Нажмите <b>«О приложении»</b>.<br>
+                2. В разделе <b>Управление уведомлениями</b> включите все галочки.<br>
+                3. В разделе <b>Использование батареи</b> включите «Разрешить работу в фоновом режиме».
+            </div>
+
+            <div id="guide-huawei" class="guide-section">
+                1. <b>Настройки</b> -> <b>Батарея</b> -> <b>Запуск приложений</b>.<br>
+                2. Найдите браузер, отключите «Автоматическое управление» и включите все 3 пункта (Автозапуск, Косвенный запуск, Работа в фоне).
+            </div>
+
+            <div id="guide-ios" class="guide-section">
+                1. Нажмите на кнопку <b>«Поделиться»</b> в Safari и выберите <b>«На экран "Домой"»</b> (PWA).<br>
+                2. Откройте созданную иконку на рабочем столе.<br>
+                3. Разрешите отправку уведомлений при первом запросе (требуется iOS 16.4+).
+            </div>
+
+            <div id="guide-pc" class="guide-section">
+                1. Нажмите на значок <b>«Замок»</b> или <b>«Настройки сайта»</b> слева от URL-адреса.<br>
+                2. В пункте <b>Уведомления</b> переключите тумблер в положение <b>«Разрешить»</b>.<br>
+                3. Убедитесь, что в Windows/macOS отключен режим «Не беспокоить».
+            </div>
+        </div>
     </div>
 
     <script>
-        const members = [
-            { id: 'lamirk', name: 'Ламирк', role: 'Главный инженер', timer: 5 },
-            { id: 'murzik', name: 'Мурзик', role: 'Верная Помощница', timer: 10 },
-            { id: 'snezhinka', name: 'Снежинка', role: 'Женский вокал', timer: 15 },
-            { id: 'hakhmi', name: 'Хахми', role: 'Мужской вокал', timer: 20 }
-        ];
+        let currentEventData = null;
 
-        const container = document.getElementById('cards-container');
-
-        // Проверка состояния разрешения на пуши при старте
-        function checkPermissionButton() {
-            const btn = document.getElementById('requestPermissionBtn');
-            if (Notification.permission === 'default') {
-                btn.style.display = 'block';
-            } else {
-                btn.style.display = 'none';
+        // Загрузка событий из JSON
+        async function loadEvents() {
+            try {
+                const res = await fetch('events.json');
+                const data = await res.json();
+                renderEvents(data.events);
+            } catch (e) {
+                console.error("Ошибка загрузки events.json", e);
             }
         }
 
-        function requestNotificationPermission() {
-            Notification.requestPermission().then(() => {
-                checkPermissionButton();
-            });
-        }
-
-        function render() {
+        function renderEvents(events) {
+            const container = document.getElementById('events-container');
             container.innerHTML = '';
-            members.forEach(member => {
-                const isActive = localStorage.getItem('notify_' + member.id) === 'true';
-                const savedTime = localStorage.getItem('time_' + member.id) || member.timer;
-                const alarmTime = localStorage.getItem('alarm_' + member.id) || '';
 
-                container.innerHTML += `
-                    <div class="card" id="card-${member.id}">
-                        <div>
-                            <strong>${member.name}</strong>
-                            <p style="font-size: 0.8em; color: #666; margin: 2px 0;">${member.role}</p>
-                            <input type="number" id="input-${member.id}" value="${savedTime}" onchange="updateTime('${member.id}')"> мин
-                            <div class="timer-info" id="status-${member.id}">${isActive && alarmTime ? 'Уведомление в: ' + alarmTime : 'Выключено'}</div>
-                        </div>
-                        <span class="material-symbols-outlined ${isActive ? 'active' : ''}" 
-                              onclick="toggleNotify('${member.id}')">
-                              ${isActive ? 'notifications_active' : 'notifications'}
+            events.forEach(ev => {
+                const isSubbed = localStorage.getItem('sub_event_' + ev.id) === 'true';
+                const card = document.createElement('div');
+                card.className = `card ${isSubbed ? 'active-notify' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <strong style="color: var(--accent-color);">${ev.title}</strong>
+                        <span class="material-symbols-outlined ${isSubbed ? 'subscribed' : ''}" 
+                              onclick="toggleEventSub(event, '${ev.id}')">
+                              ${isSubbed ? 'notifications_active' : 'notifications'}
                         </span>
                     </div>
+                    <p style="font-size: 0.85em; color: var(--text-secondary); margin: 8px 0;">${ev.description.short}</p>
+                    <div style="font-size: 0.8em; text-align: center; margin-top: 6px;">
+                        Заканчивается: ${ev.dates.extended ? `<span class="date-strike">${ev.dates.end_original}</span>` : ''} 
+                        <span class="date-new">${ev.dates.display_end}</span>
+                    </div>
                 `;
+
+                card.onclick = (e) => {
+                    if (!e.target.classList.contains('material-symbols-outlined')) {
+                        openEventModal(ev);
+                    }
+                };
+                container.appendChild(card);
             });
-
-            // Восстановление состояния подписки на событие релиза
-            const eventBtn = document.getElementById('eventNotifyBtn');
-            const eventText = document.getElementById('eventNotifyText');
-            if (localStorage.getItem('sub_traitor_beta2') === 'true') {
-                eventBtn.classList.add('subscribed');
-                eventText.innerText = 'Подписка активна';
-                eventBtn.querySelector('.material-symbols-outlined').innerText = 'notifications_active';
-            } else {
-                eventBtn.classList.remove('subscribed');
-                eventText.innerText = 'Получить уведо...';
-                eventBtn.querySelector('.material-symbols-outlined').innerText = 'notifications';
-            }
         }
 
-        function updateTime(id) {
-            localStorage.setItem('time_' + id, document.getElementById('input-' + id).value);
+        // Рендер Объединенной Тестовой Карточки «ЛМСХ»
+        function renderGroups() {
+            const container = document.getElementById('groups-container');
+            const savedColor = localStorage.getItem('group_accent_color') || '#6750a4';
+            document.documentElement.style.setProperty('--group-color', savedColor);
+
+            const isLmshActive = localStorage.getItem('notify_lmsh') === 'true';
+            const savedTime = localStorage.getItem('time_lmsh') || 5;
+            const alarmTime = localStorage.getItem('alarm_lmsh') || '';
+
+            container.innerHTML = `
+                <div class="card group-box ${isLmshActive ? 'active-notify' : ''}">
+                    <div class="card-header">
+                        <div>
+                            <strong>Штаб ЛМСХ (Тестовое)</strong>
+                            <p style="font-size: 0.8em; color: var(--text-secondary);">Ламирк, Мурзик, Снежинка, Хахми</p>
+                        </div>
+                        <span class="material-symbols-outlined ${isLmshActive ? 'active' : ''}" onclick="toggleLmshNotify()">
+                            ${isLmshActive ? 'notifications_active' : 'notifications'}
+                        </span>
+                    </div>
+                    <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px; font-size: 0.85em;">
+                        Таймер: <input type="number" id="input-lmsh" value="${savedTime}" onchange="updateLmshTime()" style="width: 45px; border-radius: 6px; border: 1px solid var(--border-color); text-align: center;"> мин
+                        <span style="font-size: 0.75em; color: var(--text-secondary);">${isLmshActive && alarmTime ? 'Уведомление в: ' + alarmTime : 'Выключено'}</span>
+                    </div>
+                </div>
+            `;
         }
 
-        function toggleNotify(id) {
-            const icon = document.querySelector(`#card-${id} .material-symbols-outlined`);
-            const minutes = document.getElementById('input-' + id).value;
-            const isActive = icon.classList.contains('active');
-            
+        // Логика Пушей ЛМСХ
+        function toggleLmshNotify() {
+            const isActive = localStorage.getItem('notify_lmsh') === 'true';
+            const minutes = document.getElementById('input-lmsh').value;
+
             if (!isActive) {
-                icon.classList.add('active');
                 const now = new Date();
                 const alarm = new Date(now.getTime() + minutes * 60000);
                 const timeString = alarm.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                localStorage.setItem('alarm_' + id, timeString);
-                localStorage.setItem('notify_' + id, 'true');
-                
-                setTimeout(() => showNotification("Штаб ЛМСХ", `Время вышло для ${members.find(m => m.id === id).name}!`), minutes * 60000);
+
+                localStorage.setItem('alarm_lmsh', timeString);
+                localStorage.setItem('notify_lmsh', 'true');
+                setTimeout(() => showNotification("Штаб ЛМСХ", "Время теста вышло! Все участники на связи."), minutes * 60000);
             } else {
-                icon.classList.remove('active');
-                localStorage.setItem('notify_' + id, 'false');
+                localStorage.setItem('notify_lmsh', 'false');
+                localStorage.removeItem('alarm_lmsh');
             }
-            render();
+            renderGroups();
         }
 
-        function toggleEventSubscription() {
-            if (Notification.permission !== 'granted') {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        executeEventSubscription();
-                    }
-                });
-            } else {
-                executeEventSubscription();
-            }
+        function updateLmshTime() {
+            localStorage.setItem('time_lmsh', document.getElementById('input-lmsh').value);
         }
 
-        function executeEventSubscription() {
-            const isSubscribed = localStorage.getItem('sub_traitor_beta2') === 'true';
-            if (!isSubscribed) {
-                localStorage.setItem('sub_traitor_beta2', 'true');
-                showNotification("Успешная подписка", "Мы уведомим вас о выходе Traitor Level 2.2 Beta 2!");
-            } else {
-                localStorage.setItem('sub_traitor_beta2', 'false');
-            }
-            render();
+        function toggleEventSub(e, id) {
+            e.stopPropagation();
+            const key = 'sub_event_' + id;
+            const current = localStorage.getItem(key) === 'true';
+            localStorage.setItem(key, (!current).toString());
+            loadEvents();
+        }
+
+        // Модальные окна управления
+        function openEventModal(ev) {
+            currentEventData = ev;
+            document.getElementById('modalTitle').innerText = ev.title;
+            document.getElementById('modalDescription').innerText = ev.description.full.join(' ');
+            document.getElementById('modalDates').innerHTML = `Период: ${ev.dates.display_start} — ${ev.dates.extended ? `<span class="date-strike">${ev.dates.end_original}</span>` : ''} <span class="date-new">${ev.dates.display_end}</span>`;
+            
+            // Файлы
+            const filesContainer = document.getElementById('modalFiles');
+            filesContainer.innerHTML = ev.attachments.length ? ev.attachments.map(f => `<li><a href="${f.url}">${f.name}</a></li>`).join('') : '<li>К сожалению прикрепленных файлов нет в данном событии</li>';
+
+            // Ссылка действия
+            document.getElementById('modalActionBtn').href = ev.links.action_url;
+            document.getElementById('aiPrivacyLink').href = ev.links.ai_privacy_url;
+
+            // Загрузка Ask Events HTML
+            document.getElementById('aiFrame').src = 'ask_events.html';
+
+            document.getElementById('eventModal').style.display = 'flex';
+        }
+
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openGuideModal() { document.getElementById('guideModal').style.display = 'flex'; }
+        function openGroupSettings() { document.getElementById('groupModal').style.display = 'flex'; }
+
+        function saveGroupColor() {
+            const color = document.getElementById('groupColorPicker').value;
+            localStorage.setItem('group_accent_color', color);
+            renderGroups();
+            closeModal('groupModal');
+        }
+
+        function switchGuide(type) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('guide-' + type).classList.add('active');
+        }
+
+        function toggleEventLike() {
+            const btn = document.getElementById('likeBtn');
+            btn.classList.toggle('active');
+        }
+
+        function checkPermissionButton() {
+            const btn = document.getElementById('requestPermissionBtn');
+            btn.style.display = Notification.permission === 'default' ? 'flex' : 'none';
+        }
+
+        function requestNotificationPermission() {
+            Notification.requestPermission().then(() => checkPermissionButton());
         }
 
         function showNotification(title, body) {
             if (Notification.permission === 'granted') {
-                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.ready.then(reg => {
-                        reg.showNotification(title, { body });
-                    });
-                } else {
-                    new Notification(title, { body });
-                }
+                new Notification(title, { body });
             }
         }
 
         function setAll(state) {
-            members.forEach(m => {
-                localStorage.setItem('notify_' + m.id, state);
-                if (!state) localStorage.removeItem('alarm_' + m.id);
-            });
-            render();
+            localStorage.setItem('notify_lmsh', state);
+            if (!state) localStorage.removeItem('alarm_lmsh');
+            renderGroups();
         }
 
         // Инициализация
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
         checkPermissionButton();
-        render();
+        loadEvents();
+        renderGroups();
     </script>
 </body>
 </html>
