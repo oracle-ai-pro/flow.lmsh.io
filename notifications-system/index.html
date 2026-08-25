@@ -337,13 +337,19 @@
             document.getElementById('modalActionBtn').href = ev.links.action_url;
             document.getElementById('aiPrivacyLink').href = ev.links.ai_privacy_url;
 
-            // Загрузка Ask Events HTML
-            document.getElementById('aiFrame').src = 'ask_events.html';
+            document.getElementById('aiFrame').src = `ask_events.html?id=${ev.id}`;
 
             document.getElementById('eventModal').style.display = 'flex';
         }
 
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+
+    // Очищаем фрейм при закрытии, чтобы чат сбрасывался и не висел в памяти
+    if (id === 'eventModal') {
+        document.getElementById('aiFrame').src = 'about:blank';
+    }
+}
         function openGuideModal() { document.getElementById('guideModal').style.display = 'flex'; }
         function openGroupSettings() { document.getElementById('groupModal').style.display = 'flex'; }
 
