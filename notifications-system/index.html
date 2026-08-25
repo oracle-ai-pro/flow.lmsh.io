@@ -6,17 +6,16 @@
     <title>Система Уведомлений | Prestige HQ</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#6750a4">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#6750a4">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
-        /* Переменные Android Material You & Авто-тема */
         :root {
             color-scheme: light dark;
             --bg-color: #f6f8fa;
             --card-bg: #ffffff;
             --text-primary: #1d1b20;
             --text-secondary: #49454f;
-            --accent-color: #6750a4; /* Fallback Material Purple */
+            --accent-color: #6750a4;
             --accent-light: #e8def8;
             --border-color: #e7e0ec;
             --active-red: #b3261e;
@@ -39,11 +38,8 @@
             }
         }
 
-        /* Системные цвета Android (если поддерживаются браузером) */
         @supports (color: AccentColor) {
-            :root {
-                --accent-color: AccentColor;
-            }
+            :root { --accent-color: AccentColor; }
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -67,7 +63,6 @@
 
         .group-box { border-left: 4px solid var(--group-color, var(--accent-color)); padding-left: 12px; margin-bottom: 12px; }
 
-        /* Модальные окна */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
         .modal-content { background: var(--card-bg); border-radius: 24px; padding: 20px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
@@ -86,7 +81,6 @@
 </head>
 <body>
 
-    <!-- Запрос прав -->
     <button id="requestPermissionBtn" class="main-btn req-auth-btn" onclick="requestNotificationPermission()">
         <span class="material-symbols-outlined">notifications</span> Разрешить уведомления
     </button>
@@ -97,7 +91,6 @@
         <button class="main-btn" onclick="openGuideModal()"><span class="material-symbols-outlined">help</span> Как настроить пуши</button>
     </div>
 
-    <!-- Категории -->
     <div class="category-title">📅 События</div>
     <div id="events-container"></div>
 
@@ -107,7 +100,7 @@
     </div>
     <div id="groups-container"></div>
 
-    <!-- Модалка: Подробности События -->
+    <!-- Модалка События -->
     <div class="modal-overlay" id="eventModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -115,7 +108,6 @@
                 <span class="material-symbols-outlined" onclick="closeModal('eventModal')">close</span>
             </div>
             
-            <!-- Ask Events AI Assistant iframe -->
             <div>
                 <strong style="font-size: 0.85em; color: var(--accent-color);">Ask Event (new)</strong>
                 <div class="iframe-container" style="margin-top: 5px;">
@@ -123,20 +115,17 @@
                 </div>
             </div>
 
-            <!-- Детали события -->
             <div style="background: var(--bg-color); padding: 12px; border-radius: 12px; font-size: 0.9em;">
                 <strong>Информация о Событии:</strong>
                 <p id="modalDescription" style="margin: 6px 0; color: var(--text-secondary);"></p>
                 <div id="modalDates" style="margin-top: 6px; font-size: 0.85em;"></div>
             </div>
 
-            <!-- Прикрепленные файлы -->
             <div>
                 <strong>Прикрепленные файлы:</strong>
                 <ul id="modalFiles" style="font-size: 0.85em; color: var(--text-secondary); padding-left: 18px; margin-top: 4px;"></ul>
             </div>
 
-            <!-- Действия -->
             <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between;">
                 <div style="display: flex; gap: 8px; align-items: center;">
                     <span class="material-symbols-outlined" id="likeBtn" onclick="toggleEventLike()">favorite</span>
@@ -147,7 +136,7 @@
         </div>
     </div>
 
-    <!-- Модалка: Группа и Настройки -->
+    <!-- Модалка Группы -->
     <div class="modal-overlay" id="groupModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -160,7 +149,7 @@
         </div>
     </div>
 
-    <!-- Модалка: Инструкция по Уведомлениям -->
+    <!-- Модалка Инструкции -->
     <div class="modal-overlay" id="guideModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -169,12 +158,12 @@
             </div>
             
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                <button class="tab-btn active" onclick="switchGuide('xiaomi')">Xiaomi / MIUI</button>
-                <button class="tab-btn" onclick="switchGuide('samsung')">Samsung</button>
-                <button class="tab-btn" onclick="switchGuide('realme')">Realme / Oppo</button>
-                <button class="tab-btn" onclick="switchGuide('huawei')">Honor / Huawei</button>
-                <button class="tab-btn" onclick="switchGuide('ios')">iPhone (iOS)</button>
-                <button class="tab-btn" onclick="switchGuide('pc')">ПК (Chrome/Edge)</button>
+                <button class="tab-btn active" onclick="switchGuide(event, 'xiaomi')">Xiaomi / MIUI</button>
+                <button class="tab-btn" onclick="switchGuide(event, 'samsung')">Samsung</button>
+                <button class="tab-btn" onclick="switchGuide(event, 'realme')">Realme / Oppo</button>
+                <button class="tab-btn" onclick="switchGuide(event, 'huawei')">Honor / Huawei</button>
+                <button class="tab-btn" onclick="switchGuide(event, 'ios')">iPhone (iOS)</button>
+                <button class="tab-btn" onclick="switchGuide(event, 'pc')">ПК (Chrome/Edge)</button>
             </div>
 
             <div id="guide-xiaomi" class="guide-section active">
@@ -216,13 +205,15 @@
 
     <script>
         let currentEventData = null;
+        let lmshTimerId = null;
 
-        // Загрузка событий из JSON
         async function loadEvents() {
             try {
                 const res = await fetch('events.json');
                 const data = await res.json();
-                renderEvents(data.events);
+                // Безопасное извлечение массива (поддерживает и [{...}], и { events: [...] })
+                const eventsList = Array.isArray(data) ? data : (data.events || []);
+                renderEvents(eventsList);
             } catch (e) {
                 console.error("Ошибка загрузки events.json", e);
             }
@@ -237,18 +228,23 @@
                 const card = document.createElement('div');
                 card.className = `card ${isSubbed ? 'active-notify' : ''}`;
                 
+                const shortDesc = ev.description ? (ev.description.short || ev.description) : '';
+                const displayEnd = ev.dates ? ev.dates.display_end : '';
+                const endOriginal = ev.dates ? ev.dates.end_original : '';
+                const isExtended = ev.dates ? ev.dates.extended : false;
+
                 card.innerHTML = `
                     <div class="card-header">
-                        <strong style="color: var(--accent-color);">${ev.title}</strong>
+                        <strong style="color: var(--accent-color);">${ev.title || ev.name}</strong>
                         <span class="material-symbols-outlined ${isSubbed ? 'subscribed' : ''}" 
                               onclick="toggleEventSub(event, '${ev.id}')">
                               ${isSubbed ? 'notifications_active' : 'notifications'}
                         </span>
                     </div>
-                    <p style="font-size: 0.85em; color: var(--text-secondary); margin: 8px 0;">${ev.description.short}</p>
+                    <p style="font-size: 0.85em; color: var(--text-secondary); margin: 8px 0;">${shortDesc}</p>
                     <div style="font-size: 0.8em; text-align: center; margin-top: 6px;">
-                        Заканчивается: ${ev.dates.extended ? `<span class="date-strike">${ev.dates.end_original}</span>` : ''} 
-                        <span class="date-new">${ev.dates.display_end}</span>
+                        Заканчивается: ${isExtended ? `<span class="date-strike">${endOriginal}</span>` : ''} 
+                        <span class="date-new">${displayEnd}</span>
                     </div>
                 `;
 
@@ -261,7 +257,6 @@
             });
         }
 
-        // Рендер Объединенной Тестовой Карточки «ЛМСХ»
         function renderGroups() {
             const container = document.getElementById('groups-container');
             const savedColor = localStorage.getItem('group_accent_color') || '#6750a4';
@@ -290,24 +285,56 @@
             `;
         }
 
-        // Логика Пушей ЛМСХ
         function toggleLmshNotify() {
             const isActive = localStorage.getItem('notify_lmsh') === 'true';
-            const minutes = document.getElementById('input-lmsh').value;
+            const minutes = parseFloat(document.getElementById('input-lmsh').value) || 5;
+
+            if (lmshTimerId) clearTimeout(lmshTimerId);
 
             if (!isActive) {
                 const now = new Date();
-                const alarm = new Date(now.getTime() + minutes * 60000);
+                const targetTime = now.getTime() + minutes * 60000;
+                const alarm = new Date(targetTime);
                 const timeString = alarm.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+                localStorage.setItem('alarm_target_timestamp', targetTime);
                 localStorage.setItem('alarm_lmsh', timeString);
                 localStorage.setItem('notify_lmsh', 'true');
-                setTimeout(() => showNotification("Штаб ЛМСХ", "Время теста вышло! Все участники на связи."), minutes * 60000);
+
+                scheduleLmshTimer(minutes * 60000);
             } else {
                 localStorage.setItem('notify_lmsh', 'false');
                 localStorage.removeItem('alarm_lmsh');
+                localStorage.removeItem('alarm_target_timestamp');
             }
             renderGroups();
+        }
+
+        function scheduleLmshTimer(delayMs) {
+            lmshTimerId = setTimeout(() => {
+                showNotification("Штаб ЛМСХ", "Время теста вышло! Все участники на связи.");
+                localStorage.setItem('notify_lmsh', 'false');
+                localStorage.removeItem('alarm_lmsh');
+                localStorage.removeItem('alarm_target_timestamp');
+                renderGroups();
+            }, delayMs);
+        }
+
+        // Восстановление таймера при перезагрузке страницы
+        function restoreLmshTimer() {
+            if (localStorage.getItem('notify_lmsh') === 'true') {
+                const targetTime = parseInt(localStorage.getItem('alarm_target_timestamp'), 10);
+                const now = Date.now();
+                
+                if (targetTime && targetTime > now) {
+                    scheduleLmshTimer(targetTime - now);
+                } else {
+                    // Время прошло, пока страница была закрыта
+                    localStorage.setItem('notify_lmsh', 'false');
+                    localStorage.removeItem('alarm_lmsh');
+                    localStorage.removeItem('alarm_target_timestamp');
+                }
+            }
         }
 
         function updateLmshTime() {
@@ -322,34 +349,48 @@
             loadEvents();
         }
 
-        // Модальные окна управления
         function openEventModal(ev) {
             currentEventData = ev;
-            document.getElementById('modalTitle').innerText = ev.title;
-            document.getElementById('modalDescription').innerText = ev.description.full.join(' ');
-            document.getElementById('modalDates').innerHTML = `Период: ${ev.dates.display_start} — ${ev.dates.extended ? `<span class="date-strike">${ev.dates.end_original}</span>` : ''} <span class="date-new">${ev.dates.display_end}</span>`;
+            document.getElementById('modalTitle').innerText = ev.title || ev.name;
             
-            // Файлы
+            // Безопасное формирование описания
+            let fullDesc = '';
+            if (ev.description) {
+                if (Array.isArray(ev.description.full)) {
+                    fullDesc = ev.description.full.join(' ');
+                } else {
+                    fullDesc = ev.description.full || ev.description.short || ev.description;
+                }
+            }
+            document.getElementById('modalDescription').innerText = fullDesc;
+
+            const displayStart = ev.dates ? ev.dates.display_start || '' : '';
+            const displayEnd = ev.dates ? ev.dates.display_end || '' : '';
+            const endOriginal = ev.dates ? ev.dates.end_original || '' : '';
+            const isExtended = ev.dates ? ev.dates.extended : false;
+
+            document.getElementById('modalDates').innerHTML = `Период: ${displayStart} — ${isExtended ? `<span class="date-strike">${endOriginal}</span>` : ''} <span class="date-new">${displayEnd}</span>`;
+            
             const filesContainer = document.getElementById('modalFiles');
-            filesContainer.innerHTML = ev.attachments.length ? ev.attachments.map(f => `<li><a href="${f.url}">${f.name}</a></li>`).join('') : '<li>К сожалению прикрепленных файлов нет в данном событии</li>';
+            if (ev.attachments && ev.attachments.length) {
+                filesContainer.innerHTML = ev.attachments.map(f => `<li><a href="${f.url}">${f.name}</a></li>`).join('');
+            } else {
+                filesContainer.innerHTML = '<li>К сожалению прикрепленных файлов нет в данном событии</li>';
+            }
 
-            // Ссылка действия
-            document.getElementById('modalActionBtn').href = ev.links.action_url;
-            document.getElementById('aiPrivacyLink').href = ev.links.ai_privacy_url;
-
+            document.getElementById('modalActionBtn').href = ev.links ? ev.links.action_url || '#' : '#';
+            document.getElementById('aiPrivacyLink').href = ev.links ? ev.links.ai_privacy_url || '#' : '#';
             document.getElementById('aiFrame').src = `ask_events.html?id=${ev.id}`;
-
             document.getElementById('eventModal').style.display = 'flex';
         }
 
         function closeModal(id) {
-    document.getElementById(id).style.display = 'none';
+            document.getElementById(id).style.display = 'none';
+            if (id === 'eventModal') {
+                document.getElementById('aiFrame').src = 'about:blank';
+            }
+        }
 
-    // Очищаем фрейм при закрытии, чтобы чат сбрасывался и не висел в памяти
-    if (id === 'eventModal') {
-        document.getElementById('aiFrame').src = 'about:blank';
-    }
-}
         function openGuideModal() { document.getElementById('guideModal').style.display = 'flex'; }
         function openGroupSettings() { document.getElementById('groupModal').style.display = 'flex'; }
 
@@ -360,50 +401,59 @@
             closeModal('groupModal');
         }
 
-        function switchGuide(type) {
+        function switchGuide(e, type) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
-            event.target.classList.add('active');
+            e.currentTarget.classList.add('active');
             document.getElementById('guide-' + type).classList.add('active');
         }
 
         function toggleEventLike() {
-            const btn = document.getElementById('likeBtn');
-            btn.classList.toggle('active');
+            document.getElementById('likeBtn').classList.toggle('active');
         }
 
         function checkPermissionButton() {
             const btn = document.getElementById('requestPermissionBtn');
-            btn.style.display = Notification.permission === 'default' ? 'flex' : 'none';
+            if ('Notification' in window) {
+                btn.style.display = Notification.permission === 'default' ? 'flex' : 'none';
+            }
         }
 
         function requestNotificationPermission() {
-            Notification.requestPermission().then(() => checkPermissionButton());
+            if ('Notification' in window) {
+                Notification.requestPermission().then(() => checkPermissionButton());
+            }
         }
 
         function showNotification(title, body) {
-            if (Notification.permission === 'granted') {
+            if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification(title, { body });
             }
         }
 
         function setAll(state) {
             localStorage.setItem('notify_lmsh', state);
-            if (!state) localStorage.removeItem('alarm_lmsh');
+            if (!state) {
+                localStorage.removeItem('alarm_lmsh');
+                localStorage.removeItem('alarm_target_timestamp');
+                if (lmshTimerId) clearTimeout(lmshTimerId);
+            }
             renderGroups();
         }
 
-        // Инициализация
+        // Инициализация приложения
         checkPermissionButton();
         loadEvents();
         renderGroups();
+        restoreLmshTimer();
+
         if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/flow.lmsh.io/sw.js')
-            .then(reg => console.log('SW зарегистрирован:', reg.scope))
-            .catch(err => console.error('Ошибка регистрации SW:', err));
-    });
-}
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('SW зарегистрирован:', reg.scope))
+                    .catch(err => console.error('Ошибка регистрации SW:', err));
+            });
+        }
     </script>
 </body>
 </html>
