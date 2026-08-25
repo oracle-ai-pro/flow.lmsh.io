@@ -1,0 +1,126 @@
+{
+  "events": [
+    {
+      "id": "cosmo_merch_beta",
+      "title": "Мерч Космо Александр (бета)",
+      "badge": "shopping_bag",
+      "is_new": true,
+      "dates": {
+        "start": "2026-08-10",
+        "end_original": "2026-08-15",
+        "end": "2026-09-03",
+        "display_start": "10 Августа 2026",
+        "display_end": "3 Сентября 2026",
+        "extended": true
+      },
+      "description": {
+        "short": "Мерч на сайте официально стартует, а бета означает, что вам нужно самостоятельно делать материалы для этой картинки.",
+        "full": [
+          "Мерч на сайте официально стартует, а бета означает, что вам нужно самостоятельно делать материалы для этой картинки, в это намерение входит: Чашки, Майки и многое другое.",
+          "Так как это бета версия, то продукты будут очень медленно добавляться."
+        ]
+      },
+      "image": null,
+      "has_image": false,
+      "links": {
+        "action_url": "https://oracle-ai-pro.github.io/flow.lmsh.io/merch",
+        "ai_privacy_url": "#ai-privacy-modal"
+      },
+      "user_interactions": {
+        "likes_count": 0,
+        "is_liked": false
+      },
+      "attachments": [],
+      "ai_assistant": {
+        "enabled": true,
+        "name": "Ask Events (new)",
+        "version": "v0.9",
+        "status": "Active",
+        "language": "ru",
+        "context_title": "Мерч Космо Александр (Бета)",
+        "initial_message": "Привет! Я твой ИИ-ассистент события. Мы обсуждаем **«Мерч Космо Александр (бета)»**. Задай мне любой вопрос о релизе!",
+        "quick_questions": [
+          {
+            "id": "q1",
+            "icon": "help_outline",
+            "text": "Что меняется с этим обновлением?"
+          },
+          {
+            "id": "q2",
+            "icon": "science",
+            "text": "Почему это Бета-версия?"
+          },
+          {
+            "id": "q3",
+            "icon": "schedule",
+            "text": "Когда добавят новые товары?"
+          }
+        ],
+        "knowledge_base": {
+          "keywords": {
+            "изменения": "Это обновление официально запускает коллекцию мерча! В бета-версии пользователи пока сами наносят принты на вещи (кружки, футболки).",
+            "бета": "Статус Бета означает, что товары добавляются постепенно, а готовые графические материалы вы можете использовать для DIY-вещей.",
+            "медленно": "Да, новые товары и принты будут добавляться постепенно по мере развития этапа Беты.",
+            "кружка": "Вы можете использовать материалы для создания чашек, маек, худи и других вещей!",
+            "майка": "Вы можете использовать материалы для создания чашек, маек, худи и других вещей!"
+          },
+          "default": "В рамках события 'Мерч Космо Александр (бета)' стартуют продажи мерча. Так как это бета-версия, продукты добавляются постепенно, и вы можете сами создавать кружки и футболки с нашими принтами!"
+        }
+      }
+    },
+    {
+      "id": "traitor_level_2_2",
+      "title": "Релиз Traitor Level 2.2 Beta 2",
+      "badge": "download",
+      "is_new": false,
+      "dates": {
+        "start": "2026-08-01",
+        "end_original": "2026-08-23",
+        "end": "2026-08-23",
+        "display_start": "1 Августа 2026",
+        "display_end": "23 Августа 2026",
+        "extended": false
+      },
+      "description": {
+        "short": "Добро пожаловать в Traitor Level 2.2 Beta 2. Сегодня вышла! Скачайте её первыми.",
+        "full": [
+          "Добро пожаловать в Traitor Level 2.2 Beta 2. Сегодня вышла!",
+          "А значит вы можете её ещё быстрее скачать. Нажмите на 'Перейти' чтобы получить эту версию Первым!"
+        ]
+      },
+      "image": null,
+      "has_image": false,
+      "links": {
+        "action_url": "https://sites.google.com/view/kosmo-level-store/link/kosmo-level-unofficial-packs/version-traitor-level-2-2",
+        "ai_privacy_url": "#ai-privacy-modal"
+      },
+      "user_interactions": {
+        "likes_count": 0,
+        "is_liked": false
+      },
+      "attachments": [],
+      "ai_assistant": {
+        "enabled": true,
+        "name": "Ask Events (new)",
+        "version": "v0.9",
+        "status": "Active",
+        "language": "ru",
+        "context_title": "Traitor Level 2.2 Beta 2",
+        "initial_message": "Привет! Задавай вопросы по поводу скачивания и изменений в **Traitor Level 2.2 Beta 2**.",
+        "quick_questions": [
+          {
+            "id": "q1",
+            "icon": "download",
+            "text": "Как скачать обновление?"
+          }
+        ],
+        "knowledge_base": {
+          "keywords": {
+            "скачать": "Нажмите кнопку 'Перейти' в карточке события, чтобы открыть официальную страницу скачивания!"
+          },
+          "default": "Это релиз Traitor Level 2.2 Beta 2. Вы можете быстро скачать сборку по кнопке 'Перейти'."
+        }
+      }
+    }
+  ]
+}
