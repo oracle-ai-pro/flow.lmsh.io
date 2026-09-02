@@ -3,109 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LMSH Flow 2.5 | Корпоративный ИИ</title>
+    <title>LMSH Flow | AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Material+Symbols+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Применение динамического скругления ко всем элементам */
-        :root {
-            --ui-radius: 8px; /* Значение по умолчанию */
-        }
-
-        .menu-item, .menu-btn, .master-input textarea, .modal-content, 
-        .quick-chip, .message, .setting-group input, .setting-group select {
-            border-radius: var(--ui-radius) !important;
-        }
-
-        /* Доработки для многострочного поля ввода */
-        .master-input {
-            height: auto !important;
-            min-height: 70px;
-            padding: 10px 15px;
-            display: flex;
-            align-items: flex-end;
-            gap: 10px;
-        }
-
-        .master-input textarea {
-            flex: 1;
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            padding: 12px 16px;
-            color: var(--text-main);
-            font-size: 0.95rem;
-            outline: none;
-            resize: none;
-            max-height: 150px;
-            min-height: 44px;
-            line-height: 1.4;
-            transition: border-color 0.2s ease;
-        }
-
-        .master-input textarea:focus {
-            border-color: var(--accent-color);
-        }
-
-        .input-action-btn {
-            background-color: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-muted);
-            width: 44px;
-            height: 44px;
-            border-radius: var(--ui-radius) !important;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
-
-        .input-action-btn:hover {
-            background-color: var(--accent-color);
-            color: #ffffff;
-            border-color: var(--accent-color);
-        }
-
-        /* Состояние активной записи микрофона */
-        .input-action-btn.recording {
-            background-color: #ef4444 !important;
-            color: #ffffff !important;
-            border-color: #ef4444 !important;
-            animation: micPulse 1.2s infinite ease-in-out;
-        }
-
-        @keyframes micPulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-
-        /* Элементы списка чатов с кнопкой удаления */
-        .menu-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: relative;
-        }
-
-        .menu-item .delete-flow-btn {
-            display: none;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 2px;
-        }
-
-        .menu-item:hover .delete-flow-btn {
-            display: block;
-        }
-
-        .menu-item .delete-flow-btn:hover {
-            color: #ef4444;
-        }
-    </style>
+    
+    <!-- ДОБАВЛЕНО: Подключение Markdown парсера -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
@@ -113,302 +16,141 @@
         <!-- Боковое меню -->
         <nav id="sidebar">
             <div class="sidebar-header">
-    <div style="display: flex; align-items: center; gap: 8px;">
-        <!-- Кнопка «Новый чат» -->
-        <button class="icon-btn" onclick="createNewChat()" title="Новый чат (Ctrl + Shift + O)">
-            <span class="material-symbols-outlined">add</span>
-        </button>
-        <!-- Кнопка «Поиск» (Лупа) -->
-        <button class="icon-btn" onclick="toggleSearch()" title="Поиск цепочек (Ctrl + Shift + F)">
-            <span class="material-symbols-outlined">search</span>
-        </button>
-    </div>
-    
-    <button class="icon-btn" onclick="toggleSidebar()" title="Свернуть меню">
-        <span class="material-symbols-outlined">dock_to_left</span>
-    </button>
-</div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="icon-btn" onclick="createNewChat()" title="Новый чат">
+                        <span class="material-symbols-outlined">add</span>
+                    </button>
+                    <button class="icon-btn" onclick="toggleSearch()" title="Поиск">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+                </div>
+                
+                <button class="icon-btn" onclick="toggleSidebar()" title="Свернуть меню">
+                    <span class="material-symbols-outlined">dock_to_left</span>
+                </button>
+            </div>
 
-<!-- Поле поиска (скрыто по умолчанию) -->
-<div id="search-container" class="search-box hidden">
-    <input 
-        type="text" 
-        id="sidebar-search-input" 
-        placeholder="Поиск чатов..." 
-        oninput="filterFlows(this.value)"
-    >
-</div>
+            <div id="search-container" class="search-box hidden">
+                <input type="text" id="sidebar-search-input" placeholder="Поиск чатов..." oninput="filterFlows(this.value)">
+            </div>
+
+            <!-- Список чатов -->
+            <div id="chat-list"></div>
 
             <div class="sidebar-bottom">
                 <button class="menu-btn" onclick="window.location.href='settings.html'">
                     <span class="material-symbols-outlined">settings</span> Настройки
                 </button>
-                <button class="menu-btn primary" onclick="openFlowBuilder()">
-                    <span class="material-symbols-outlined">add_circle</span> Создать Flow
-                </button>
             </div>
         </nav>
 
-        <!-- Кнопка вызова меню для мобильных -->
-        <button class="mobile-menu-btn" onclick="toggleSidebar()">
-            <span class="material-symbols-outlined">menu</span>
-        </button>
-
         <!-- Основная область -->
-        <main id="main-container" class="app-grid">
+        <main id="main-container">
+            <!-- Шапка чата -->
+            <header class="chat-header">
+                <button class="icon-btn burger-btn" onclick="toggleSidebar()" title="Развернуть меню">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <span class="chat-title" id="current-chat-title">Штаб ЛМСХ</span>
+            </header>
+
             <div class="chat-panel" id="chat-left">
-                <div class="chat-messages" id="messages-left">
-                    <!-- Приветственный экран -->
-                    <div id="welcome-screen" class="welcome-container">
-                        <div class="welcome-icon">
-                            <span class="material-symbols-outlined">psychology</span>
-                        </div>
-                        <h2>Начните диалог сейчас</h2>
-                        <p>Штаб ЛМСХ готов к работе. Выберите быстрый запрос или введите запрос ниже.</p>
-                        <div class="quick-chips">
-                            <button class="quick-chip" onclick="sendQuickPrompt('Привет')">👋 Привет</button>
-                            <button class="quick-chip" onclick="sendQuickPrompt('Что делаете?')">💡 Что делаете?</button>
-                            <button class="quick-chip" onclick="sendQuickPrompt('Статус систем')">⚡ Статус систем</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="chat-panel hidden" id="chat-right">
-                <div class="chat-messages" id="messages-right"></div>
+                <div class="chat-messages" id="messages-left"></div>
             </div>
         </main>
 
-        <!-- Поле ввода с микрофоном и кнопкой отправки -->
-        <footer class="master-input">
-            <button id="mic-btn" class="input-action-btn" onclick="toggleSpeechRecognition()" title="Голосовой ввод">
-                <span class="material-symbols-outlined">mic</span>
-            </button>
-            <textarea id="master-input" rows="1" placeholder="Введите запрос..." onkeydown="handleKeyDown(event)" oninput="autoResizeTextarea(this)"></textarea>
-            <button class="input-action-btn primary" onclick="handleInput()" title="Отправить сообщение" style="background-color: var(--accent-color); color: white;">
-                <span class="material-symbols-outlined">send</span>
-            </button>
+        <!-- Поле ввода -->
+        <footer class="master-input-wrapper">
+            <div id="file-previews" class="file-previews-container"></div>
+
+            <div class="master-input">
+                <input type="file" id="file-input" style="display: none;" multiple 
+                       accept="image/*,video/*,.js,.ts,.py,.html,.css,.json,.c,.cpp,.cs,.java,.php,.rb,.go,.rs,.sql,.pdf,audio/*" 
+                       onchange="handleFileSelect(event)">
+
+                <button id="attach-btn" class="input-action-btn" onclick="document.getElementById('file-input').click()" title="Прикрепить файлы">
+                    <span class="material-symbols-outlined">attach_file</span>
+                </button>
+
+                <textarea id="master-input" rows="1" placeholder="Введите запрос..." onkeydown="handleKeyDown(event)" oninput="autoResizeTextarea(this)"></textarea>
+
+                <div class="input-right-actions">
+                    <button id="mic-btn" class="input-action-btn" onclick="toggleSpeechRecognition()" title="Голосовой ввод">
+                        <span class="material-symbols-outlined">mic</span>
+                    </button>
+                    <button id="send-btn" class="input-action-btn primary" onclick="handleSendClick()" title="Отправить сообщение">
+    <span class="material-symbols-outlined">send</span>
+</button>
+                </div>
+            </div>
         </footer>
     </div>
 
-    <!-- Модальное окно создания Flow -->
-    <div id="flow-builder-modal" class="modal hidden">
-        <div class="modal-content">
-            <h2>Создание нового Flow</h2>
-            <input type="text" id="flow-name" placeholder="Название (например: Снежинка)">
-            <textarea id="flow-prompt" placeholder="Системная инструкция..."></textarea>
-            <div class="modal-actions">
-                <button onclick="closeFlowBuilder()">Отмена</button>
-                <button class="primary" onclick="saveCustomFlow()">Сохранить</button>
-            </div>
+    <!-- Кастомное контекстное меню (ПКМ) -->
+    <div id="context-menu" class="context-menu hidden">
+        <div class="context-menu-item" onclick="renameCurrentContextMenuChat()">
+            <span class="material-symbols-outlined">edit</span> Переименовать
+        </div>
+        <div class="context-menu-item danger" onclick="deleteCurrentContextMenuChat()">
+            <span class="material-symbols-outlined">delete</span> Удалить
         </div>
     </div>
 
-    <script src="kombonation.js"></script>
     <script src="core.js"></script>
 
-    <!-- Скрипт инициализации пользовательских стилей, голосового ввода и управления чатами -->
+    <!-- ДОБАВЛЕНО: Функции поиска для сайдбара -->
     <script>
-        let currentFlowId = 'default';
-        let recognition = null;
-        let isRecording = false;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            applySavedStyles();
-            renderChatList();
-            initSpeechRecognition();
-        });
-
-        /* 1. Применение настроек интерфейса из localStorage */
-        function applySavedStyles() {
-            const savedAccent = localStorage.getItem('lmsh_accent_color');
-            const savedRadius = localStorage.getItem('lmsh_ui_radius');
-
-            if (savedAccent) {
-                document.documentElement.style.setProperty('--accent-color', savedAccent);
-            }
-            if (savedRadius) {
-                document.documentElement.style.setProperty('--ui-radius', savedRadius);
-            }
-        }
-
-        /* 2. Управление Flow и чатами */
-        function getFlows() {
-            const defaultFlows = [{ id: 'default', name: 'Общий поток', prompt: '' }];
-            const saved = localStorage.getItem('lmsh_flows');
-            return saved ? JSON.parse(saved) : defaultFlows;
-        }
-
-        function renderChatList() {
-            const chatListContainer = document.getElementById('chat-list');
-            const flows = getFlows();
-            chatListContainer.innerHTML = '';
-
-            flows.forEach(flow => {
-                const item = document.createElement('div');
-                item.className = `menu-item ${flow.id === currentFlowId ? 'active' : ''}`;
-                item.onclick = () => switchFlow(flow.id, item);
-
-                const titleSpan = document.createElement('span');
-                titleSpan.innerText = flow.name;
-                item.appendChild(titleSpan);
-
-                // Можно удалять только кастомные потоки
-                if (flow.id !== 'default') {
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.className = 'delete-flow-btn';
-                    deleteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">delete</span>';
-                    deleteBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        deleteFlow(flow.id);
-                    };
-                    item.appendChild(deleteBtn);
+        function toggleSearch() {
+            const container = document.getElementById('search-container');
+            if (container) {
+                container.classList.toggle('hidden');
+                if (!container.classList.contains('hidden')) {
+                    document.getElementById('sidebar-search-input')?.focus();
                 }
+            }
+        }
 
-                chatListContainer.appendChild(item);
+        function filterFlows(query) {
+            const items = document.querySelectorAll('#chat-list .menu-item');
+            const cleanQuery = query.toLowerCase().trim();
+
+            items.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                if (text.includes(cleanQuery)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
             });
         }
 
-        function switchFlow(flowId, element) {
-            currentFlowId = flowId;
-            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-            if (element) element.classList.add('active');
-            localStorage.setItem('lmsh_active_flow', flowId);
-        }
-
-        function openFlowBuilder() {
-            document.getElementById('flow-builder-modal').classList.remove('hidden');
-        }
-
-        function closeFlowBuilder() {
-            document.getElementById('flow-builder-modal').classList.add('hidden');
-            document.getElementById('flow-name').value = '';
-            document.getElementById('flow-prompt').value = '';
-        }
-
-        function saveCustomFlow() {
-            const name = document.getElementById('flow-name').value.trim();
-            const prompt = document.getElementById('flow-prompt').value.trim();
-
-            if (!name) {
-                alert('Введите название Flow!');
-                return;
-            }
-
-            const flows = getFlows();
-            const newFlow = {
-                id: 'flow_' + Date.now(),
-                name: name,
-                prompt: prompt
-            };
-
-            flows.push(newFlow);
-            localStorage.setItem('lmsh_flows', JSON.stringify(flows));
-            closeFlowBuilder();
-            renderChatList();
-            switchFlow(newFlow.id);
-        }
-
-        function deleteFlow(flowId) {
-            if (confirm('Удалить этот Flow?')) {
-                let flows = getFlows().filter(f => f.id !== flowId);
-                localStorage.setItem('lmsh_flows', JSON.stringify(flows));
-                if (currentFlowId === flowId) currentFlowId = 'default';
-                renderChatList();
+    function toggleSearch() {
+        const container = document.getElementById('search-container');
+        if (container) {
+            container.classList.toggle('hidden');
+            if (!container.classList.contains('hidden')) {
+                const input = document.getElementById('sidebar-search-input');
+                if (input) {
+                    input.value = '';
+                    input.focus();
+                    renderSidebarFlows();
+                }
             }
         }
+    }
 
-        /* 3. Автоматическое изменение высоты Textarea и обработка клавиш */
-        function autoResizeTextarea(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+    function filterFlows(query) {
+        const flows = getFlows();
+        const cleanQuery = query.toLowerCase().trim();
+
+        if (!cleanQuery) {
+            renderSidebarFlows(flows);
+            return;
         }
 
-        function handleKeyDown(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                handleInput();
-            }
-        }
-
-        function sendQuickPrompt(text) {
-            const input = document.getElementById('master-input');
-            input.value = text;
-            handleInput();
-        }
-
-        function handleInput() {
-            const input = document.getElementById('master-input');
-            const text = input.value.trim();
-            if (!text) return;
-
-            // Если скрыт welcome screen — скрываем при первом сообщении
-            const welcome = document.getElementById('welcome-screen');
-            if (welcome) welcome.style.display = 'none';
-
-            // Очищаем и сбрасываем высоту
-            input.value = '';
-            autoResizeTextarea(input);
-
-            // Функция обработчика в core.js подхватит отправитель
-            if (window.processUserMessage) {
-                window.processUserMessage(text, currentFlowId);
-            }
-        }
-
-        /* 4. Голосовой ввод (Web Speech API) */
-        function initSpeechRecognition() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                console.warn('Speech Recognition не поддерживается текущим браузером.');
-                return;
-            }
-
-            recognition = new SpeechRecognition();
-            recognition.lang = 'ru-RU';
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                const input = document.getElementById('master-input');
-                input.value += (input.value ? ' ' : '') + transcript;
-                autoResizeTextarea(input);
-            };
-
-            recognition.onend = () => {
-                isRecording = false;
-                document.getElementById('mic-btn').classList.remove('recording');
-            };
-
-            recognition.onerror = (err) => {
-                console.error('Ошибка распознавания речи:', err);
-                isRecording = false;
-                document.getElementById('mic-btn').classList.remove('recording');
-            };
-        }
-
-        function toggleSpeechRecognition() {
-            if (!recognition) {
-                alert('Ваш браузер не поддерживает распознавание речи.');
-                return;
-            }
-
-            const micBtn = document.getElementById('mic-btn');
-            if (isRecording) {
-                recognition.stop();
-                isRecording = false;
-                micBtn.classList.remove('recording');
-            } else {
-                recognition.start();
-                isRecording = true;
-                micBtn.classList.add('recording');
-            }
-        }
-
-        function toggleSidebar() {
-            document.querySelector('.app-wrapper').classList.toggle('sidebar-collapsed');
-            document.querySelector('.app-wrapper').classList.toggle('sidebar-mobile-open');
-        }
+        const filtered = flows.filter(f => f.name.toLowerCase().includes(cleanQuery));
+        renderSidebarFlows(filtered);
+    }
     </script>
 </body>
 </html>
