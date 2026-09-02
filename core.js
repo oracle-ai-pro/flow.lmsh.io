@@ -1,355 +1,601 @@
 // ==========================================
-// LMSH Flow 2.5 — Core Engine (core.js)
+// Flow LMSH 2.6 — Core Engine
 // ==========================================
 
 const KEYS = {
     apiKey: 'lmsh_api_key',
-    provider: 'lmsh_provider',
     temperature: 'lmsh_temperature',
     maxTokens: 'lmsh_max_tokens',
     accentColor: 'lmsh_accent_color',
-    uiRadius: 'lmsh_ui_radius',
     flows: 'lmsh_flows',
-    activeFlow: 'lmsh_active_flow'
+    activeFlow: 'lmsh_active_flow',
+    userContext: 'lmsh_user_context'
 };
 
-let currentFlowId = 'default';
+let currentFlowId = null;
+let contextTargetFlowId = null;
 let recognition = null;
 let isRecording = false;
+let attachedFiles = []; 
+let currentAbortController = null; // Контроллер для отмены текущего запроса
 
-// Инициализация ядра при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
     applySavedTheme();
     initFlows();
     renderChatHistory(currentFlowId);
     initSpeechRecognition();
+    initContextMenuEvents();
 });
 
-// ==========================================
-// 1. Применение настроек UI и темы
-// ==========================================
 function applySavedTheme() {
     const accent = localStorage.getItem(KEYS.accentColor);
-    const radius = localStorage.getItem(KEYS.uiRadius);
-
     if (accent) document.documentElement.style.setProperty('--accent-color', accent);
-    if (radius) document.documentElement.style.setProperty('--ui-radius', radius);
 }
 
 // ==========================================
-// 2. Управление Flow и боковым меню
+// 1. Управление чатами (Flows)
 // ==========================================
 function getFlows() {
-    const defaultFlows = [{ id: 'default', name: 'Общий поток', prompt: 'Ты — официальный ИИ-ассистент Штаба ЛМСХ.' }];
     const saved = localStorage.getItem(KEYS.flows);
-    return saved ? JSON.parse(saved) : defaultFlows;
+    return saved ? JSON.parse(saved) : [];
+}
+
+function saveFlows(flows) {
+    localStorage.setItem(KEYS.flows, JSON.stringify(flows));
 }
 
 function initFlows() {
+    const flows = getFlows();
     const savedActive = localStorage.getItem(KEYS.activeFlow);
-    if (savedActive) currentFlowId = savedActive;
+
+    if (savedActive && flows.some(f => f.id === savedActive)) {
+        currentFlowId = savedActive;
+    } else if (flows.length > 0) {
+        currentFlowId = flows[0].id;
+    } else {
+        currentFlowId = null;
+    }
+
     renderSidebarFlows();
 }
 
-function renderSidebarFlows() {
+function renderSidebarFlows(filteredFlows = null) {
     const chatList = document.getElementById('chat-list');
     if (!chatList) return;
 
     const flows = getFlows();
+    const flowsToRender = filteredFlows !== null ? filteredFlows : flows;
+
     chatList.innerHTML = '';
 
-    flows.forEach(flow => {
+    // Если чатов вообще нет
+    if (flows.length === 0) {
+        chatList.innerHTML = `<div class="sidebar-empty-state">Создайте первый чат</div>`;
+        updateHeaderTitle();
+        return;
+    }
+
+    // Если поиск ничего не нашел
+    if (flowsToRender.length === 0) {
+        chatList.innerHTML = `<div class="sidebar-empty-state">Не найдено</div>`;
+        return;
+    }
+
+    flowsToRender.forEach(flow => {
         const item = document.createElement('div');
         item.className = `menu-item ${flow.id === currentFlowId ? 'active' : ''}`;
-        item.onclick = () => switchFlow(flow.id, item);
+        item.onclick = () => switchFlow(flow.id);
+        item.oncontextmenu = (e) => showContextMenu(e, flow.id);
 
         const title = document.createElement('span');
         title.innerText = flow.name;
         item.appendChild(title);
 
-        // Кнопка удаления для кастомных потоков
-        if (flow.id !== 'default') {
-            const delBtn = document.createElement('button');
-            delBtn.className = 'delete-flow-btn';
-            delBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">delete</span>';
-            delBtn.onclick = (e) => {
-                e.stopPropagation();
-                deleteFlow(flow.id);
-            };
-            item.appendChild(delBtn);
-        }
-
         chatList.appendChild(item);
     });
+
+    updateHeaderTitle();
 }
 
-function switchFlow(flowId, element) {
+function updateHeaderTitle() {
+    const titleEl = document.getElementById('current-chat-title');
+    if (!titleEl) return;
+    const flows = getFlows();
+    const active = flows.find(f => f.id === currentFlowId);
+    titleEl.innerText = active ? active.name : 'Новый чат';
+}
+
+function switchFlow(flowId) {
+    if (currentAbortController) stopGeneration(); // Остановка при переключении
     currentFlowId = flowId;
     localStorage.setItem(KEYS.activeFlow, flowId);
-
-    document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
-    if (element) {
-        element.classList.add('active');
-    } else {
-        renderSidebarFlows();
-    }
-
+    renderSidebarFlows();
     renderChatHistory(currentFlowId);
 }
 
-function openFlowBuilder() {
-    const modal = document.getElementById('flow-builder-modal');
-    if (modal) modal.classList.remove('hidden');
-}
-
-function closeFlowBuilder() {
-    const modal = document.getElementById('flow-builder-modal');
-    if (modal) modal.classList.add('hidden');
-    document.getElementById('flow-name').value = '';
-    document.getElementById('flow-prompt').value = '';
-}
-
-function saveCustomFlow() {
-    const name = document.getElementById('flow-name').value.trim();
-    const prompt = document.getElementById('flow-prompt').value.trim();
-
-    if (!name) {
-        alert('Укажите название Flow!');
-        return;
-    }
-
-    const flows = getFlows();
-    const newFlow = {
-        id: 'flow_' + Date.now(),
-        name: name,
-        prompt: prompt
-    };
-
-    flows.push(newFlow);
-    localStorage.setItem(KEYS.flows, JSON.stringify(flows));
-
-    closeFlowBuilder();
-    switchFlow(newFlow.id);
-}
-
-function deleteFlow(flowId) {
-    if (confirm('Удалить выбранный Flow и его историю?')) {
-        let flows = getFlows().filter(f => f.id !== flowId);
-        localStorage.setItem(KEYS.flows, JSON.stringify(flows));
-        localStorage.removeItem(`lmsh_chat_history_${flowId}`);
-
-        if (currentFlowId === flowId) currentFlowId = 'default';
-        initFlows();
-    }
+function createNewChat() {
+    if (currentAbortController) stopGeneration();
+    currentFlowId = null;
+    localStorage.removeItem(KEYS.activeFlow);
+    renderSidebarFlows();
+    renderChatHistory(null);
 }
 
 // ==========================================
-// 3. Хранение и отрисовка истории сообщений
+// 2. Файлы и Превью
 // ==========================================
-function getChatHistory(flowId) {
-    const history = localStorage.getItem(`lmsh_chat_history_${flowId}`);
-    return history ? JSON.parse(history) : [];
+async function handleFileSelect(event) {
+    const files = Array.from(event.target.files);
+    if (!files.length) return;
+
+    for (const file of files) {
+        const base64 = await fileToBase64(file);
+        attachedFiles.push({
+            name: file.name,
+            type: file.type,
+            data: base64.split(',')[1]
+        });
+    }
+
+    renderFilePreviews();
+    event.target.value = '';
 }
 
-function saveMessageToHistory(flowId, sender, text) {
-    const history = getChatHistory(flowId);
-    history.push({ sender, text, timestamp: new Date().toISOString() });
-    localStorage.setItem(`lmsh_chat_history_${flowId}`, JSON.stringify(history));
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
 }
 
-function renderChatHistory(flowId) {
-    const container = document.getElementById('messages-left');
+function removeFile(index) {
+    attachedFiles.splice(index, 1);
+    renderFilePreviews();
+}
+
+function renderFilePreviews() {
+    const container = document.getElementById('file-previews');
     if (!container) return;
 
     container.innerHTML = '';
-    const history = getChatHistory(flowId);
-
-    if (history.length === 0) {
-        // Если история пуста — выводим приветственный экран
-        container.innerHTML = `
-            <div id="welcome-screen" class="welcome-container">
-                <div class="welcome-icon">
-                    <span class="material-symbols-outlined">psychology</span>
-                </div>
-                <h2>Начните диалог сейчас</h2>
-                <p>Штаб ЛМСХ готов к работе. Выберите быстрый запрос или введите команду ниже.</p>
-                <div class="quick-chips">
-                    <button class="quick-chip" onclick="sendQuickPrompt('Привет')">👋 Привет</button>
-                    <button class="quick-chip" onclick="sendQuickPrompt('Что делаете?')">💡 Что делаете?</button>
-                    <button class="quick-chip" onclick="sendQuickPrompt('Статус систем')">⚡ Статус систем</button>
-                </div>
-            </div>
-        `;
-    } else {
-        history.forEach(msg => appendMessageUI('left', msg.sender, msg.text, false));
+    if (attachedFiles.length === 0) {
+        container.style.display = 'none';
+        return;
     }
+
+    container.style.display = 'flex';
+    attachedFiles.forEach((file, index) => {
+        const chip = document.createElement('div');
+        chip.className = 'file-chip';
+        chip.innerHTML = `
+            <span class="material-symbols-outlined file-icon">description</span>
+            <span class="file-name">${escapeHTML(file.name)}</span>
+            <button class="remove-file-btn" onclick="removeFile(${index})">&times;</button>
+        `;
+        container.appendChild(chip);
+    });
 }
 
 // ==========================================
-// 4. Обработка ввода и запросов к ИИ
+// 3. Форматирование Markdown & Code
 // ==========================================
+function formatAIResponse(rawText) {
+    if (!rawText) return '';
+
+    if (typeof marked !== 'undefined') {
+        marked.setOptions({ breaks: true, gfm: true });
+
+        let parsedHtml = marked.parse(rawText);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = parsedHtml;
+
+        tempDiv.querySelectorAll('pre').forEach((preBlock) => {
+            const codeElement = preBlock.querySelector('code');
+            const rawCode = codeElement ? codeElement.innerText : preBlock.innerText;
+
+            let language = 'code';
+            if (codeElement) {
+                codeElement.classList.forEach(className => {
+                    if (className.startsWith('language-')) {
+                        language = className.replace('language-', '');
+                    }
+                });
+            }
+
+            const codeWrapper = document.createElement('div');
+            codeWrapper.className = 'code-window';
+
+            codeWrapper.innerHTML = `
+                <div class="code-window-header">
+                    <span class="code-language">${escapeHTML(language)}</span>
+                    <button class="copy-code-btn" onclick="copyCodeToClipboard(this)">
+                        <span class="material-symbols-outlined">content_copy</span>
+                        <span>Копировать</span>
+                    </button>
+                </div>
+                <div class="code-window-body">
+                    <pre><code>${escapeHTML(rawCode)}</code></pre>
+                </div>
+            `;
+
+            preBlock.replaceWith(codeWrapper);
+        });
+
+        return tempDiv.innerHTML;
+    } 
+
+    return escapeHTML(rawText).replace(/\n/g, '<br>');
+}
+
+function copyCodeToClipboard(button) {
+    const codeContainer = button.closest('.code-window')?.querySelector('code');
+    if (!codeContainer) return;
+
+    navigator.clipboard.writeText(codeContainer.innerText).then(() => {
+        const span = button.querySelector('span:not(.material-symbols-outlined)');
+        const icon = button.querySelector('.material-symbols-outlined');
+        
+        if (span) span.innerText = 'Скопировано!';
+        if (icon) icon.innerText = 'check';
+        button.classList.add('copied');
+
+        setTimeout(() => {
+            if (span) span.innerText = 'Копировать';
+            if (icon) icon.innerText = 'content_copy';
+            button.classList.remove('copied');
+        }, 2000);
+    });
+}
+
+// ==========================================
+// 4. Отправка, Остановка и Retry
+// ==========================================
+function handleSendClick() {
+    if (currentAbortController) {
+        stopGeneration();
+    } else {
+        handleInput();
+    }
+}
+
+function stopGeneration() {
+    if (currentAbortController) {
+        currentAbortController.abort();
+        currentAbortController = null;
+    }
+}
+
+function toggleSendButtonState(isGenerating) {
+    const sendBtn = document.getElementById('send-btn');
+    if (!sendBtn) return;
+
+    if (isGenerating) {
+        sendBtn.innerHTML = '<span class="material-symbols-outlined">stop</span>';
+        sendBtn.title = 'Остановить генерацию';
+        sendBtn.classList.add('stop-mode');
+    } else {
+        sendBtn.innerHTML = '<span class="material-symbols-outlined">send</span>';
+        sendBtn.title = 'Отправить сообщение';
+        sendBtn.classList.remove('stop-mode');
+    }
+}
+
 function handleInput() {
     const input = document.getElementById('master-input');
     const text = input.value.trim();
-    if (!text) return;
+    if (!text && attachedFiles.length === 0) return;
 
-    // Прячем приветствие при первом сообщении
+    if (!currentFlowId) {
+        const flows = getFlows();
+        const autoName = text ? (text.length > 25 ? text.substring(0, 25) + '...' : text) : 'Анализ файлов';
+        const newFlow = { id: 'flow_' + Date.now(), name: autoName };
+        
+        flows.unshift(newFlow);
+        saveFlows(flows);
+        
+        currentFlowId = newFlow.id;
+        localStorage.setItem(KEYS.activeFlow, currentFlowId);
+        renderSidebarFlows();
+    }
+
     const welcome = document.getElementById('welcome-screen');
     if (welcome) welcome.style.display = 'none';
 
-    // Отображаем и сохраняем сообщение пользователя
-    appendMessageUI('left', 'Вы', text, true);
-    saveMessageToHistory(currentFlowId, 'Вы', text);
+    let displayHtml = escapeHTML(text);
+    if (attachedFiles.length > 0) {
+        const filesHtml = attachedFiles.map(f => `<div class="msg-attached-file"><span class="material-symbols-outlined">attach_file</span> ${escapeHTML(f.name)}</div>`).join('');
+        displayHtml = filesHtml + (displayHtml ? `<div style="margin-top:8px;">${displayHtml}</div>` : '');
+    }
 
+    appendMessageUI('left', 'user', displayHtml, true, true);
+    saveMessageToHistory(currentFlowId, 'user', displayHtml);
+
+    const currentFiles = [...attachedFiles];
+    
     input.value = '';
+    attachedFiles = [];
+    renderFilePreviews();
     autoResizeTextarea(input);
 
-    // Запускаем генерацию ответа ИИ
-    processCoreResponse(text);
+    processCoreResponse(text, currentFiles);
 }
 
-async function processCoreResponse(userText) {
-    const apiKey = localStorage.getItem(KEYS.apiKey);
-    const flows = getFlows();
-    const activeFlow = flows.find(f => f.id === currentFlowId) || flows[0];
-
-    // Показываем индикатор печати
+async function processCoreResponse(userText, files = []) {
+    const rawApiKey = localStorage.getItem(KEYS.apiKey);
+    const apiKey = validateAndCleanApiKey(rawApiKey);
     const typingId = appendTypingIndicator('left');
 
-    let aiResponse = "";
-
-    if (apiKey) {
-        // Элемент 1: Отправка запроса в Google Gemini API
-        try {
-            aiResponse = await fetchGeminiResponse(apiKey, activeFlow.prompt, userText);
-        } catch (err) {
-            console.error('API Error:', err);
-            aiResponse = `[Ошибка API]: Не удалось получить ответ. Проверьте ключ в настройках. (${err.message})`;
-        }
-    } else {
-        // Элемент 0: Локальные ответы Штаба без API
-        await new Promise(res => setTimeout(res, 600)); // Имитация задержки
-        aiResponse = generateLocalResponse(userText, activeFlow.name);
+    if (!apiKey) {
+        removeTypingIndicator('left', typingId);
+        const warning = `[Система]: API-ключ не найден. Пожалуйста, укажите его в настройках.`;
+        appendMessageUI('left', 'bot', warning, true, false);
+        saveMessageToHistory(currentFlowId, 'bot', warning);
+        return;
     }
 
-    removeTypingIndicator('left', typingId);
-    appendMessageUI('left', activeFlow.name, aiResponse, true);
-    saveMessageToHistory(currentFlowId, activeFlow.name, aiResponse);
+    // Инициализируем контроллер отмены
+    currentAbortController = new AbortController();
+    toggleSendButtonState(true);
+
+    try {
+        const aiResponse = await fetchGeminiResponse(apiKey, userText, files, currentAbortController.signal);
+        removeTypingIndicator('left', typingId);
+        
+        const formattedResponse = formatAIResponse(aiResponse);
+        appendMessageUI('left', 'bot', formattedResponse, true, true);
+        saveMessageToHistory(currentFlowId, 'bot', formattedResponse);
+
+    } catch (err) {
+        removeTypingIndicator('left', typingId);
+
+        if (err.name === 'AbortError') {
+            appendErrorMessageUI('left', userText, files, 'Генерация остановлена пользователем.');
+        } else {
+            appendErrorMessageUI('left', userText, files, err.message);
+        }
+    } finally {
+        currentAbortController = null;
+        toggleSendButtonState(false);
+    }
 }
 
-// Запрос к Google Gemini REST API
-async function fetchGeminiResponse(apiKey, systemPrompt, userMessage) {
+function validateAndCleanApiKey(rawKey) {
+    return rawKey ? rawKey.trim() : '';
+}
+
+async function fetchGeminiResponse(apiKey, userMessage, files = [], signal) {
     const temp = parseFloat(localStorage.getItem(KEYS.temperature) || '0.7');
     const maxTokens = parseInt(localStorage.getItem(KEYS.maxTokens) || '2048');
+    const userContext = localStorage.getItem(KEYS.userContext) || '';
+    
+    // Актуальная рабочая модель Google Gemini 2.0
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
-
-    const bodyData = {
-        contents: [
-            {
-                role: 'user',
-                parts: [{ text: userMessage }]
-            }
-        ],
-        generationConfig: {
-            temperature: temp,
-            maxOutputTokens: maxTokens
-        }
-    };
-
-    if (systemPrompt) {
-        bodyData.systemInstruction = {
-            parts: [{ text: systemPrompt }]
+    const parts = [];
+    
+    let systemInstruction = null;
+    if (userContext.trim()) {
+        systemInstruction = {
+            parts: [{ text: `Информация о пользователе (Память ИИ):\n${userContext}` }]
         };
     }
+    
+    files.forEach(file => {
+        parts.push({
+            inline_data: {
+                mime_type: file.type || "application/octet-stream",
+                data: file.data
+            }
+        });
+    });
+
+    if (userMessage) parts.push({ text: userMessage });
+
+    const bodyData = {
+        contents: [{ role: 'user', parts: parts }],
+        generationConfig: { temperature: temp, maxOutputTokens: maxTokens }
+    };
+
+    if (systemInstruction) bodyData.systemInstruction = systemInstruction;
 
     const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bodyData)
+        body: JSON.stringify(bodyData),
+        signal: signal // Передаем сигнал для возможности отмены
     });
 
     if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error?.message || `Status code ${res.status}`);
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `Статус ошибки: ${res.status}`);
     }
 
     const data = await res.json();
     return data.candidates[0].content.parts[0].text;
 }
 
-// Резервный локальный процессор команд
-function generateLocalResponse(text, flowName) {
-    const lower = text.toLowerCase();
-
-    if (lower.includes('привет') || lower.includes('здравствуй')) {
-        return `Приветствую! Штаб ЛМСХ на связи. Канал [${flowName}] готов к приему команд.`;
-    } else if (lower.includes('статус') || lower.includes('состояние')) {
-        return `[Штаб ЛМСХ]: Все системы Core Node 2.5 функционируют нормально. Подключение к API: ${localStorage.getItem(KEYS.apiKey) ? 'АКТИВНО' : 'НЕ НАСТРОЕНО'}.`;
-    } else if (lower.includes('что делаете') || lower.includes('чем занят')) {
-        return `Ламирк проектирует архитектуру, Мурзик ведет учет данных, Снежинка и Хахми на вокале. Все при деле!`;
-    } else {
-        return `[Штаб (${flowName})]: Запрос принят локально. Для подключения реального нейро-интеллекта добавьте API-ключ в настройках!`;
-    }
+function retryQuery(text, filesJson) {
+    let files = [];
+    try {
+        files = JSON.parse(decodeURIComponent(filesJson));
+    } catch (e) {}
+    processCoreResponse(text, files);
 }
 
 // ==========================================
-// 5. Вспомогательные функции UI
+// 5. Рендеринг и UI
 // ==========================================
-function appendMessageUI(panelId, sender, text, autoScroll = true) {
+function renderChatHistory(flowId) {
+    const container = document.getElementById('messages-left');
+    if (!container) return;
+
+    container.innerHTML = '';
+    
+    if (!flowId) {
+        container.innerHTML = `
+            <div id="welcome-screen" class="welcome-container">
+                <div class="welcome-icon">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                </div>
+                <h2>Flow LMSH 2.6</h2>
+                <p>Начните диалог или прикрепите файлы для анализа.</p>
+                <div class="quick-chips">
+                    <button class="quick-chip" onclick="sendQuickPrompt('Привет, Штаб!')">👋 Привет</button>
+                    <button class="quick-chip" onclick="sendQuickPrompt('Статус систем')">⚡ Статус</button>
+                </div>
+            </div>`;
+        return;
+    }
+
+    const history = getChatHistory(flowId);
+    history.forEach(msg => {
+        appendMessageUI('left', msg.role, msg.text, false, true);
+    });
+    scrollToBottom();
+}
+
+function getChatHistory(flowId) {
+    if (!flowId) return [];
+    const history = localStorage.getItem(`lmsh_chat_history_${flowId}`);
+    return history ? JSON.parse(history) : [];
+}
+
+function saveMessageToHistory(flowId, role, text) {
+    if (!flowId) return;
+    const history = getChatHistory(flowId);
+    history.push({ role, text, timestamp: new Date().toISOString() });
+    localStorage.setItem(`lmsh_chat_history_${flowId}`, JSON.stringify(history));
+}
+
+function appendMessageUI(panelId, role, content, autoScroll = true, isHtml = false) {
     const container = document.getElementById(`messages-${panelId}`);
     if (!container) return;
 
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender === 'Вы' ? 'user' : 'bot'}`;
-    messageDiv.style.margin = '10px 0';
-    messageDiv.style.padding = '12px 16px';
-    messageDiv.style.borderRadius = 'var(--ui-radius, 8px)';
-    messageDiv.style.backgroundColor = sender === 'Вы' ? 'var(--bg-input)' : 'var(--bg-sidebar)';
-    messageDiv.style.border = '1px solid var(--border-color)';
-    messageDiv.style.lineHeight = '1.5';
-
-    messageDiv.innerHTML = `<strong style="color: var(--accent-color);">${sender}:</strong> ${escapeHTML(text)}`;
-    container.appendChild(messageDiv);
-
-    if (autoScroll) {
-        container.scrollTop = container.scrollHeight;
+    const div = document.createElement('div');
+    div.className = `message ${role === 'user' ? 'user' : 'bot'}`;
+    
+    if (isHtml) {
+        div.innerHTML = content;
+    } else {
+        div.innerText = content;
     }
+
+    container.appendChild(div);
+    if (autoScroll) scrollToBottom();
+}
+
+function appendErrorMessageUI(panelId, userText, files, errorMessage) {
+    const container = document.getElementById(`messages-${panelId}`);
+    if (!container) return;
+
+    const div = document.createElement('div');
+    div.className = 'message bot error-message';
+    
+    const encodedFiles = encodeURIComponent(JSON.stringify(files));
+    
+    div.innerHTML = `
+        <div style="margin-bottom: 8px;">${escapeHTML(errorMessage)}</div>
+        <button class="retry-btn" onclick="retryQuery('${escapeHTML(userText)}', '${encodedFiles}')">
+            <span class="material-symbols-outlined">refresh</span> Повторить (Retry)
+        </button>
+    `;
+
+    container.appendChild(div);
+    scrollToBottom();
 }
 
 function appendTypingIndicator(panelId) {
     const container = document.getElementById(`messages-${panelId}`);
     if (!container) return null;
-
+    
     const id = 'typing_' + Date.now();
     const div = document.createElement('div');
     div.id = id;
-    div.className = 'message bot';
-    div.style.padding = '10px 14px';
-    div.style.color = 'var(--text-muted)';
-    div.style.fontStyle = 'italic';
-    div.innerText = 'Штаб генерирует ответ...';
+    div.className = 'message bot typing-indicator';
+    div.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="typing-dots">
+                <span></span><span></span><span></span>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Модель генерирует ответ...</span>
+        </div>
+    `;
     container.appendChild(div);
-    container.scrollTop = container.scrollHeight;
+    scrollToBottom();
     return id;
 }
 
 function removeTypingIndicator(panelId, typingId) {
-    if (!typingId) return;
     const el = document.getElementById(typingId);
     if (el) el.remove();
 }
 
-function autoResizeTextarea(textarea) {
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+function scrollToBottom() {
+    const container = document.getElementById('messages-left');
+    if (container) {
+        requestAnimationFrame(() => {
+            container.scrollTop = container.scrollHeight;
+        });
+    }
 }
 
-function handleKeyDown(event) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault();
-        handleInput();
+// ==========================================
+// 6. Контекстное меню и утилиты
+// ==========================================
+function showContextMenu(e, flowId) {
+    e.preventDefault();
+    contextTargetFlowId = flowId;
+
+    const menu = document.getElementById('context-menu');
+    if (!menu) return;
+
+    menu.style.top = `${e.clientY}px`;
+    menu.style.left = `${e.clientX}px`;
+    menu.classList.remove('hidden');
+}
+
+function hideContextMenu() {
+    const menu = document.getElementById('context-menu');
+    if (menu) menu.classList.add('hidden');
+}
+
+function initContextMenuEvents() {
+    document.addEventListener('click', () => hideContextMenu());
+}
+
+function renameCurrentContextMenuChat() {
+    if (!contextTargetFlowId) return;
+    const flows = getFlows();
+    const flow = flows.find(f => f.id === contextTargetFlowId);
+
+    if (flow) {
+        const newName = prompt('Переименовать чат:', flow.name);
+        if (newName && newName.trim()) {
+            flow.name = newName.trim();
+            saveFlows(flows);
+            renderSidebarFlows();
+        }
     }
+    hideContextMenu();
+}
+
+function deleteCurrentContextMenuChat() {
+    if (!contextTargetFlowId) return;
+    
+    if (confirm('Удалить этот чат?')) {
+        let flows = getFlows().filter(f => f.id !== contextTargetFlowId);
+        saveFlows(flows);
+        localStorage.removeItem(`lmsh_chat_history_${contextTargetFlowId}`);
+
+        if (currentFlowId === contextTargetFlowId) {
+            createNewChat();
+        } else {
+            renderSidebarFlows();
+        }
+    }
+    hideContextMenu();
 }
 
 function sendQuickPrompt(text) {
@@ -360,121 +606,128 @@ function sendQuickPrompt(text) {
     }
 }
 
+function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+}
+
+function handleKeyDown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        handleSendClick();
+    }
+}
+
 function toggleSidebar() {
     document.querySelector('.app-wrapper')?.classList.toggle('sidebar-collapsed');
-    document.querySelector('.app-wrapper')?.classList.toggle('sidebar-mobile-open');
 }
 
 function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
+    return str ? str.replace(/[&<>'"]/g, t => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[t] || t)) : '';
 }
 
-// ==========================================
-// 6. Распознавание речи (Микрофон)
-// ==========================================
 function initSpeechRecognition() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
 
     recognition = new SpeechRecognition();
     recognition.lang = 'ru-RU';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
+    
     recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
         const input = document.getElementById('master-input');
         if (input) {
-            input.value += (input.value ? ' ' : '') + transcript;
+            input.value += (input.value ? ' ' : '') + event.results[0][0].transcript;
             autoResizeTextarea(input);
         }
     };
-
-    recognition.onend = () => {
-        isRecording = false;
-        document.getElementById('mic-btn')?.classList.remove('recording');
-    };
-
-    recognition.onerror = () => {
-        isRecording = false;
-        document.getElementById('mic-btn')?.classList.remove('recording');
-    };
+    recognition.onend = () => resetMicBtn();
+    recognition.onerror = () => resetMicBtn();
 }
 
 function toggleSpeechRecognition() {
-    if (!recognition) {
-        alert('Ваш браузер не поддерживает голосовой ввод.');
-        return;
-    }
-
+    if (!recognition) return alert('Браузер не поддерживает микрофон.');
     const micBtn = document.getElementById('mic-btn');
+    
     if (isRecording) {
         recognition.stop();
-        isRecording = false;
-        micBtn?.classList.remove('recording');
+        resetMicBtn();
     } else {
         recognition.start();
         isRecording = true;
         micBtn?.classList.add('recording');
     }
 }
-// ==========================================
-// 7. Новый чат и Поиск по цепочкам
-// ==========================================
+// Настройки лимитов (например, 20 запросов на 4 часа)
+const LIMIT_CONFIG = {
+    maxRequests: 20,
+    cooldownHours: 4
+};
 
-// Начать новый диалог в текущем Flow (очистить историю)
-function createNewChat() {
-    const history = getChatHistory(currentFlowId);
-    if (history.length === 0) return;
+function checkUserLimits() {
+    const limitData = JSON.parse(localStorage.getItem('lmsh_limit_data') || '{"count": 0, "resetTime": null}');
+    const now = Date.now();
 
-    if (confirm('Начать новый диалог? История текущего потока будет очищена.')) {
-        localStorage.removeItem(`lmsh_chat_history_${currentFlowId}`);
-        renderChatHistory(currentFlowId);
-        console.log(`[Core Node]: Чат ${currentFlowId} сброшен.`);
+    // Если время сброса прошло — обнуляем
+    if (limitData.resetTime && now >= limitData.resetTime) {
+        limitData.count = 0;
+        limitData.resetTime = null;
+        localStorage.setItem('lmsh_limit_data', JSON.stringify(limitData));
     }
+
+    updateLimitUI(limitData);
+    return limitData;
 }
 
-// Показать/скрыть поле поиска
-function toggleSearch() {
-    const searchContainer = document.getElementById('search-container');
-    const searchInput = document.getElementById('sidebar-search-input');
+function registerRequestUse() {
+    let limitData = checkUserLimits();
+    const now = Date.now();
+
+    if (limitData.count === 0) {
+        // Устанавливаем время сброса через 4 часа от первого запроса
+        limitData.resetTime = now + (LIMIT_CONFIG.cooldownHours * 60 * 60 * 1000);
+    }
+
+    limitData.count++;
+    localStorage.setItem('lmsh_limit_data', JSON.stringify(limitData));
+    updateLimitUI(limitData);
+}
+
+function updateLimitUI(limitData) {
+    const percentage = Math.min(100, Math.round((limitData.count / LIMIT_CONFIG.maxRequests) * 100));
     
-    if (searchContainer) {
-        searchContainer.classList.toggle('hidden');
-        if (!searchContainer.classList.contains('hidden') && searchInput) {
-            searchInput.focus();
-        } else if (searchInput) {
-            searchInput.value = '';
-            filterFlows(''); // Сброс фильтра при закрытии
-        }
+    // Обновляем прогресс-бар
+    const fill = document.getElementById('limit-fill');
+    const percentText = document.getElementById('limit-percent');
+    if (fill) fill.style.width = `${percentage}%`;
+    if (percentText) percentText.innerText = `${percentage}%`;
+
+    // Если лимит исчерпан
+    if (percentage >= 100) {
+        blockChatInput(limitData.resetTime);
+    } else {
+        unblockChatInput();
     }
 }
 
-// Фокусировка на поиске (для горячих клавиш)
-function focusSearchInput() {
-    const searchContainer = document.getElementById('search-container');
-    const searchInput = document.getElementById('sidebar-search-input');
-    
-    if (searchContainer && searchInput) {
-        searchContainer.classList.remove('hidden');
-        searchInput.focus();
-        searchInput.select();
-    }
+function blockChatInput(resetTime) {
+    const inputWrapper = document.querySelector('.master-input-wrapper');
+    if (!inputWrapper) return;
+
+    const resetDate = new Date(resetTime);
+    const timeString = resetDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    inputWrapper.innerHTML = `
+        <div class="input-blocked-banner">
+            Чат приостановлен. Вы много общались в данном чате, сброс лимита будет в ${timeString}, до этого момента вы не сможете общаться в чатах.
+        </div>
+    `;
 }
 
-// Фильтрация списка чатов/Flows по поисковому запросу
-function filterFlows(query) {
-    const cleanQuery = query.toLowerCase().trim();
-    const items = document.querySelectorAll('#chat-list .menu-item');
+function unblockChatInput() {
+    // Возвращает стандартную форму ввода, если лимит снова доступен
+}
 
-    items.forEach(item => {
-        const text = item.textContent.toLowerCase();
-        if (text.includes(cleanQuery)) {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = 'none';
-        }
-    });
+function resetMicBtn() {
+    isRecording = false;
+    document.getElementById('mic-btn')?.classList.remove('recording');
 }
