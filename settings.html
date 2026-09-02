@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Настройки Штаба | LMSH Flow 2.5</title>
+    <title>Настройки Штаба | LMSH Flow 2.6</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Material+Symbols+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Разрешаем скролл для страницы настроек */
         body {
             overflow-y: auto !important;
             height: auto !important;
             min-height: 100dvh;
         }
 
-        /* Всплывающая шапка (Floating Header) */
         .floating-header {
             position: fixed;
             top: 0;
@@ -46,7 +44,12 @@
             margin: 0;
         }
 
-        /* Сетка карточек */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .settings-grid {
             display: grid;
             gap: 20px;
@@ -125,6 +128,73 @@
             cursor: pointer;
         }
 
+        /* --- Стили для шкал лимитов --- */
+        .limit-card-block {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .limit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .limit-reset-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.4s ease, background-color 0.4s ease;
+        }
+
+        .bar-fill.text-bar {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+
+        .bar-fill.files-bar {
+            background: linear-gradient(90deg, #10b981, #f59e0b);
+        }
+
+        .bar-fill.danger {
+            background: #ef4444 !important;
+        }
+
+        .limit-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
         @media (max-width: 600px) {
             .row-group {
                 grid-template-columns: 1fr;
@@ -134,17 +204,20 @@
 </head>
 <body>
 
-    <!-- Всплывающая панель при скролле -->
     <div id="floating-header" class="floating-header">
-        <h3>Панель управления Штабом</h3>
-        <button class="menu-btn" onclick="window.location.href='index.html'">
-            <span class="material-symbols-outlined">arrow_back</span> В Штаб
-        </button>
+        <h3>Настройки</h3>
+        <div class="header-actions">
+            <button class="menu-btn primary" onclick="saveSettings()" style="padding: 8px 16px; font-size: 0.9rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">save</span> Сохранить
+            </button>
+            <button class="menu-btn" onclick="window.location.href='index.html'">
+                <span class="material-symbols-outlined">arrow_back</span> В Штаб
+            </button>
+        </div>
     </div>
 
     <div class="settings-grid">
         
-        <!-- Главный заголовок (триггер скролла) -->
         <div id="main-header" style="display: flex; align-items: center; justify-content: space-between;">
             <h2>Панель управления Штабом</h2>
             <button class="menu-btn" onclick="window.location.href='index.html'">
@@ -152,7 +225,17 @@
             </button>
         </div>
 
-        <!-- 1. Основное (Провайдер и Ключ) -->
+        <!-- 1. Память ИИ / Персональный контекст -->
+        <div class="settings-card">
+            <h3>🧠 Память ИИ и Персональный контекст</h3>
+            <div class="setting-group">
+                <label>Информация о вас и правила (учитываются во всех моделях)</label>
+                <textarea id="user-context-input" style="min-height: 110px;" placeholder="Пример: Меня зовут Александр. Обращаться на 'Ты'. Штаб ЛМСХ включает: Ламирк (Главный инженер), Мурзик (Верная Помощница)..."></textarea>
+                <small style="color: var(--text-muted); font-size: 0.8rem;">Эти данные автоматически передаются в качестве системного контекста для нейросетей Claude, ChatGPT, Grok и Gemini.</small>
+            </div>
+        </div>
+
+        <!-- 2. Основное (Провайдер и Ключ) -->
         <div class="settings-card">
             <h3>Подключение ИИ</h3>
             <div class="setting-group">
@@ -171,7 +254,7 @@
             </div>
         </div>
 
-        <!-- 2. Гиперпараметры генерации -->
+        <!-- 3. Гиперпараметры генерации -->
         <div class="settings-card">
             <h3>Гиперпараметры генерации</h3>
             <div class="row-group">
@@ -180,13 +263,65 @@
                     <input type="range" id="temperature-input" min="0" max="1" step="0.05" value="0.7" oninput="document.getElementById('temp-value').innerText = this.value">
                 </div>
                 <div class="setting-group">
-                    <label>Максимум токенов</label>
-                    <input type="number" id="max-tokens-input" value="2048" placeholder="2048">
+                    <label>Максимум токенов вывода</label>
+                    <input type="number" id="max-tokens-input" value="8192" placeholder="8192">
                 </div>
             </div>
         </div>
 
-        <!-- 3. Интерфейс и UX -->
+        <!-- 4. Лимиты использования -->
+        <div class="settings-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                <h3 style="border: none; padding: 0; margin: 0;">Лимиты и Использование</h3>
+                <span class="limit-reset-tag">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                    Авто сброс в <strong id="reset-time-label">--:--</strong>
+                </span>
+            </div>
+
+            <!-- Шкала для Текстового чата -->
+            <div class="limit-card-block">
+                <div class="limit-header">
+                    <span>💬 Текстовый чат (Запросы)</span>
+                    <span id="text-limit-percent">0%</span>
+                </div>
+                <div class="bar-container">
+                    <div id="text-bar-fill" class="bar-fill text-bar"></div>
+                </div>
+                <div class="limit-values">
+                    <span>Использовано: <strong id="text-used-count">0</strong> / <span id="text-max-count">30</span></span>
+                    <span>Сброс каждые 4 часа</span>
+                </div>
+            </div>
+
+            <!-- Шкала для Вложения файлов -->
+            <div class="limit-card-block">
+                <div class="limit-header">
+                    <span>📁 Вложения файлов (Картинки, Код, Docs)</span>
+                    <span id="files-limit-percent">0%</span>
+                </div>
+                <div class="bar-container">
+                    <div id="files-bar-fill" class="bar-fill files-bar"></div>
+                </div>
+                <div class="limit-values">
+                    <span>Загружено: <strong id="files-used-count">0</strong> / <span id="files-max-count">10</span></span>
+                    <span>Сброс каждые 4 часа</span>
+                </div>
+            </div>
+
+            <div class="setting-group" style="margin-top: 5px;">
+                <label class="checkbox-row">
+                    <input type="checkbox" id="stop-on-limit-toggle">
+                    Блокировать отправку при 100% лимите
+                </label>
+            </div>
+
+            <button class="menu-btn" style="align-self: flex-start; font-size: 0.8rem; padding: 6px 12px;" onclick="resetLimitsManually()">
+                <span class="material-symbols-outlined" style="font-size: 14px;">restart_alt</span> Сбросить счетчик (Тест)
+            </button>
+        </div>
+
+        <!-- 5. Интерфейс и UX -->
         <div class="settings-card">
             <h3>Интерфейс и UX</h3>
             <div class="row-group">
@@ -200,11 +335,11 @@
                     </select>
                 </div>
                 <div class="setting-group">
-                    <label>Состояние скруглений углов</label>
+                    <label>Скругление углов</label>
                     <select id="ui-radius-select">
-                        <option value="0px">Нету (Строгий / Старый)</option>
-                        <option value="8px">Обычные (Стандартные)</option>
-                        <option value="20px">Максимальные (Плавные / Pills)</option>
+                        <option value="0px">Строгие</option>
+                        <option value="8px">Стандартные</option>
+                        <option value="20px">Плавные</option>
                     </select>
                 </div>
             </div>
@@ -216,15 +351,15 @@
             </div>
         </div>
 
-        <!-- 4. Персонажи Штаба ЛМСХ -->
+        <!-- 6. Системные роли Штаба -->
         <div class="settings-card">
             <h3>Системные роли Штаба ЛМСХ</h3>
             <div class="setting-group">
-                <label>ЛАМИРК (Главный инженер — мужской профиль)</label>
+                <label>ЛАМИРК (Главный инженер)</label>
                 <textarea id="prompt-lamirk" placeholder="Системный промпт для Ламирка..."></textarea>
             </div>
             <div class="setting-group">
-                <label>МУРЗИК (Верная Помощница — женский профиль)</label>
+                <label>МУРЗИК (Верная Помощница)</label>
                 <textarea id="prompt-murzik" placeholder="Системный промпт для Мурзика..."></textarea>
             </div>
             <div class="setting-group">
@@ -237,7 +372,7 @@
             </div>
         </div>
 
-        <!-- 5. Данные и сброс -->
+        <!-- 7. Данные и сброс -->
         <div class="settings-card">
             <h3>Управление данными</h3>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -248,7 +383,6 @@
             </div>
         </div>
 
-        <!-- Кнопка сохранения -->
         <div style="display: flex; justify-content: flex-end; margin-bottom: 40px;">
             <button class="menu-btn primary" onclick="saveSettings()" style="padding: 12px 24px; font-size: 1rem;">Сохранить все настройки</button>
         </div>
@@ -256,7 +390,6 @@
     </div>
 
     <script>
-        // Трекинг видимости главного заголовка для вызова floating header
         const mainHeader = document.getElementById('main-header');
         const floatingHeader = document.getElementById('floating-header');
 
@@ -272,10 +405,17 @@
 
         headerObserver.observe(mainHeader);
 
-        // Загрузка настроек при открытии
+        const LIMIT_DEFAULTS = {
+            maxText: 30,
+            maxFiles: 10,
+            cooldownMs: 4 * 60 * 60 * 1000 // 4 часа
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('lmsh_user_context')) document.getElementById('user-context-input').value = localStorage.getItem('lmsh_user_context');
             if (localStorage.getItem('lmsh_api_key')) document.getElementById('api-key-input').value = localStorage.getItem('lmsh_api_key');
             if (localStorage.getItem('lmsh_provider')) document.getElementById('provider-select').value = localStorage.getItem('lmsh_provider');
+            
             if (localStorage.getItem('lmsh_temperature')) {
                 const temp = localStorage.getItem('lmsh_temperature');
                 document.getElementById('temperature-input').value = temp;
@@ -285,16 +425,71 @@
             if (localStorage.getItem('lmsh_accent_color')) document.getElementById('accent-color-select').value = localStorage.getItem('lmsh_accent_color');
             if (localStorage.getItem('lmsh_ui_radius')) document.getElementById('ui-radius-select').value = localStorage.getItem('lmsh_ui_radius');
             if (localStorage.getItem('lmsh_sounds') === 'true') document.getElementById('sound-effects-toggle').checked = true;
+            if (localStorage.getItem('lmsh_stop_on_limit') === 'true') document.getElementById('stop-on-limit-toggle').checked = true;
 
-            // Загрузка промптов Штаба
             document.getElementById('prompt-lamirk').value = localStorage.getItem('lmsh_prompt_lamirk') || '';
             document.getElementById('prompt-murzik').value = localStorage.getItem('lmsh_prompt_murzik') || '';
             document.getElementById('prompt-sneginka').value = localStorage.getItem('lmsh_prompt_sneginka') || '';
             document.getElementById('prompt-haxmi').value = localStorage.getItem('lmsh_prompt_haxmi') || '';
+
+            renderLimitsData();
         });
 
-        // Сохранение настроек
+        function getLimitsData() {
+            const raw = localStorage.getItem('lmsh_usage_limits');
+            const now = Date.now();
+
+            if (!raw) {
+                return { textCount: 0, filesCount: 0, resetTime: now + LIMIT_DEFAULTS.cooldownMs };
+            }
+
+            let data = JSON.parse(raw);
+            if (now >= data.resetTime) {
+                data = { textCount: 0, filesCount: 0, resetTime: now + LIMIT_DEFAULTS.cooldownMs };
+                localStorage.setItem('lmsh_usage_limits', JSON.stringify(data));
+            }
+            return data;
+        }
+
+        function renderLimitsData() {
+            const data = getLimitsData();
+
+            // Текстовый лимит
+            const textPercent = Math.min(100, Math.round((data.textCount / LIMIT_DEFAULTS.maxText) * 100));
+            document.getElementById('text-used-count').innerText = data.textCount;
+            document.getElementById('text-max-count').innerText = LIMIT_DEFAULTS.maxText;
+            document.getElementById('text-limit-percent').innerText = `${textPercent}%`;
+            
+            const textBar = document.getElementById('text-bar-fill');
+            textBar.style.width = `${textPercent}%`;
+            if (textPercent >= 100) textBar.classList.add('danger');
+
+            // Лимит файлов
+            const filesPercent = Math.min(100, Math.round((data.filesCount / LIMIT_DEFAULTS.maxFiles) * 100));
+            document.getElementById('files-used-count').innerText = data.filesCount;
+            document.getElementById('files-max-count').innerText = LIMIT_DEFAULTS.maxFiles;
+            document.getElementById('files-limit-percent').innerText = `${filesPercent}%`;
+            
+            const filesBar = document.getElementById('files-bar-fill');
+            filesBar.style.width = `${filesPercent}%`;
+            if (filesPercent >= 100) filesBar.classList.add('danger');
+
+            // Время авто сброса
+            const resetDate = new Date(data.resetTime);
+            const timeStr = resetDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('reset-time-label').innerText = timeStr;
+        }
+
+        function resetLimitsManually() {
+            const now = Date.now();
+            const freshData = { textCount: 0, filesCount: 0, resetTime: now + LIMIT_DEFAULTS.cooldownMs };
+            localStorage.setItem('lmsh_usage_limits', JSON.stringify(freshData));
+            renderLimitsData();
+            alert('[Штаб]: Счетчики лимитов успешно обнулены!');
+        }
+
         function saveSettings() {
+            localStorage.setItem('lmsh_user_context', document.getElementById('user-context-input').value.trim());
             localStorage.setItem('lmsh_api_key', document.getElementById('api-key-input').value.trim());
             localStorage.setItem('lmsh_provider', document.getElementById('provider-select').value);
             localStorage.setItem('lmsh_temperature', document.getElementById('temperature-input').value);
@@ -302,6 +497,7 @@
             localStorage.setItem('lmsh_accent_color', document.getElementById('accent-color-select').value);
             localStorage.setItem('lmsh_ui_radius', document.getElementById('ui-radius-select').value);
             localStorage.setItem('lmsh_sounds', document.getElementById('sound-effects-toggle').checked);
+            localStorage.setItem('lmsh_stop_on_limit', document.getElementById('stop-on-limit-toggle').checked);
 
             localStorage.setItem('lmsh_prompt_lamirk', document.getElementById('prompt-lamirk').value);
             localStorage.setItem('lmsh_prompt_murzik', document.getElementById('prompt-murzik').value);
@@ -312,7 +508,6 @@
             window.location.href = 'index.html';
         }
 
-        // Экспорт конфигурации
         function exportConfig() {
             const data = {};
             for (let i = 0; i < localStorage.length; i++) {
@@ -329,7 +524,6 @@
             a.click();
         }
 
-        // Импорт конфигурации
         function importConfig(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -351,7 +545,6 @@
             reader.readAsText(file);
         }
 
-        // Сброс системы
         function resetSystem() {
             if (confirm('Внимание! Все локальные данные, ключи и промпты будут удалены. Продолжить?')) {
                 const keysToRemove = [];
