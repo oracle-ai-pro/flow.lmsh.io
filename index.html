@@ -38,6 +38,9 @@
             <div id="chat-list"></div>
 
             <div class="sidebar-bottom">
+                <button class="menu-btn" id="reader-btn" onclick="enterReaderMode()" title="Reader — истории">
+                    <span class="material-symbols-outlined">auto_stories</span> Reader
+                </button>
                 <button class="menu-btn" onclick="window.location.href='settings.html'">
                     <span class="material-symbols-outlined">settings</span> Настройки
                 </button>
@@ -52,6 +55,14 @@
                     <span class="material-symbols-outlined">menu</span>
                 </button>
                 <span class="chat-title" id="current-chat-title">Штаб ЛМСХ</span>
+                <span class="temp-chat-indicator" id="temp-chat-indicator">
+                    <span class="material-symbols-outlined" style="font-size:14px">timelapse</span> Временный
+                </span>
+                <div class="header-right-actions">
+                    <button class="temp-chat-btn" id="temp-chat-btn" onclick="createTempChat()" title="Временный чат (не сохраняется)">
+                        <span class="material-symbols-outlined" style="font-size:20px">add_circle_outline</span>
+                    </button>
+                </div>
             </header>
 
             <div class="chat-panel" id="chat-left">
@@ -79,17 +90,109 @@
                         <span class="material-symbols-outlined">mic</span>
                     </button>
                     <button id="send-btn" class="input-action-btn primary" onclick="handleSendClick()" title="Отправить сообщение">
-    <span class="material-symbols-outlined">send</span>
+    <span class="material-symbols-outlined">arrow_upward</span>
 </button>
                 </div>
             </div>
         </footer>
     </div>
 
+
+    <!-- ========== READER MODE ========== -->
+    <div id="reader-mode" class="reader-mode hidden">
+        <div class="reader-layout">
+            <!-- Reader sidebar -->
+            <aside class="reader-sidebar">
+                <div class="reader-sidebar-header">
+                    <span class="reader-sidebar-title">
+                        <span class="material-symbols-outlined">auto_stories</span> Истории
+                    </span>
+                    <button class="icon-btn" onclick="exitReaderMode()" title="Выйти из Reader">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="reader-sidebar-actions">
+                    <button class="menu-btn" onclick="createNewStory()">
+                        <span class="material-symbols-outlined">add</span> Новая история
+                    </button>
+                </div>
+                <div id="stories-list" class="stories-list"></div>
+            </aside>
+
+            <!-- Reader main -->
+            <div class="reader-main">
+                <!-- Welcome when no story -->
+                <div id="reader-welcome" class="reader-welcome">
+                    <div class="reader-welcome-card">
+                        <div class="welcome-icon">
+                            <span class="material-symbols-outlined">auto_stories</span>
+                        </div>
+                        <h2>Новый Reader</h2>
+                        <p>Выберите историю в боковом меню или создайте новую. Ниже — быстрый старт.</p>
+                        <div class="quick-chips">
+                            <button class="quick-chip" onclick="createNewStory()">
+                                <span class="material-symbols-outlined" style="font-size:16px">add</span> Новая история
+                            </button>
+                            <button class="quick-chip" onclick="openStoriesArchive()">
+                                <span class="material-symbols-outlined" style="font-size:16px">menu_open</span> Открыть архив
+                            </button>
+                            <button class="quick-chip" onclick="showReaderHelp()">
+                                <span class="material-symbols-outlined" style="font-size:16px">school</span> Обучение
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Editor (hidden until story selected) -->
+                <div id="reader-editor" class="reader-editor hidden">
+                    <div class="reader-toolbar">
+                        <button class="icon-btn burger-btn" onclick="toggleReaderSidebar()" title="Список историй" style="display:none" id="reader-menu-btn">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                        <input type="text" id="story-title-input" class="story-title-input" placeholder="Без названия" maxlength="120">
+                        <div class="reader-toolbar-right">
+                            <div class="color-swatches" id="story-color-swatches">
+                                <button type="button" class="color-swatch active" data-color="#3b82f6" style="background:#3b82f6" title="Синий"></button>
+                                <button type="button" class="color-swatch" data-color="#10b981" style="background:#10b981" title="Зелёный"></button>
+                                <button type="button" class="color-swatch" data-color="#8b5cf6" style="background:#8b5cf6" title="Фиолетовый"></button>
+                                <button type="button" class="color-swatch" data-color="#f59e0b" style="background:#f59e0b" title="Янтарный"></button>
+                                <button type="button" class="color-swatch" data-color="#ef4444" style="background:#ef4444" title="Красный"></button>
+                                <button type="button" class="color-swatch" data-color="#ec4899" style="background:#ec4899" title="Розовый"></button>
+                            </div>
+                            <div class="format-btns">
+                                <button type="button" class="icon-btn format-btn" onclick="formatStory('bold')" title="Жирный">
+                                    <span class="material-symbols-outlined">format_bold</span>
+                                </button>
+                                <button type="button" class="icon-btn format-btn" onclick="formatStory('italic')" title="Курсив">
+                                    <span class="material-symbols-outlined">format_italic</span>
+                                </button>
+                                <button type="button" class="icon-btn format-btn" onclick="formatStory('underline')" title="Подчёркнутый">
+                                    <span class="material-symbols-outlined">format_underlined</span>
+                                </button>
+                                <button type="button" class="icon-btn format-btn" onclick="formatStory('insertUnorderedList')" title="Список">
+                                    <span class="material-symbols-outlined">format_list_bulleted</span>
+                                </button>
+                            </div>
+                            <span id="story-save-status" class="story-save-status">Сохранено</span>
+                            <button class="icon-btn" onclick="exitReaderMode()" title="Закрыть Reader">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="story-content" class="story-content" contenteditable="true" data-placeholder="Начните писать историю..."></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Кастомное контекстное меню (ПКМ) -->
     <div id="context-menu" class="context-menu hidden">
         <div class="context-menu-item" onclick="renameCurrentContextMenuChat()">
             <span class="material-symbols-outlined">edit</span> Переименовать
+        </div>
+        <div class="context-menu-item" onclick="shareCurrentContextMenuChat()">
+            <span class="material-symbols-outlined">ios_share</span> Поделиться
+            <span class="novelty-badge" id="share-novelty-badge">Новинка</span>
         </div>
         <div class="context-menu-item danger" onclick="deleteCurrentContextMenuChat()">
             <span class="material-symbols-outlined">delete</span> Удалить
