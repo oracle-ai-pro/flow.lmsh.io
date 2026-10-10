@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>LMSH I/O: TITAN SYSTEM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+    <style>
+        :root { 
+            --bg: #0d0e11; 
+            --card: #17181f; 
+            --text: #e2e2e9; 
+            --m3-primary: #adc6ff; 
+            --m3-surface-variant: #434753; 
+            --m3-accent: #e8bbf1; 
+            --border: #292a33;
+            --danger: #ff8a80;
+            --overlay: rgba(0,0,0,0.65);
+            --novelty: #ff6b6b;
+        }
+        body.light-theme {
+            --bg: #f8f9fc;
+            --card: #ffffff;
+            --text: #1a1b20;
+            --m3-primary: #3f5f94;
+            --m3-surface-variant: #e0e2ec;
+            --border: #c4c6cf;
+            --danger: #d32f2f;
+            --overlay: rgba(0,0,0,0.4);
+            --novelty: #e53935;
+        }
+        * { box-sizing: border-box; }
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0;
+            padding: 16px; 
+            font-family: system-ui, -apple-system, sans-serif; 
+            transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .card { 
+            background: var(--card); 
+            max-width: 720px; 
+            margin: auto; 
+            padding: 20px 24px; 
+            border-radius: 28px; 
+            border: 1px solid var(--border); 
+            transition: background 0.3s, border-color 0.3s;
+            position: relative;
+        }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+        
+        .title-input { 
+            background: transparent; 
+            border: none; 
+            color: var(--m3-primary); 
+            font-size: 18px; 
+            font-weight: 700; 
+            flex: 1;
+            outline: none; 
+            min-width: 0;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        
+        #editor { 
+            min-height: 340px; 
+            outline: none; 
+            padding: 10px 4px; 
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        #editor:empty::before {
+            content: attr(data-placeholder);
+            color: #757780;
+            cursor: text;
+        }
+        
+        /* Tables inside editor */
+        #editor table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            table-layout: fixed;
+        }
+        #editor td, #editor th {
+            border: 1px solid var(--m3-surface-variant);
+            padding: 8px 10px;
+            min-width: 60px;
+            vertical-align: top;
+            word-break: break-word;
+        }
+        #editor th {
+            background: color-mix(in srgb, var(--m3-primary) 15%, transparent);
+            font-weight: 600;
+        }
+        #editor td:focus, #editor th:focus {
+            outline: 2px solid var(--m3-primary);
+            outline-offset: -2px;
+        }
+        
+        /* Bubble toolbar */
+        .bubble-toolbar { 
+            position: absolute; 
+            display: none; 
+            background: var(--card); 
+            border: 1px solid var(--m3-surface-variant); 
+            border-radius: 20px; 
+            padding: 6px; 
+            z-index: 1000; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35); 
+            flex-direction: column; 
+            gap: 4px; 
+        }
+        .toolbar-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+        
+        .bubble-btn { 
+            background: transparent; 
+            border: none; 
+            color: var(--text); 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.2s;
+            position: relative;
+        }
+        .bubble-btn:hover { background: var(--m3-surface-variant); }
+        
+        /* Novelty red dot */
+        .novelty-dot {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--novelty);
+            border-radius: 50%;
+            border: 1.5px solid var(--card);
+            pointer-events: none;
+        }
+        
+        .ai-menu { 
+            display: none; 
+            flex-direction: column; 
+            border-top: 1px solid var(--m3-surface-variant); 
+            padding-top: 5px; 
+            margin-top: 2px;
+        }
+        .ai-menu-item { 
+            background: transparent; 
+            border: none; 
+            color: var(--text); 
+            padding: 8px 12px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            font-size: 13px; 
+            text-align: left;
+            border-radius: 8px;
+        }
+        .ai-menu-item:hover { background: var(--m3-surface-variant); }
+        
+        /* Color palette popup */
+        .color-palette {
+            position: absolute;
+            display: none;
+            background: var(--card);
+            border: 1px solid var(--m3-surface-variant);
+            border-radius: 16px;
+            padding: 10px;
+            z-index: 1100;
+            box-shadow: 0 10px 36px rgba(0,0,0,0.4);
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            width: 170px;
+        }
+        .color-palette.open { display: grid; }
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .color-swatch:hover { transform: scale(1.12); border-color: var(--text); }
+        .color-swatch.reset {
+            background: var(--bg);
+            border: 1px dashed var(--m3-surface-variant);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--text);
+        }
+        
+        /* Side drawer */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay);
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.25s;
+            backdrop-filter: blur(3px);
+        }
+        .drawer-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+        .drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 320px;
+            max-width: 86vw;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            z-index: 3100;
+            transform: translateX(-105%);
+            transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 8px 0 40px rgba(0,0,0,0.25);
+        }
+        .drawer.open { transform: translateX(0); }
+        
+        .drawer-header {
+            padding: 20px 16px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+        }
+        .drawer-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--m3-primary);
+        }
+        .drawer-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .story-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 10px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-bottom: 2px;
+        }
+        .story-item:hover { background: var(--m3-surface-variant); }
+        .story-item.active {
+            background: color-mix(in srgb, var(--m3-primary) 18%, transparent);
+        }
+        .story-name {
+            flex: 1;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+        .story-menu-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+        .story-menu-btn:hover { background: var(--m3-surface-variant); opacity: 1; }
+        
+        .drawer-footer {
+            padding: 12px 16px 20px;
+            border-top: 1px solid var(--border);
+        }
+        .create-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px dashed var(--m3-primary);
+            background: transparent;
+            color: var(--m3-primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .create-btn:hover {
+            background: color-mix(in srgb, var(--m3-primary) 12%, transparent);
+        }
+        
+        /* Context menus */
+        .context-menu {
+            position: fixed;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 6px;
+            z-index: 4000;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+            min-width: 210px;
+            display: none;
+        }
+        .context-menu.open { display: block; }
+        .ctx-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 12px;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 13.5px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+        }
+        .ctx-item:hover { background: var(--m3-surface-variant); }
+        .ctx-item.danger { color: var(--danger); }
+        
+        /* Custom modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            padding: 16px;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+        }
+        .modal-box h3 {
+            margin: 0 0 8px;
+            font-size: 18px;
+            color: var(--m3-primary);
+        }
+        .modal-box p {
+            margin: 0 0 18px;
+            font-size: 14px;
+            line-height: 1.45;
+            color: var(--text);
+            opacity: 0.9;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            margin-bottom: 18px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .modal-btn.primary {
+            background: var(--m3-primary);
+            color: var(--bg);
+        }
+        .modal-btn.secondary {
+            background: var(--m3-surface-variant);
+            color: var(--text);
+        }
+        .modal-btn.danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        
+        /* Export format options */
+        .format-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .format-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: transparent;
+            cursor: pointer;
+            transition: 0.15s;
+            text-align: left;
+        }
+        .format-option:hover { background: var(--m3-surface-variant); }
+        .format-option.selected {
+            border-color: var(--m3-primary);
+            background: color-mix(in srgb, var(--m3-primary) 12%, transparent);
+        }
+        .format-option .ext {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--m3-primary);
+            min-width: 42px;
+        }
+        .format-option .desc {
+            font-size: 12.5px;
+            opacity: 0.8;
+            line-height: 1.3;
+        }
+        
+        /* Novelty tooltip */
+        .novelty-bubble {
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--m3-primary);
+            color: var(--bg);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 12px;
+            border-radius: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+            z-index: 50;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        }
+        .novelty-bubble::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--m3-primary);
+        }
+        .novelty-bubble.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px);
+        }
+        
+        /* Tutorial overlay */
+        .tutorial-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            z-index: 6000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .tutorial-overlay.open { display: flex; }
+        .tutorial-card {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 28px 24px;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .tutorial-card h2 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: var(--m3-primary);
+        }
+        .tutorial-card p {
+            margin: 0 0 22px;
+            font-size: 14.5px;
+            line-height: 1.5;
+            opacity: 0.92;
+        }
+        .tutorial-steps {
+            text-align: left;
+            margin-bottom: 22px;
+            font-size: 13.5px;
+            line-height: 1.6;
+        }
+        .tutorial-steps li { margin-bottom: 6px; }
+        
+        /* Oracle modal */
+        #oracle-modal { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: var(--overlay); 
+            display: none; 
+            z-index: 2000; 
+            align-items: center; 
+            justify-content: center; 
+            backdrop-filter: blur(4px);
+        }
+        .modal-content { 
+            background: var(--card); 
+            padding: 24px; 
+            border-radius: 24px; 
+            border: 1px solid var(--m3-surface-variant); 
+            width: 80%; 
+            max-width: 400px; 
+            text-align: center; 
+        }
+        
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .card { padding: 16px; border-radius: 22px; }
+            .drawer { width: 100%; max-width: 100%; border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <input class="title-input" id="title-input" value="LMSH_Project" spellcheck="false">
+        <div class="header-actions">
+            <button class="bubble-btn" id="history-btn" title="История историй">
+                <span class="material-symbols-rounded">history</span>
+                <div class="novelty-bubble" id="novelty-bubble">Новинка! Теперь вы можете сохранять истории</div>
+            </button>
+            <button class="bubble-btn" id="theme-btn" title="Тема">
+                <span class="material-symbols-rounded">dark_mode</span>
+            </button>
+            <button class="bubble-btn" id="export-btn" title="Экспорт">
+                <span class="material-symbols-rounded">download</span>
+            </button>
+        </div>
+    </div>
+    <div id="editor" contenteditable="true" data-placeholder="Здесь начинается ваша история..."></div>
+</div>
+
+<!-- Bubble toolbar -->
+<div id="bubble-toolbar" class="bubble-toolbar">
+    <div class="toolbar-row">
+        <button class="bubble-btn" data-cmd="bold"><span class="material-symbols-rounded">format_bold</span></button>
+        <button class="bubble-btn" data-cmd="italic"><span class="material-symbols-rounded">format_italic</span></button>
+        <button class="bubble-btn" data-cmd="underline"><span class="material-symbols-rounded">format_underlined</span></button>
+        
+        <button class="bubble-btn" id="color-btn" title="Цвет текста">
+            <span class="material-symbols-rounded">palette</span>
+        </button>
+        <button class="bubble-btn" id="table-btn" title="Вставить таблицу">
+            <span class="material-symbols-rounded">table</span>
+            <span class="novelty-dot" id="table-dot"></span>
+        </button>
+        <button class="bubble-btn" id="ai-toggle-btn"><span class="material-symbols-rounded">settings</span></button>
+    </div>
+    
+    <div id="ai-menu" class="ai-menu">
+        <button class="ai-menu-item" data-title="Кинематографичный Лор" data-msg="Система active: режим блокбастера запущен."><span class="material-symbols-rounded">rocket_launch</span> Кинематографичный Лор</button>
+        <button class="ai-menu-item" data-title="Шифрованная история" data-msg="Данные надежно зашифрованы протоколом ЛМСХ."><span class="material-symbols-rounded">shield</span> Шифрованная История</button>
+        <button class="ai-menu-item" data-title="Эмоции кошек" data-msg="Мурзик передает: все уровни стабильны, мурчание 100%."><span class="material-symbols-rounded">pets</span> Эмоции Кошек</button>
+        <button class="ai-menu-item" data-title="Макс. понятность" data-msg="Хроники упрощены до базового уровня понимания."><span class="material-symbols-rounded">bolt</span> Макс. Понятность</button>
+        <button class="ai-menu-item" data-title="Генератор безумия" data-msg="⚠️ Внимание: логика Оракула отключена. Хаос неизбежен."><span class="material-symbols-rounded">psychology</span> Генератор Безумия</button>
+    </div>
+</div>
+
+<!-- Color palette (positioned dynamically) -->
+<div class="color-palette" id="color-palette">
+    <div class="color-swatch" data-color="#e2e2e9" style="background:#e2e2e9" title="Белый"></div>
+    <div class="color-swatch" data-color="#000000" style="background:#000000" title="Чёрный"></div>
+    <div class="color-swatch" data-color="#ff5252" style="background:#ff5252" title="Красный"></div>
+    <div class="color-swatch" data-color="#ff9800" style="background:#ff9800" title="Оранжевый"></div>
+    <div class="color-swatch" data-color="#ffeb3b" style="background:#ffeb3b" title="Жёлтый"></div>
+    <div class="color-swatch" data-color="#4caf50" style="background:#4caf50" title="Зелёный"></div>
+    <div class="color-swatch" data-color="#2196f3" style="background:#2196f3" title="Синий"></div>
+    <div class="color-swatch" data-color="#9c27b0" style="background:#9c27b0" title="Фиолетовый"></div>
+    <div class="color-swatch" data-color="#e91e63" style="background:#e91e63" title="Розовый"></div>
+    <div class="color-swatch reset" data-color="inherit" title="Сбросить">↺</div>
+</div>
+
+<!-- Side drawer -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<aside class="drawer" id="drawer">
+    <div class="drawer-header">
+        <div class="drawer-title">Истории</div>
+        <button class="bubble-btn" id="close-drawer-btn" style="width:36px;height:36px;">
+            <span class="material-symbols-rounded">close</span>
+        </button>
+    </div>
+    <div class="drawer-list" id="story-list"></div>
+    <div class="drawer-footer">
+        <button class="create-btn" id="create-story-btn">
+            <span class="material-symbols-rounded">add</span>
+            Создать новую Историю
+        </button>
+    </div>
+</aside>
+
+<!-- Context menu (stories) -->
+<div class="context-menu" id="context-menu">
+    <button class="ctx-item" data-action="rename">
+        <span class="material-symbols-rounded" style="font-size:18px">edit</span>
+        Изменить название
+    </button>
+    <button class="ctx-item" data-action="fast">
+        <span class="material-symbols-rounded" style="font-size:18px">bolt</span>
+        Добавить в Fast Assistant
+    </button>
+    <button class="ctx-item danger" data-action="delete">
+        <span class="material-symbols-rounded" style="font-size:18px">delete</span>
+        Удалить историю
+    </button>
+</div>
+
+<!-- Table context menu (ПКМ) -->
+<div class="context-menu" id="table-context-menu">
+    <button class="ctx-item danger" data-action="remove-table">
+        <span class="material-symbols-rounded" style="font-size:18px">delete</span>
+        Убрать таблицу
+    </button>
+</div>
+
+<!-- Custom modals -->
+<div class="modal-overlay" id="rename-modal">
+    <div class="modal-box">
+        <h3>Изменить название</h3>
+        <p>Введите новое название истории</p>
+        <input type="text" class="modal-input" id="rename-input" maxlength="80">
+        <div class="modal-actions">
+            <button class="modal-btn secondary" id="rename-cancel">Отмена</button>
+            <button class="modal-btn primary" id="rename-ok">Сохранить</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="delete-modal">
+    <div class="modal-box">
+        <h3>Удалить историю?</h3>
+        <p>Восстановить будет невозможно. Все данные этой истории исчезнут навсегда.</p>
+        <div class="modal-actions">
+            <button class="modal-btn secondary" id="delete-cancel">Отмена</button>
+            <button class="modal-btn danger" id="delete-ok">Удалить</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="info-modal">
+    <div class="modal-box">
+        <h3 id="info-title">Готово</h3>
+        <p id="info-text"></p>
+        <div class="modal-actions">
+            <button class="modal-btn primary" id="info-ok" style="flex:1">Понятно</button>
+        </div>
+    </div>
+</div>
+
+<!-- Export modal -->
+<div class="modal-overlay" id="export-modal">
+    <div class="modal-box">
+        <h3>Экспорт истории</h3>
+        <p>Выберите формат файла</p>
+        <div class="format-options" id="format-options">
+            <div class="format-option selected" data-ext="md">
+                <div class="ext">.md</div>
+                <div class="desc">Markdown — сохраняет структуру текста</div>
+            </div>
+            <div class="format-option" data-ext="txt">
+                <div class="ext">.txt</div>
+                <div class="desc">Простой текст — цвета и форматирование исчезнут</div>
+            </div>
+            <div class="format-option" data-ext="json">
+                <div class="ext">.json</div>
+                <div class="desc">Полные данные истории (title + content)</div>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="modal-btn secondary" id="export-cancel">Отмена</button>
+            <button class="modal-btn primary" id="export-download">Скачать в виде .md</button>
+        </div>
+    </div>
+</div>
+
+<!-- Tutorial -->
+<div class="tutorial-overlay" id="tutorial">
+    <div class="tutorial-card">
+        <h2>Добро пожаловать в LMSH</h2>
+        <p>Краткий гид по новым возможностям</p>
+        <ul class="tutorial-steps">
+            <li>Нажмите <strong>History</strong> (или свайп справа налево) — откроется список ваших историй.</li>
+            <li>Каждая история автоматически сохраняется в браузере.</li>
+            <li>Три точки → переименовать, отправить в Fast Assistant или удалить.</li>
+            <li>Кнопка <strong>Таблица</strong> добавляет ячейки для сравнений. ПКМ по таблице → «Убрать таблицу».</li>
+            <li>Тема переключается кнопкой в верхней панели.</li>
+        </ul>
+        <button class="modal-btn primary" id="tutorial-close" style="width:100%">Начать писать</button>
+    </div>
+</div>
+
+<!-- Oracle modal -->
+<div id="oracle-modal">
+    <div class="modal-content">
+        <h3 id="modal-title">Оракул</h3>
+        <p id="modal-text" style="margin: 20px 0; color: var(--m3-accent); line-height: 1.4;"></p>
+        <button class="bubble-btn" style="width: 100%; border: 1px solid var(--m3-surface-variant);" id="close-modal-btn">Закрыть</button>
+    </div>
+</div>
+
+<script>
+(() => {
+    // ========== State ==========
+    const STORAGE_KEY = 'lmsh_stories_v1';
+    const CURRENT_KEY = 'lmsh_current_id';
+    const THEME_KEY = 'lmsh_theme';
+    const TUTORIAL_KEY = 'lmsh_tutorial_seen';
+    const NOVELTY_KEY = 'lmsh_novelty_seen';
+    const TABLE_NOVELTY_KEY = 'lmsh_table_novelty_seen';
+
+    let stories = [];
+    let currentId = null;
+    let ctxStoryId = null;
+    let selectedExt = 'md';
+    let activeTable = null; // for table context menu
+
+    // ========== DOM ==========
+    const editor = document.getElementById('editor');
+    const titleInput = document.getElementById('title-input');
+    const toolbar = document.getElementById('bubble-toolbar');
+    const aiMenu = document.getElementById('ai-menu');
+    const colorPalette = document.getElementById('color-palette');
+    const drawer = document.getElementById('drawer');
+    const drawerOverlay = document.getElementById('drawer-overlay');
+    const storyList = document.getElementById('story-list');
+    const contextMenu = document.getElementById('context-menu');
+    const tableContextMenu = document.getElementById('table-context-menu');
+    const noveltyBubble = document.getElementById('novelty-bubble');
+    const tableDot = document.getElementById('table-dot');
+    const exportDownloadBtn = document.getElementById('export-download');
+
+    // ========== Storage ==========
+    function loadStories() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            stories = raw ? JSON.parse(raw) : [];
+        } catch { stories = []; }
+        if (!Array.isArray(stories)) stories = [];
+    }
+    function saveStories() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(stories));
+    }
+    function generateId() {
+        return 's_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    }
+
+    // ========== Core story ops ==========
+    function getCurrentStory() {
+        return stories.find(s => s.id === currentId) || null;
+    }
+    function persistCurrent() {
+        const s = getCurrentStory();
+        if (!s) return;
+        s.title = titleInput.value.trim() || 'Без названия';
+        s.content = editor.innerHTML;
+        s.updated = Date.now();
+        saveStories();
+        renderStoryList();
+    }
+    function loadStory(id) {
+        const s = stories.find(x => x.id === id);
+        if (!s) return;
+        currentId = id;
+        localStorage.setItem(CURRENT_KEY, id);
+        titleInput.value = s.title;
+        editor.innerHTML = s.content || '';
+        renderStoryList();
+        closeDrawer();
+    }
+    function createNewStory(title = 'Новая история') {
+        persistCurrent();
+        const id = generateId();
+        stories.unshift({ id, title, content: '', updated: Date.now() });
+        saveStories();
+        loadStory(id);
+    }
+    function deleteStory(id) {
+        const idx = stories.findIndex(s => s.id === id);
+        if (idx === -1) return;
+        stories.splice(idx, 1);
+        saveStories();
+        if (currentId === id) {
+            if (stories.length) loadStory(stories[0].id);
+            else createNewStory('LMSH_Project');
+        } else renderStoryList();
+    }
+    function renameStory(id, newTitle) {
+        const s = stories.find(x => x.id === id);
+        if (!s) return;
+        s.title = newTitle.trim() || 'Без названия';
+        s.updated = Date.now();
+        saveStories();
+        if (currentId === id) titleInput.value = s.title;
+        renderStoryList();
+    }
+
+    // ========== Render list ==========
+    function renderStoryList() {
+        storyList.innerHTML = '';
+        if (!stories.length) {
+            storyList.innerHTML = '<div style="padding:20px;text-align:center;opacity:0.6;font-size:13px;">Пока нет историй</div>';
+            return;
+        }
+        const sorted = [...stories].sort((a, b) => b.updated - a.updated);
+        sorted.forEach(s => {
+            const item = document.createElement('div');
+            item.className = 'story-item' + (s.id === currentId ? ' active' : '');
+            item.innerHTML = `
+                <div class="story-name">${escapeHtml(s.title)}</div>
+                <button class="story-menu-btn" data-id="${s.id}" title="Меню">
+                    <span class="material-symbols-rounded" style="font-size:20px">more_vert</span>
+                </button>
+            `;
+            item.querySelector('.story-name').addEventListener('click', () => loadStory(s.id));
+            item.querySelector('.story-menu-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                openContextMenu(e.currentTarget, s.id);
+            });
+            storyList.appendChild(item);
+        });
+    }
+    function escapeHtml(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ========== Drawer ==========
+    function openDrawer() {
+        persistCurrent();
+        renderStoryList();
+        drawer.classList.add('open');
+        drawerOverlay.classList.add('open');
+        hideNovelty();
+    }
+    function closeDrawer() {
+        drawer.classList.remove('open');
+        drawerOverlay.classList.remove('open');
+        closeContextMenu();
+    }
+    document.getElementById('history-btn').addEventListener('click', openDrawer);
+    document.getElementById('close-drawer-btn').addEventListener('click', closeDrawer);
+    drawerOverlay.addEventListener('click', closeDrawer);
+    document.getElementById('create-story-btn').addEventListener('click', () => createNewStory());
+
+    // Swipe
+    let touchStartX = 0, touchStartY = 0;
+    document.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }, {passive: true});
+    document.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].screenX - touchStartX;
+        const dy = e.changedTouches[0].screenY - touchStartY;
+        if (dx > 70 && Math.abs(dy) < 50 && touchStartX < 40) openDrawer();
+    }, {passive: true});
+
+    // ========== Context menus ==========
+    function openContextMenu(btn, id) {
+        ctxStoryId = id;
+        const rect = btn.getBoundingClientRect();
+        contextMenu.style.top = Math.min(rect.bottom + 4, window.innerHeight - 180) + 'px';
+        contextMenu.style.left = Math.min(rect.left - 160, window.innerWidth - 230) + 'px';
+        contextMenu.classList.add('open');
+    }
+    function closeContextMenu() {
+        contextMenu.classList.remove('open');
+        ctxStoryId = null;
+    }
+    function closeTableContextMenu() {
+        tableContextMenu.classList.remove('open');
+        activeTable = null;
+    }
+    document.addEventListener('mousedown', e => {
+        if (!contextMenu.contains(e.target)) closeContextMenu();
+        if (!tableContextMenu.contains(e.target)) closeTableContextMenu();
+    });
+
+    contextMenu.addEventListener('click', e => {
+        const btn = e.target.closest('.ctx-item');
+        if (!btn || !ctxStoryId) return;
+        const action = btn.dataset.action;
+        const id = ctxStoryId;
+        closeContextMenu();
+
+        if (action === 'rename') {
+            const s = stories.find(x => x.id === id);
+            document.getElementById('rename-input').value = s ? s.title : '';
+            document.getElementById('rename-modal').dataset.id = id;
+            openModal('rename-modal');
+            document.getElementById('rename-input').focus();
+            document.getElementById('rename-input').select();
+        } else if (action === 'delete') {
+            document.getElementById('delete-modal').dataset.id = id;
+            openModal('delete-modal');
+        } else if (action === 'fast') {
+            const s = stories.find(x => x.id === id);
+            if (!s) return;
+            const url = new URL('https://oracle-ai-pro.github.io/oracle/fast-assistant');
+            url.searchParams.set('title', s.title);
+            url.searchParams.set('content', s.content.replace(/<[^>]+>/g, ' ').slice(0, 1500));
+            window.open(url.toString(), '_blank');
+            showInfo('Отправлено', 'История открыта в Fast Assistant.');
+        }
+    });
+
+    // Table ПКМ
+    editor.addEventListener('contextmenu', e => {
+        const cell = e.target.closest('td, th');
+        if (!cell) return;
+        e.preventDefault();
+        const table = cell.closest('table');
+        if (!table) return;
+        activeTable = table;
+        tableContextMenu.style.top = Math.min(e.clientY, window.innerHeight - 80) + 'px';
+        tableContextMenu.style.left = Math.min(e.clientX, window.innerWidth - 220) + 'px';
+        tableContextMenu.classList.add('open');
+    });
+
+    tableContextMenu.addEventListener('click', e => {
+        const btn = e.target.closest('.ctx-item');
+        if (!btn || !activeTable) return;
+        if (btn.dataset.action === 'remove-table') {
+            activeTable.remove();
+            persistCurrent();
+        }
+        closeTableContextMenu();
+    });
+
+    // ========== Modals ==========
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    document.getElementById('rename-cancel').addEventListener('click', () => closeModal('rename-modal'));
+    document.getElementById('rename-ok').addEventListener('click', () => {
+        const id = document.getElementById('rename-modal').dataset.id;
+        renameStory(id, document.getElementById('rename-input').value);
+        closeModal('rename-modal');
+    });
+    document.getElementById('rename-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('rename-ok').click();
+    });
+
+    document.getElementById('delete-cancel').addEventListener('click', () => closeModal('delete-modal'));
+    document.getElementById('delete-ok').addEventListener('click', () => {
+        deleteStory(document.getElementById('delete-modal').dataset.id);
+        closeModal('delete-modal');
+    });
+
+    document.getElementById('info-ok').addEventListener('click', () => closeModal('info-modal'));
+    function showInfo(title, text) {
+        document.getElementById('info-title').textContent = title;
+        document.getElementById('info-text').textContent = text;
+        openModal('info-modal');
+    }
+
+    // ========== Export modal ==========
+    document.getElementById('export-btn').addEventListener('click', () => {
+        persistCurrent();
+        selectedExt = 'md';
+        document.querySelectorAll('.format-option').forEach(el => {
+            el.classList.toggle('selected', el.dataset.ext === 'md');
+        });
+        exportDownloadBtn.textContent = 'Скачать в виде .md';
+        openModal('export-modal');
+    });
+    document.getElementById('export-cancel').addEventListener('click', () => closeModal('export-modal'));
+
+    document.getElementById('format-options').addEventListener('click', e => {
+        const opt = e.target.closest('.format-option');
+        if (!opt) return;
+        selectedExt = opt.dataset.ext;
+        document.querySelectorAll('.format-option').forEach(el => el.classList.remove('selected'));
+        opt.classList.add('selected');
+        exportDownloadBtn.textContent = `Скачать в виде .${selectedExt}`;
+    });
+
+    exportDownloadBtn.addEventListener('click', () => {
+        const title = titleInput.value.trim() || 'untitled';
+        const fileName = title.replace(/[/\\?%*:|"<>\s]+/g, '_');
+        let content = '';
+        let mime = 'text/plain;charset=utf-8';
+
+        if (selectedExt === 'txt') {
+            content = editor.innerText;
+            mime = 'text/plain;charset=utf-8';
+        } else if (selectedExt === 'md') {
+            content = editor.innerText; // simple md for now
+            mime = 'text/markdown;charset=utf-8';
+        } else if (selectedExt === 'json') {
+            const s = getCurrentStory() || { title, content: editor.innerHTML };
+            content = JSON.stringify({
+                title: s.title,
+                content: s.content,
+                exportedAt: new Date().toISOString()
+            }, null, 2);
+            mime = 'application/json;charset=utf-8';
+        }
+
+        const blob = new Blob([content], { type: mime });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${fileName}.${selectedExt}`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+        closeModal('export-modal');
+    });
+
+    // ========== Theme ==========
+    function applyTheme(isLight) {
+        document.body.classList.toggle('light-theme', isLight);
+        const icon = document.querySelector('#theme-btn .material-symbols-rounded');
+        icon.textContent = isLight ? 'light_mode' : 'dark_mode';
+        localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+    }
+    document.getElementById('theme-btn').addEventListener('click', () => {
+        applyTheme(!document.body.classList.contains('light-theme'));
+    });
+
+    // ========== Novelty bubble ==========
+    function showNovelty() {
+        if (localStorage.getItem(NOVELTY_KEY)) return;
+        noveltyBubble.classList.add('show');
+        setTimeout(hideNovelty, 5500);
+    }
+    function hideNovelty() {
+        noveltyBubble.classList.remove('show');
+        localStorage.setItem(NOVELTY_KEY, '1');
+    }
+
+    // ========== Table novelty ==========
+    function updateTableDot() {
+        if (localStorage.getItem(TABLE_NOVELTY_KEY)) {
+            tableDot.style.display = 'none';
+        } else {
+            tableDot.style.display = 'block';
+        }
+    }
+    document.getElementById('table-btn').addEventListener('mousedown', e => {
+        e.preventDefault();
+        localStorage.setItem(TABLE_NOVELTY_KEY, '1');
+        updateTableDot();
+        insertTable();
+    });
+
+    function insertTable() {
+        const tableHtml = `
+            <table>
+                <tr><th>Сравнение</th><th>Вариант A</th><th>Вариант B</th></tr>
+                <tr><td></td><td></td><td></td></tr>
+                <tr><td></td><td></td><td></td></tr>
+            </table><p><br></p>
+        `;
+        document.execCommand('insertHTML', false, tableHtml);
+        persistCurrent();
+    }
+
+    // ========== Color palette ==========
+    document.getElementById('color-btn').addEventListener('mousedown', e => {
+        e.preventDefault();
+        const btn = e.currentTarget;
+        const rect = btn.getBoundingClientRect();
+        const paletteH = 90;
+        const spaceAbove = rect.top;
+        const spaceBelow = window.innerHeight - rect.bottom;
+
+        colorPalette.classList.add('open');
+        // Prefer below if not enough space above
+        if (spaceAbove < paletteH + 12 && spaceBelow > spaceAbove) {
+            colorPalette.style.top = (rect.bottom + 8 + window.scrollY) + 'px';
+        } else {
+            colorPalette.style.top = (rect.top - paletteH - 8 + window.scrollY) + 'px';
+        }
+        colorPalette.style.left = Math.min(rect.left + window.scrollX, window.innerWidth - 190) + 'px';
+    });
+
+    colorPalette.addEventListener('mousedown', e => {
+        e.preventDefault();
+        const swatch = e.target.closest('.color-swatch');
+        if (!swatch) return;
+        const color = swatch.dataset.color;
+        if (color === 'inherit') {
+            document.execCommand('removeFormat', false, null);
+            // also try to clear color
+            document.execCommand('foreColor', false, 'inherit');
+        } else {
+            document.execCommand('foreColor', false, color);
+        }
+        colorPalette.classList.remove('open');
+    });
+
+    document.addEventListener('mousedown', e => {
+        if (!colorPalette.contains(e.target) && e.target.id !== 'color-btn' && !e.target.closest('#color-btn')) {
+            colorPalette.classList.remove('open');
+        }
+    });
+
+    // ========== Tutorial ==========
+    function showTutorialIfNeeded() {
+        if (localStorage.getItem(TUTORIAL_KEY)) return;
+        document.getElementById('tutorial').classList.add('open');
+    }
+    document.getElementById('tutorial-close').addEventListener('click', () => {
+        document.getElementById('tutorial').classList.remove('open');
+        localStorage.setItem(TUTORIAL_KEY, '1');
+        showNovelty();
+    });
+
+    // ========== Auto-save ==========
+    let saveTimer = null;
+    function scheduleSave() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(persistCurrent, 600);
+    }
+    editor.addEventListener('input', scheduleSave);
+    titleInput.addEventListener('input', scheduleSave);
+
+    // ========== Toolbar positioning ==========
+    function updateToolbar() {
+        const selection = window.getSelection();
+        if (!selection.isCollapsed && editor.contains(selection.anchorNode)) {
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect();
+            toolbar.style.display = 'flex';
+            toolbar.style.top = `${rect.top + window.scrollY - toolbar.offsetHeight - 10}px`;
+            toolbar.style.left = `${rect.left + window.scrollX + (rect.width / 2) - (toolbar.offsetWidth / 2)}px`;
+        }
+    }
+    document.addEventListener('selectionchange', updateToolbar);
+
+    document.addEventListener('mousedown', (e) => {
+        if (!editor.contains(e.target) && !toolbar.contains(e.target) && 
+            !document.getElementById('oracle-modal').contains(e.target) &&
+            !document.querySelector('.modal-overlay.open') &&
+            !colorPalette.contains(e.target)) {
+            toolbar.style.display = 'none';
+            aiMenu.style.display = 'none';
+        }
+    });
+
+    toolbar.addEventListener('mousedown', (e) => {
+        const btn = e.target.closest('.bubble-btn[data-cmd]');
+        if (btn) {
+            e.preventDefault();
+            document.execCommand(btn.getAttribute('data-cmd'), false, null);
+        }
+    });
+
+    document.getElementById('ai-toggle-btn').addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        aiMenu.style.display = (aiMenu.style.display === 'flex') ? 'none' : 'flex';
+        updateToolbar();
+    });
+
+    aiMenu.addEventListener('mousedown', (e) => {
+        const item = e.target.closest('.ai-menu-item');
+        if (item) {
+            e.preventDefault();
+            showOracle(item.getAttribute('data-title'), item.getAttribute('data-msg'));
+        }
+    });
+
+    function showOracle(title, message) {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-text').innerText = message;
+        document.getElementById('oracle-modal').style.display = 'flex';
+    }
+    document.getElementById('close-modal-btn').addEventListener('click', () => {
+        document.getElementById('oracle-modal').style.display = 'none';
+    });
+
+    // ========== Init ==========
+    function init() {
+        const savedTheme = localStorage.getItem(THEME_KEY);
+        applyTheme(savedTheme === 'light');
+
+        loadStories();
+        updateTableDot();
+
+        const savedId = localStorage.getItem(CURRENT_KEY);
+        if (savedId && stories.some(s => s.id === savedId)) {
+            loadStory(savedId);
+        } else if (stories.length) {
+            loadStory(stories[0].id);
+        } else {
+            createNewStory('LMSH_Project');
+        }
+
+        if (!localStorage.getItem(TUTORIAL_KEY)) {
+            showTutorialIfNeeded();
+        } else {
+            showNovelty();
+        }
+    }
+
+    init();
+})();
+</script>
+</body>
+</html>
