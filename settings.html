@@ -272,7 +272,6 @@
                 <span class="check-box"><span class="material-symbols-outlined">check</span></span>
                 <span>Блокировать отправку при 100%</span>
             </label>
-            <button class="menu-btn" style="width:auto;align-self:flex-start;font-size:0.85rem;padding:8px 14px" onclick="resetLimitsManually()">Сбросить счётчик</button>
             <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.5;margin:0">С 1 ноября лимиты по <strong style="color:var(--text-main)">группам нагрузки</strong> (диалог / поиск / медиа / проект).</p>
         </div>
     </div>
@@ -311,6 +310,9 @@
             <p><strong>LMSH Flow 2.6</strong> — локальный штаб для работы с ИИ.</p>
             <p>Чаты, Reader, I.S. Model, публичные ссылки, лимиты по группам.</p>
             <p>Данные только в localStorage браузера.</p>
+            <button class="menu-btn" style="width:auto;padding:10px 16px;font-size:0.9rem;margin-top:8px" onclick="location.href='about.html'">
+                <span class="material-symbols-outlined" style="font-size:18px">info</span> Подробнее о Flow Assistant
+            </button>
             <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
                 <button class="menu-btn" style="width:auto;padding:8px 14px;font-size:0.85rem" onclick="exportConfig()">Экспорт</button>
                 <button class="menu-btn" style="width:auto;padding:8px 14px;font-size:0.85rem" onclick="document.getElementById('import-file').click()">Импорт</button>
@@ -421,10 +423,6 @@ function renderLimitsData() {
     document.getElementById('files-max-count').innerText = LIMIT_DEFAULTS.maxFiles;
     document.getElementById('files-limit-percent').innerText = fp+'%';
     const fb = document.getElementById('files-bar-fill'); fb.style.width = fp+'%'; fb.classList.toggle('danger', fp>=100);
-}
-function resetLimitsManually() {
-    localStorage.setItem('lmsh_usage_limits', JSON.stringify({ textCount:0, filesCount:0, resetTime: Date.now()+LIMIT_DEFAULTS.cooldownMs }));
-    renderLimitsData(); showAlert('Штаб', 'Счётчики обнулены');
 }
 function renderPublicLinks() {
     const list = document.getElementById('public-links-list');
