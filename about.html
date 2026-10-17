@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О Flow Assistant | LMSH Flow 2.6</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Material+Symbols+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            overflow-y: auto !important;
+            height: auto !important;
+            min-height: 100dvh;
+            background: var(--bg-primary);
+        }
+        .about-page {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 24px 16px 80px;
+        }
+        .about-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+        .about-top h1 {
+            flex: 1;
+            font-size: 1.35rem;
+            color: var(--text-main);
+            margin: 0;
+        }
+        .hero {
+            text-align: center;
+            padding: 36px 24px;
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: var(--ui-radius, 20px);
+            margin-bottom: 20px;
+        }
+        .hero-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 16px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+        .hero-icon .material-symbols-outlined { font-size: 36px; }
+        .hero h2 {
+            font-size: 1.5rem;
+            color: var(--text-main);
+            margin: 0 0 8px;
+        }
+        .hero .version {
+            display: inline-block;
+            background: rgba(59,130,246,0.15);
+            color: var(--accent-color);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 999px;
+            margin-bottom: 12px;
+        }
+        .hero p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.55;
+            margin: 0;
+            max-width: 420px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .about-card {
+            background: var(--bg-sidebar);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px 22px;
+            margin-bottom: 14px;
+        }
+        .about-card h3 {
+            font-size: 1rem;
+            color: var(--text-main);
+            margin: 0 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .about-card h3 .material-symbols-outlined {
+            font-size: 22px;
+            color: var(--accent-color);
+        }
+        .about-card p, .about-card li {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 0 0 8px;
+        }
+        .about-card ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+        .about-card li { margin-bottom: 6px; }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media (max-width: 520px) {
+            .feature-grid { grid-template-columns: 1fr; }
+        }
+        .feature-chip {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+        }
+        [data-theme="light"] .feature-chip {
+            background: rgba(0,0,0,0.03);
+        }
+        .feature-chip .material-symbols-outlined {
+            font-size: 20px;
+            color: var(--accent-color);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .feature-chip span:last-child {
+            font-size: 0.85rem;
+            color: var(--text-main);
+            line-height: 1.4;
+        }
+        .feature-chip small {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            margin-top: 2px;
+        }
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .meta-tag {
+            font-size: 0.78rem;
+            padding: 5px 10px;
+            border-radius: 999px;
+            background: var(--bg-input);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+        }
+        .footer-note {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 28px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+<div class="about-page">
+    <div class="about-top">
+        <button class="icon-btn" onclick="history.length > 1 ? history.back() : location.href='index.html'" title="Назад">
+            <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <h1>О проекте</h1>
+        <button class="menu-btn" onclick="location.href='index.html'" style="width:auto;padding:8px 14px;font-size:0.85rem">
+            <span class="material-symbols-outlined" style="font-size:18px">home</span> Штаб
+        </button>
+    </div>
+
+    <div class="hero">
+        <div class="hero-icon">
+            <span class="material-symbols-outlined">auto_awesome</span>
+        </div>
+        <div class="version">v 2.6</div>
+        <h2>Flow Assistant</h2>
+        <p>Локальный штаб ЛМСХ для работы с нейросетями. Чаты, файлы, поиск в интернете, истории и настройки — всё в браузере, без сервера.</p>
+    </div>
+
+    <div class="about-card">
+        <h3><span class="material-symbols-outlined">info</span> Что это</h3>
+        <p><strong style="color:var(--text-main)">LMSH Flow</strong> (Flow Assistant) — клиент для ИИ, заточенный под Штаб ЛМСХ. Ключи API и история хранятся только у вас в <code style="color:var(--accent-color)">localStorage</code>. Нет облачного аккаунта Штаба — данные не уходят на сторонний бэкенд приложения.</p>
+    </div>
+
+    <div class="about-card">
+        <h3><span class="material-symbols-outlined">widgets</span> Возможности</h3>
+        <div class="feature-grid">
+            <div class="feature-chip">
+                <span class="material-symbols-outlined">chat</span>
+                <span>Чаты и история<small>Несколько диалогов, поиск по названиям</small></span>
+            </div>
+            <div class="feature-chip">
+                <span class="material-symbols-outlined">travel_explore</span>
+                <span>I.S. Model<small>Поиск в интернете (Google Grounding)</small></span>
+            </div>
+            <div class="feature-chip">
+                <span class="material-symbols-outlined">auto_stories</span>
+                <span>Reader<small>Редактор историй с автосохранением</small></span>
+            </div>
+            <div class="feature-chip">
+                <span class="material-symbols-outlined">timelapse</span>
+                <span>Временный чат<small>Без записи в историю</small></span>
+            </div>
+            <div class="feature-chip">
+                <span class="material-symbols-outlined">attach_file</span>
+                <span>Файлы<small>Картинки, код, документы</small></span>
+            </div>
+            <div class="feature-chip">
+                <span class="material-symbols-outlined">link</span>
+                <span>Публичные ссылки<small>Поделиться чатом (локальный код)</small></span>
+            </div>
+            <div class="feature-chip">
+                <span class="material-symbols-outlined">bar_chart</span>
+                <span>Лимиты<small>Группы нагрузки с 1 ноября</small></span>
+            </div>
+            <div class="feature-chip">
+                <span class="material-symbols-outlined">palette</span>
+                <span>Темы<small>Тёмная / светлая, акценты</small></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="about-card">
+        <h3><span class="material-symbols-outlined">hub</span> Модели</h3>
+        <p>Основной провайдер — <strong style="color:var(--text-main)">Google Gemini</strong> (API Studio). В настройках заложены слоты под Claude, ChatGPT и Grok; сейчас в ядре реализован запрос к Gemini.</p>
+        <div class="meta-row">
+            <span class="meta-tag">gemini-2.5-flash</span>
+            <span class="meta-tag">gemini-2.5-pro</span>
+            <span class="meta-tag">gemini-2.0-flash</span>
+            <span class="meta-tag">gemini-3.x</span>
+        </div>
+    </div>
+
+    <div class="about-card">
+        <h3><span class="material-symbols-outlined">security</span> Приватность</h3>
+        <ul>
+            <li>API-ключ хранится только в браузере.</li>
+            <li>Запросы уходят напрямую к API провайдера (например, Google).</li>
+            <li>Нет обязательной регистрации в Flow.</li>
+            <li>Сброс системы в настройках удаляет все локальные данные <code style="color:var(--accent-color)">lmsh_*</code>.</li>
+        </ul>
+    </div>
+
+    <div class="about-card">
+        <h3><span class="material-symbols-outlined">groups</span> Штаб ЛМСХ</h3>
+        <p>Проект заточен под роли Штаба (Ламирк, Мурзик, Снежинка, Хахми) и персональный контекст. Промпты и «память» настраиваются во вкладке «О вас».</p>
+    </div>
+
+    <div class="about-card">
+        <h3><span class="material-symbols-outlined">handshake</span> Лицензия и ответственность</h3>
+        <p>Flow Assistant — локальный инструмент. Использование API подчиняется правилам выбранного провайдера. Авторы Штаба не хранят ваши ключи и переписку на своих серверах в рамках этого клиента.</p>
+    </div>
+
+    <p class="footer-note">
+        LMSH Flow 2.6 · Flow Assistant<br>
+        Сделано для Штаба ЛМСХ
+    </p>
+</div>
+<script>
+    (function () {
+        const accent = localStorage.getItem('lmsh_accent_color');
+        if (accent) document.documentElement.style.setProperty('--accent-color', accent);
+        const radius = localStorage.getItem('lmsh_ui_radius');
+        if (radius) document.documentElement.style.setProperty('--ui-radius', radius);
+        const theme = localStorage.getItem('lmsh_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+</script>
+</body>
+</html>
