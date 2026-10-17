@@ -73,7 +73,6 @@
         <!-- Поле ввода -->
         <footer class="master-input-wrapper">
             <div id="file-previews" class="file-previews-container"></div>
-
             <div class="master-input">
                 <input type="file" id="file-input" style="display: none;" multiple 
                        accept="image/*,video/*,.js,.ts,.py,.html,.css,.json,.c,.cpp,.cs,.java,.php,.rb,.go,.rs,.sql,.pdf,audio/*" 
@@ -86,6 +85,27 @@
                 <textarea id="master-input" rows="1" placeholder="Введите запрос..." onkeydown="handleKeyDown(event)" oninput="autoResizeTextarea(this)"></textarea>
 
                 <div class="input-right-actions">
+                    <div class="custom-select model-picker" id="model-picker" data-value="gemini-2.5-flash">
+                        <div class="custom-select-trigger model-picker-trigger" title="Модель и I.S. поиск">
+                            <span class="material-symbols-outlined" style="font-size:16px;opacity:0.75">smart_toy</span>
+                            <span class="custom-select-value">Модели</span>
+                            <span class="material-symbols-outlined custom-select-arrow">expand_more</span>
+                        </div>
+                        <div class="custom-select-options model-picker-options">
+                            <div class="custom-select-option" data-value="gemini-2.5-flash">Gemini 2.5 Flash</div>
+                            <div class="custom-select-option" data-value="gemini-2.5-pro">Gemini 2.5 Pro</div>
+                            <div class="custom-select-option" data-value="gemini-2.0-flash">Gemini 2.0 Flash</div>
+                            <div class="custom-select-option" data-value="gemini-3.6-flash">Gemini 3.6 Flash</div>
+                            <div class="custom-select-option" data-value="gemini-3.8-flash">Gemini 3.8 Flash</div>
+                            <div class="custom-select-option" data-value="gemini-1.5-pro">Gemini 1.5 Pro</div>
+                            <div class="model-picker-divider"></div>
+                            <label class="model-picker-is" id="model-picker-is-toggle">
+                                <input type="checkbox" id="model-is-checkbox">
+                                <span class="check-box"><span class="material-symbols-outlined">check</span></span>
+                                <span>I.S. поиск <span class="novelty-badge" style="font-size:0.55rem;padding:1px 5px">IS</span></span>
+                            </label>
+                        </div>
+                    </div>
                     <button id="mic-btn" class="input-action-btn" onclick="toggleSpeechRecognition()" title="Голосовой ввод">
                         <span class="material-symbols-outlined">mic</span>
                     </button>
