@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initMobileLayout();
     showLimitsAgreementModal();
     updateReaderNoveltyBadge();
+    initModelPickers();
 });
 
 function initMobileLayout() {
@@ -1628,3 +1629,78 @@ function exitTempChatMode() {
 }
 
 // При переключении на обычный чат — сбрасываем temp
+
+
+// ==========================================
+// Model picker — в поле ввода, «Модели» + I.S.
+// ==========================================
+const MODEL_LABELS = {
+    'gemini-2.5-flash': 'Gemini 2.5 Flash',
+    'gemini-2.5-pro': 'Gemini 2.5 Pro',
+    'gemini-2.0-flash': 'Gemini 2.0 Flash',
+    'gemini-3.6-flash': 'Gemini 3.6 Flash',
+    'gemini-3.8-flash': 'Gemini 3.8 Flash',
+    'gemini-1.5-pro': 'Gemini 1.5 Pro'
+};
+
+function initModelPickers() {
+    const picker = document.getElementById('model-picker');
+    if (!picker) return;
+
+    const saved = localStorage.getItem(KEYS.model) || 'gemini-2.5-flash';
+    setModelPickerValue(picker, saved);
+
+    // I.S. checkbox
+    const isCb = document.getElementById('model-is-checkbox');
+    if (isCb) {
+        isCb.checked = localStorage.getItem(KEYS.searchMode) === 'true';
+        isCb.addEventListener('change', () => {
+            localStorage.setItem(KEYS.searchMode, isCb.checked ? 'true' : 'false');
+            updateSearchModeIndicator();
+            if (typeof showToast === 'function') {
+                showToast(isCb.checked ? 'I.S. поиск включён' : 'I.S. поиск выключен', 'info', 2000);
+            }
+        });
+        // don't close dropdown when clicking the label
+        document.getElementById('model-picker-is-toggle')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+
+    const trigger = picker.querySelector('.model-picker-trigger');
+    if (trigger && !trigger.dataset.bound) {
+        trigger.dataset.bound = '1';
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            picker.classList.toggle('open');
+        });
+    }
+
+    picker.querySelectorAll('.custom-select-option').forEach(opt => {
+        opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const val = opt.dataset.value;
+            localStorage.setItem(KEYS.model, val);
+            setModelPickerValue(picker, val);
+            picker.classList.remove('open');
+            if (typeof showToast === 'function') {
+                showToast('Модель: ' + (MODEL_LABELS[val] || val), 'info', 2000);
+            }
+        });
+    });
+
+    document.addEventListener('click', () => {
+        picker.classList.remove('open');
+    });
+}
+
+function setModelPickerValue(picker, value) {
+    if (!picker) return;
+    picker.dataset.value = value;
+    // Компактная подпись на кнопке всегда «Модели»
+    const valEl = picker.querySelector('.custom-select-value');
+    if (valEl) valEl.textContent = 'Модели';
+    picker.querySelectorAll('.custom-select-option').forEach(o => {
+        o.classList.toggle('selected', o.dataset.value === value);
+    });
+}
