@@ -19,6 +19,7 @@
             --accent-light: #e8def8;
             --border-color: #e7e0ec;
             --active-red: #b3261e;
+            --active-green: #10b981;
             --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             --modal-bg: rgba(0, 0, 0, 0.5);
         }
@@ -33,6 +34,7 @@
                 --accent-light: #4a4458;
                 --border-color: #49454f;
                 --active-red: #f2b8b5;
+                --active-green: #34d399;
                 --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
                 --modal-bg: rgba(0, 0, 0, 0.75);
             }
@@ -45,21 +47,53 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); color: var(--text-primary); padding: 20px; display: flex; flex-direction: column; align-items: center; transition: background 0.3s, color 0.3s; }
 
-        .controls { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        /* Глобальная новинка: Виджет Штаба в шапке */
+        .hq-global-banner { width: 100%; max-width: 400px; background: linear-gradient(135deg, var(--accent-color), var(--accent-light)); color: var(--card-bg); padding: 12px 16px; border-radius: 20px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--card-shadow); }
+        .hq-global-banner .hq-info { display: flex; align-items: center; gap: 10px; }
+        .hq-global-banner .hq-badge { background: var(--active-red); color: white; font-size: 0.65em; padding: 2px 6px; border-radius: 8px; font-weight: bold; text-transform: uppercase; }
+
+        .controls { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; }
         .main-btn { padding: 10px 16px; border-radius: 20px; border: 1px solid var(--border-color); cursor: pointer; font-weight: 600; background: var(--card-bg); color: var(--text-primary); box-shadow: var(--card-shadow); transition: 0.2s; display: flex; align-items: center; gap: 6px; font-size: 0.85em; }
         .main-btn:hover { background: var(--accent-light); }
         .req-auth-btn { background: var(--accent-color); color: white; border: none; display: none; }
 
-        .category-title { width: 100%; max-width: 400px; margin: 20px 0 8px 0; font-size: 1.05em; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: space-between; }
+        /* Кастомный селект сортировки */
+        .filter-bar { width: 100%; max-width: 400px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; background: var(--card-bg); padding: 8px 14px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); }
+        .filter-dropdown { position: relative; display: inline-block; }
+        .filter-dropdown-btn { background: transparent; border: none; color: var(--text-primary); font-weight: 600; font-size: 0.85em; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .filter-menu { display: none; position: absolute; right: 0; background: var(--card-bg); min-width: 160px; box-shadow: var(--card-shadow); border: 1px solid var(--border-color); border-radius: 14px; z-index: 10; overflow: hidden; margin-top: 6px; }
+        .filter-menu.show { display: block; }
+        .filter-item { padding: 10px 14px; font-size: 0.85em; cursor: pointer; display: flex; align-items: center; gap: 8px; color: var(--text-primary); transition: background 0.2s; }
+        .filter-item:hover { background: var(--accent-light); }
+
+        .category-title { width: 100%; max-width: 400px; margin: 15px 0 8px 0; font-size: 1.05em; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: space-between; }
         
-        .card { background: var(--card-bg); padding: 18px; border-radius: 20px; width: 100%; max-width: 400px; margin: 8px 0; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); transition: transform 0.2s, border-color 0.2s; cursor: pointer; }
+        /* Карточки с круглыми иконками и цветными обводками */
+        .card { background: var(--card-bg); padding: 18px; border-radius: 20px; width: 100%; max-width: 400px; margin: 8px 0; border: 1px solid var(--border-color); box-shadow: var(--card-shadow); transition: transform 0.2s, border-color 0.2s; cursor: pointer; position: relative; }
         .card:hover { transform: translateY(-2px); }
         .card.active-notify { border: 2px solid var(--accent-color); background: var(--accent-light); }
+        
+        /* Цветные рамки по статусам */
+        .card.status-active { border-left: 5px solid var(--active-green); }
+        .card.status-upcoming { border-left: 5px solid var(--text-secondary); }
+        .card.status-archive { border-left: 5px solid var(--active-red); opacity: 0.85; }
 
         .card-header { display: flex; justify-content: space-between; align-items: center; }
+        .event-title-area { display: flex; align-items: center; gap: 10px; }
+        
+        /* Круглая иконка события */
+        .event-circle-icon { width: 42px; height: 42px; border-radius: 50%; background: var(--accent-light); color: var(--accent-color); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+        .event-circle-icon img { width: 100%; height: 100%; object-fit: cover; }
+
         .material-symbols-outlined { font-size: 26px; cursor: pointer; color: var(--text-secondary); transition: 0.3s; }
         .material-symbols-outlined.active { color: var(--active-red); font-variation-settings: 'FILL' 1; }
         .material-symbols-outlined.subscribed { color: var(--accent-color); font-variation-settings: 'FILL' 1; }
+        .material-symbols-outlined.liked-icon { color: var(--active-red); font-variation-settings: 'FILL' 1; }
+
+        .card-actions-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-color); font-size: 0.8em; }
+        .action-icon-group { display: flex; gap: 12px; align-items: center; }
+        .hide-card-btn { color: var(--text-secondary); cursor: pointer; background: transparent; border: none; font-size: 0.75em; display: flex; align-items: center; gap: 2px; }
+        .hide-card-btn:hover { color: var(--active-red); }
 
         .group-box { border-left: 4px solid var(--group-color, var(--accent-color)); padding-left: 12px; margin-bottom: 12px; }
 
@@ -81,6 +115,18 @@
 </head>
 <body>
 
+    <!-- Глобальная Новинка: Интерактивный мини-виджет Штаба -->
+    <div class="hq-global-banner">
+        <div class="hq-info">
+            <span class="material-symbols-outlined" style="color: var(--card-bg);">hq</span>
+            <div>
+                <strong style="font-size: 0.9em; display: block;">Штаб ЛМСХ на связи</strong>
+                <span style="font-size: 0.75em; opacity: 0.9;">Все системы активны и пиксели на месте</span>
+            </div>
+        </div>
+        <div class="hq-badge">Новинка</div>
+    </div>
+
     <button id="requestPermissionBtn" class="main-btn req-auth-btn" onclick="requestNotificationPermission()">
         <span class="material-symbols-outlined">notifications</span> Разрешить уведомления
     </button>
@@ -91,7 +137,22 @@
         <button class="main-btn" onclick="openGuideModal()"><span class="material-symbols-outlined">help</span> Как настроить пуши</button>
     </div>
 
-    <div class="category-title">📅 События</div>
+    <div class="category-title">
+        <span>📅 События</span>
+        <!-- Кастомный выпадающий список сортировки с иконкой фильтра -->
+        <div class="filter-dropdown">
+            <button class="filter-dropdown-btn" onclick="toggleFilterMenu()">
+                <span class="material-symbols-outlined" style="font-size: 20px;">filter_list</span> <span id="currentFilterLabel">Все</span>
+            </button>
+            <div id="filterMenu" class="filter-menu">
+                <div class="filter-item" onclick="setFilter('all')"><span class="material-symbols-outlined" style="font-size: 16px;">list</span> Все</div>
+                <div class="filter-item" onclick="setFilter('upcoming')"><span class="material-symbols-outlined" style="font-size: 16px;">schedule</span> Предстоящие</div>
+                <div class="filter-item" onclick="setFilter('active')"><span class="material-symbols-outlined" style="font-size: 16px;">bolt</span> Активные</div>
+                <div class="filter-item" onclick="setFilter('archive')"><span class="material-symbols-outlined" style="font-size: 16px;">archive</span> Архив</div>
+            </div>
+        </div>
+    </div>
+    
     <div id="events-container"></div>
 
     <div class="category-title">
@@ -128,10 +189,9 @@
 
             <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between;">
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <span class="material-symbols-outlined" id="likeBtn" onclick="toggleEventLike()">favorite</span>
                     <a id="aiPrivacyLink" href="#" target="_blank" style="font-size: 0.75em; color: var(--text-secondary);">Конфиденциальность ИИ</a>
                 </div>
-                <a id="modalActionBtn" href="#" class="main-btn" style="background: var(--accent-color); color: white; text-decoration: none;">Перейти</a>
+                <a id="modalActionBtn" href="#" target="_blank" class="main-btn" style="background: var(--accent-color); color: white; text-decoration: none;">Перейти</a>
             </div>
         </div>
     </div>
@@ -202,72 +262,120 @@
             </div>
         </div>
     </div>
-<!-- Модальное окно #aiPrivacyModal -->
-<div class="modal-overlay" id="aiPrivacyModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <div>
-                <span style="font-size: 0.75em; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Event Overview: AI in Action Showcase</span>
-                <h3>FutureSync: AI & Immersive Experiences</h3>
+
+    <!-- Модальное окно #aiPrivacyModal -->
+    <div class="modal-overlay" id="aiPrivacyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <span style="font-size: 0.75em; color: var(--accent-color); font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; display: block;">Event Overview: AI in Action Showcase</span>
+                    <h3>FutureSync: AI & Immersive Experiences</h3>
+                </div>
+                <span class="material-symbols-outlined" onclick="closeModal('aiPrivacyModal')">close</span>
             </div>
-            <span class="material-symbols-outlined" onclick="closeModal('aiPrivacyModal')">close</span>
-        </div>
-        
-        <div style="font-size: 0.85em; background: var(--bg-color); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
-            <strong>Date & Format:</strong> Hybrid Global Event (Online & Interactive Hubs)
-        </div>
+            
+            <div style="font-size: 0.85em; background: var(--bg-color); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
+                <strong>Date & Format:</strong> Hybrid Global Event (Online & Interactive Hubs)
+            </div>
 
-        <div>
-            <strong style="font-size: 0.95em;">Core Concept</strong>
-            <p style="font-size: 0.88em; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
-                A dynamic event exploring how artificial intelligence is transforming modern digital experiences, community interaction, and automated workflows.
-            </p>
-        </div>
+            <div>
+                <strong style="font-size: 0.95em;">Core Concept</strong>
+                <p style="font-size: 0.88em; color: var(--text-secondary); margin-top: 4px; line-height: 1.4;">
+                    A dynamic event exploring how artificial intelligence is transforming modern digital experiences, community interaction, and automated workflows.
+                </p>
+            </div>
 
-        <div>
-            <strong style="font-size: 0.95em; color: var(--accent-color);">Role of AI in the Event</strong>
-            <ul style="font-size: 0.85em; color: var(--text-secondary); padding-left: 18px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
-                <li><strong>Intelligent Personalization:</strong> AI algorithms analyze participant preferences to curate customized schedules and recommend relevant panel discussions.</li>
-                <li><strong>Real-Time Analytics:</strong> Machine learning models track live engagement metrics to dynamically adapt event content and interactive voting outcomes.</li>
-                <li><strong>Automated Assistance:</strong> Smart virtual assistants provide instant multi-language support, answering attendee queries and guiding them through the event ecosystem.</li>
-                <li><strong>Content Generation:</strong> AI-powered tools assist in creating immersive visual assets, dynamic summaries, and automated highlights for global participants.</li>
-            </ul>
+            <div>
+                <strong style="font-size: 0.95em; color: var(--accent-color);">Role of AI in the Event</strong>
+                <ul style="font-size: 0.85em; color: var(--text-secondary); padding-left: 18px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px;">
+                    <li><strong>Intelligent Personalization:</strong> AI algorithms analyze participant preferences to curate customized schedules and recommend relevant panel discussions.</li>
+                    <li><strong>Real-Time Analytics:</strong> Machine learning models track live engagement metrics to dynamically adapt event content and interactive voting outcomes.</li>
+                    <li><strong>Automated Assistance:</strong> Smart virtual assistants provide instant multi-language support, answering attendee queries and guiding them through the event ecosystem.</li>
+                    <li><strong>Content Generation:</strong> AI-powered tools assist in creating immersive visual assets, dynamic summaries, and automated highlights for global participants.</li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
+
     <script>
         let currentEventData = null;
         let lmshTimerId = null;
+        let allEventsGlobal = [];
+        let currentFilter = 'all';
 
         async function loadEvents() {
             try {
                 const res = await fetch('events.json');
                 const data = await res.json();
-                // Безопасное извлечение массива (поддерживает и [{...}], и { events: [...] })
-                const eventsList = Array.isArray(data) ? data : (data.events || []);
-                renderEvents(eventsList);
+                allEventsGlobal = Array.isArray(data) ? data : (data.events || []);
+                renderEvents(allEventsGlobal);
             } catch (e) {
                 console.error("Ошибка загрузки events.json", e);
             }
+        }
+
+        // Определение категории события для сортировки
+        function getEventStatus(ev) {
+            const now = new Date();
+            const start = ev.dates && ev.dates.start ? new Date(ev.dates.start) : null;
+            const end = ev.dates && ev.dates.end ? new Date(ev.dates.end) : null;
+
+            if (start && start > now) return 'upcoming';
+            if (end && end < now) {
+                // Если закончилось менее чем 3 дня назад — считаем архивом/недавно завершенным
+                const diffDays = (now - end) / (1000 * 60 * 60 * 24);
+                if (diffDays <= 3) return 'archive';
+                return 'archive';
+            }
+            return 'active';
         }
 
         function renderEvents(events) {
             const container = document.getElementById('events-container');
             container.innerHTML = '';
 
-            events.forEach(ev => {
+            const hiddenEvents = JSON.parse(localStorage.getItem('hidden_events') || '[]');
+
+            const filtered = events.filter(ev => {
+                if (hiddenEvents.includes(ev.id)) return false;
+                const status = getEventStatus(ev);
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'upcoming') return status === 'upcoming';
+                if (currentFilter === 'active') return status === 'active';
+                if (currentFilter === 'archive') return status === 'archive';
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-secondary); font-size: 0.9em; padding: 20px;">Нет событий в этой категории</div>`;
+                return;
+            }
+
+            filtered.forEach(ev => {
                 const isSubbed = localStorage.getItem('sub_event_' + ev.id) === 'true';
+                const isLiked = localStorage.getItem('like_event_' + ev.id) === 'true';
+                const status = getEventStatus(ev);
+                
                 const card = document.createElement('div');
-                card.className = `card ${isSubbed ? 'active-notify' : ''}`;
+                card.className = `card ${isSubbed ? 'active-notify' : ''} status-${status}`;
                 
                 const shortDesc = ev.description ? (ev.description.short || ev.description) : '';
                 const displayEnd = ev.dates ? ev.dates.display_end : '';
                 const endOriginal = ev.dates ? ev.dates.end_original : '';
                 const isExtended = ev.dates ? ev.dates.extended : false;
+                
+                // Иконка или круглая гифка/картинка
+                let iconHtml = `<span class="material-symbols-outlined">${ev.badge || 'event'}</span>`;
+                if (ev.has_image && ev.image) {
+                    iconHtml = `<img src="${ev.image}" alt="icon">`;
+                }
 
                 card.innerHTML = `
                     <div class="card-header">
-                        <strong style="color: var(--accent-color);">${ev.title || ev.name}</strong>
+                        <div class="event-title-area">
+                            <div class="event-circle-icon">${iconHtml}</div>
+                            <strong style="color: var(--accent-color);">${ev.title || ev.name}</strong>
+                        </div>
                         <span class="material-symbols-outlined ${isSubbed ? 'subscribed' : ''}" 
                               onclick="toggleEventSub(event, '${ev.id}')">
                               ${isSubbed ? 'notifications_active' : 'notifications'}
@@ -278,15 +386,62 @@
                         Заканчивается: ${isExtended ? `<span class="date-strike">${endOriginal}</span>` : ''} 
                         <span class="date-new">${displayEnd}</span>
                     </div>
+                    <div class="card-actions-row">
+                        <div class="action-icon-group">
+                            <span class="material-symbols-outlined ${isLiked ? 'liked-icon' : ''}" onclick="toggleCardLike(event, '${ev.id}')" style="font-size: 22px;">favorite</span>
+                        </div>
+                        <button class="hide-card-btn" onclick="hideEventCard(event, '${ev.id}')">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">visibility_off</span> Скрыть
+                        </button>
+                    </div>
                 `;
 
                 card.onclick = (e) => {
-                    if (!e.target.classList.contains('material-symbols-outlined')) {
+                    if (!e.target.closest('.material-symbols-outlined') && !e.target.closest('button')) {
                         openEventModal(ev);
                     }
                 };
                 container.appendChild(card);
             });
+        }
+
+        // Фильтрация событий
+        function toggleFilterMenu() {
+            document.getElementById('filterMenu').classList.toggle('show');
+        }
+
+        function setFilter(type) {
+            currentFilter = type;
+            const labels = { all: 'Все', upcoming: 'Предстоящие', active: 'Активные', archive: 'Архив' };
+            document.getElementById('currentFilterLabel').innerText = labels[type];
+            document.getElementById('filterMenu').classList.remove('show');
+            renderEvents(allEventsGlobal);
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.closest('.filter-dropdown')) {
+                document.getElementById('filterMenu').classList.remove('show');
+            }
+        }
+
+        // Пред-лайк на карточке
+        function toggleCardLike(e, id) {
+            e.stopPropagation();
+            const key = 'like_event_' + id;
+            const current = localStorage.getItem(key) === 'true';
+            localStorage.setItem(key, (!current).toString());
+            renderEvents(allEventsGlobal);
+        }
+
+        // Скрыть карточку до перезахода
+        function hideEventCard(e, id) {
+            e.stopPropagation();
+            const hiddenEvents = JSON.parse(localStorage.getItem('hidden_events') || '[]');
+            if (!hiddenEvents.includes(id)) {
+                hiddenEvents.push(id);
+                localStorage.setItem('hidden_events', JSON.stringify(hiddenEvents));
+            }
+            renderEvents(allEventsGlobal);
         }
 
         function renderGroups() {
@@ -352,7 +507,6 @@
             }, delayMs);
         }
 
-        // Восстановление таймера при перезагрузке страницы
         function restoreLmshTimer() {
             if (localStorage.getItem('notify_lmsh') === 'true') {
                 const targetTime = parseInt(localStorage.getItem('alarm_target_timestamp'), 10);
@@ -361,7 +515,6 @@
                 if (targetTime && targetTime > now) {
                     scheduleLmshTimer(targetTime - now);
                 } else {
-                    // Время прошло, пока страница была закрыта
                     localStorage.setItem('notify_lmsh', 'false');
                     localStorage.removeItem('alarm_lmsh');
                     localStorage.removeItem('alarm_target_timestamp');
@@ -385,7 +538,6 @@
             currentEventData = ev;
             document.getElementById('modalTitle').innerText = ev.title || ev.name;
             
-            // Безопасное формирование описания
             let fullDesc = '';
             if (ev.description) {
                 if (Array.isArray(ev.description.full)) {
@@ -412,15 +564,14 @@
 
             document.getElementById('modalActionBtn').href = ev.links ? ev.links.action_url || '#' : '#';
 
-// Настройка открытия модального окна ИИ-конфиденциальности
-const privacyBtn = document.getElementById('aiPrivacyLink');
-privacyBtn.onclick = (e) => {
-    e.preventDefault();
-    document.getElementById('aiPrivacyModal').style.display = 'flex';
-};
+            const privacyBtn = document.getElementById('aiPrivacyLink');
+            privacyBtn.onclick = (e) => {
+                e.preventDefault();
+                document.getElementById('aiPrivacyModal').style.display = 'flex';
+            };
 
-document.getElementById('aiFrame').src = `ask_events.html?id=${ev.id}`;
-document.getElementById('eventModal').style.display = 'flex';
+            document.getElementById('aiFrame').src = `ask_events.html?id=${ev.id}`;
+            document.getElementById('eventModal').style.display = 'flex';
         }
 
         function closeModal(id) {
@@ -445,10 +596,6 @@ document.getElementById('eventModal').style.display = 'flex';
             document.querySelectorAll('.guide-section').forEach(s => s.classList.remove('active'));
             e.currentTarget.classList.add('active');
             document.getElementById('guide-' + type).classList.add('active');
-        }
-
-        function toggleEventLike() {
-            document.getElementById('likeBtn').classList.toggle('active');
         }
 
         function checkPermissionButton() {
