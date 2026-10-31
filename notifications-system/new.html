@@ -18,6 +18,7 @@
             --active-red: #b3261e;
             --active-green: #10b981;
             --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --modal-bg: rgba(0, 0, 0, 0.5);
         }
 
         body.dark-theme {
@@ -31,6 +32,7 @@
             --active-red: #f2b8b5;
             --active-green: #34d399;
             --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+            --modal-bg: rgba(0, 0, 0, 0.8);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -52,34 +54,50 @@
         .form-control { width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); font-size: 0.9em; outline: none; }
         .form-control:focus { border-color: var(--accent-color); }
 
+        /* Кастомный не нативный селект */
+        .custom-select { position: relative; width: 100%; }
+        .select-selected { background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 14px; font-size: 0.9em; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: var(--text-primary); }
+        .select-items { display: none; position: absolute; background: var(--card-bg); top: 105%; left: 0; right: 0; border: 1px solid var(--border-color); border-radius: 12px; z-index: 99; overflow: hidden; box-shadow: var(--card-shadow); }
+        .select-items div { padding: 10px 14px; font-size: 0.9em; cursor: pointer; transition: background 0.2s; }
+        .select-items div:hover { background: var(--accent-light); color: var(--accent-color); }
+        .select-items.show { display: block; }
+
         /* Панель форматирования текста */
         .toolbar { display: flex; gap: 6px; background: var(--bg-color); padding: 6px; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap; }
         .tool-btn { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8em; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
         .tool-btn:hover { background: var(--accent-light); color: var(--accent-color); }
 
-        textarea.form-control { resize: vertical; min-height: 180px; font-family: monospace; }
+        /* Поле с contenteditable */
+        .content-editable { min-height: 180px; max-height: 300px; overflow-y: auto; resize: vertical; }
+        .content-editable:empty:before { content: attr(placeholder); color: var(--text-secondary); opacity: 0.6; pointer-events: none; display: block; }
 
         .ai-qa-pair { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
         .ai-qa-pair input { flex: 1; }
 
-        .main-btn { padding: 12px 20px; border-radius: 16px; border: none; background: var(--accent-color); color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; box-shadow: var(--card-shadow); }
+        .main-btn { padding: 12px 20px; border-radius: 16px; border: none; background: var(--accent-color); color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; box-shadow: var(--card-shadow); text-decoration: none; font-size: 0.9em; }
         .main-btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .back-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
+        .github-btn { background: #24292e; color: #fff; }
 
-        .json-output { width: 100%; height: 120px; font-family: monospace; font-size: 0.75em; padding: 10px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); resize: none; }
+        /* Модальное окно JSON и Предпросмотра */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--modal-bg); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
+        .modal-content { background: var(--card-bg); border-radius: 24px; padding: 20px; width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 15px; box-shadow: var(--card-shadow); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+        
+        .json-output-box { width: 100%; height: 260px; font-family: monospace; font-size: 0.8em; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); resize: none; white-space: pre-wrap; overflow-y: auto; }
+        .modal-footer-btns { display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin-top: 10px; }
     </style>
 </head>
 <body class="light-theme">
 
     <script>
-        // Срочная проверка авторизации при загрузке страницы
+        // Проверка авторизации администратора
         (function checkAdminAuth() {
             const isAuth = sessionStorage.getItem('lmsh_admin_auth') === 'true';
             if (!isAuth) {
                 const email = prompt("Введите почту администратора:");
                 const pass = prompt("Введите пароль администратора:");
 
-                // Строгие данные для входа
                 if (email === "lmsh@auth.io" && pass === "LMSH_Admin_2026_Secure!") {
                     sessionStorage.setItem('lmsh_admin_auth', 'true');
                     alert("Авторизация успешна! Добро пожаловать в Штаб ЛМСХ.");
@@ -106,15 +124,22 @@
                 
                 <div class="form-group">
                     <label>Тип записи</label>
-                    <select id="postType" class="form-control">
-                        <option value="event">📅 Событие</option>
-                        <option value="news">📰 Новость / Объявление</option>
-                    </select>
+                    <div class="custom-select" id="typeSelectWrapper">
+                        <div class="select-selected" onclick="toggleSelectMenu('typeDropdown')">
+                            <span id="typeSelectedText">📅 Событие</span>
+                            <span class="material-symbols-outlined" style="font-size: 18px;">expand_more</span>
+                        </div>
+                        <div class="select-items" id="typeDropdown">
+                            <div onclick="selectCustomOption('typeSelectWrapper', 'typeDropdown', 'event', '📅 Событие')">📅 Событие</div>
+                            <div onclick="selectCustomOption('typeSelectWrapper', 'typeDropdown', 'news', '📰 Новость / Объявление')">📰 Новость / Объявление</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="postType" value="event">
                 </div>
 
                 <div class="form-group">
-                    <label>ID записи (латиницей, например: update_v2)</label>
-                    <input type="text" id="postId" class="form-control" placeholder="feature_name">
+                    <label>ID записи (латиницей)</label>
+                    <input type="text" id="postId" class="form-control" placeholder="feature_update_v2">
                 </div>
 
                 <div class="form-group">
@@ -128,15 +153,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Полный текст / Детали</label>
+                    <label>Полный текст / Детали (Rich Text)</label>
                     <!-- Панель форматирования -->
                     <div class="toolbar">
-                        <button class="tool-btn" onclick="formatText('**', '**')"><b>B</b> Жирный</button>
-                        <button class="tool-btn" onclick="formatText('*', '*')"><i>I</i> Курсив</button>
-                        <button class="tool-btn" onclick="formatText('[Ссылка](url)')">🔗 Ссылка</button>
-                        <button class="tool-btn" onclick="formatText('\n- ')">• Список</button>
+                        <button class="tool-btn" onclick="formatContent('bold')"><b>B</b> Жирный</button>
+                        <button class="tool-btn" onclick="formatContent('italic')"><i>I</i> Курсив</button>
+                        <button class="tool-btn" onclick="insertLink()">🔗 Ссылка</button>
                     </div>
-                    <textarea id="postFull" class="form-control" placeholder="Подробное описание..."></textarea>
+                    <div id="postFull" class="form-control content-editable" contenteditable="true" placeholder="Подробное описание события или новости..."></div>
                 </div>
 
                 <div class="form-group">
@@ -151,10 +175,17 @@
 
                 <div class="form-group">
                     <label>Статус даты</label>
-                    <select id="dateMode" class="form-control" onchange="toggleDateInputs()">
-                        <option value="exact">Точная дата</option>
-                        <option value="tba">Дата уточняется (Скоро)</option>
-                    </select>
+                    <div class="custom-select" id="dateSelectWrapper">
+                        <div class="select-selected" onclick="toggleSelectMenu('dateDropdown')">
+                            <span id="dateSelectedText">Точная дата</span>
+                            <span class="material-symbols-outlined" style="font-size: 18px;">expand_more</span>
+                        </div>
+                        <div class="select-items" id="dateDropdown">
+                            <div onclick="selectCustomOption('dateSelectWrapper', 'dateDropdown', 'exact', 'Точная дата', toggleDateInputs)">Точная дата</div>
+                            <div onclick="selectCustomOption('dateSelectWrapper', 'dateDropdown', 'tba', 'Дата уточняется (Скоро)', toggleDateInputs)">Дата уточняется (Скоро)</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="dateMode" value="exact">
                 </div>
 
                 <div id="exactDatesGroup" style="display: flex; flex-direction: column; gap: 10px;">
@@ -178,26 +209,72 @@
                     <label>Ключевые вопросы и ответы ИИ</label>
                     <div id="aiPairsContainer">
                         <div class="ai-qa-pair">
-                            <input type="text" class="form-control ai-key" placeholder="Ключевое слово (например: цена)">
-                            <input type="text" class="form-control ai-val" placeholder="Ответ ИИ">
+                            <input type="text" class="form-control ai-key" placeholder="Ключ (напр: цена)">
+                            <input type="text" class="form-control ai-val" placeholder="Ответ ассистента">
                         </div>
                     </div>
                     <button class="tool-btn" onclick="addAiPair()" style="margin-top: 6px; width: fit-content;"><span class="material-symbols-outlined" style="font-size: 16px;">add</span> Добавить правило</button>
                 </div>
 
                 <div class="form-group" style="margin-top: auto;">
-                    <label>Сгенерированный JSON для events.json</label>
-                    <textarea class="json-output" id="jsonOutput" readonly placeholder="Здесь появится готовый JSON..."></textarea>
-                    <button class="main-btn" onclick="generateJson()" style="margin-top: 8px;"><span class="material-symbols-outlined">code</span> Сгенерировать JSON</button>
+                    <button class="main-btn" onclick="openJsonModal()" style="width: 100%; justify-content: center;"><span class="material-symbols-outlined">code</span> Сгенерировать JSON</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Модальное окно результата JSON -->
+    <div class="modal-overlay" id="jsonModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Готовый JSON для events.json</h3>
+                <span class="material-symbols-outlined" onclick="closeModal('jsonModal')">close</span>
+            </div>
+            
+            <pre class="json-output-box" id="jsonOutputContent"></pre>
+            
+            <div id="previewCardArea" style="display:none; background: var(--bg-color); padding: 15px; border-radius: 16px; border: 1px solid var(--border-color);">
+                <strong style="font-size: 0.85em; color: var(--accent-color); display: block; margin-bottom: 8px;">Предварительный просмотр карточки:</strong>
+                <div id="previewCardMock" style="background: var(--card-bg); padding: 15px; border-radius: 16px; border: 1px solid var(--border-color);"></div>
+            </div>
+
+            <div class="modal-footer-btns">
+                <button class="main-btn" onclick="copyJsonCode()"><span class="material-symbols-outlined">content_copy</span> Копировать</button>
+                <button class="main-btn back-btn" onclick="togglePreview()"><span class="material-symbols-outlined">visibility</span> Предварительный Просмотр</button>
+                <a href="https://github.com/oracle-ai-pro/flow.lmsh.io/blob/main/notifications-system/events.json" target="_blank" class="main-btn github-btn"><span class="material-symbols-outlined">code</span> Перейти в Гитхаб</a>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Инициализация темы с учетом настроек index.html
         if (localStorage.getItem('site_theme') === 'dark') {
             document.body.classList.add('dark-theme');
+        }
+
+        // Логика кастомных селектов
+        function toggleSelectMenu(menuId) {
+            const menu = document.getElementById(menuId);
+            // Закрыть остальные
+            document.querySelectorAll('.select-items').forEach(m => { if(m.id !== menuId) m.classList.remove('show'); });
+            menu.classList.toggle('show');
+        }
+
+        function selectCustomOption(wrapperId, menuId, value, text, callback) {
+            document.getElementById(menuId).classList.remove('show');
+            if(menuId === 'typeDropdown') {
+                document.getElementById('typeSelectedText').innerText = text;
+                document.getElementById('postType').value = value;
+            } else if(menuId === 'dateDropdown') {
+                document.getElementById('dateSelectedText').innerText = text;
+                document.getElementById('dateMode').value = value;
+                if(callback) callback();
+            }
+        }
+
+        window.onclick = function(e) {
+            if (!e.target.closest('.custom-select')) {
+                document.querySelectorAll('.select-items').forEach(m => m.classList.remove('show'));
+            }
         }
 
         function toggleDateInputs() {
@@ -205,14 +282,18 @@
             document.getElementById('exactDatesGroup').style.display = mode === 'exact' ? 'flex' : 'none';
         }
 
-        function formatText(wrapperBefore, wrapperAfter = '') {
-            const textarea = document.getElementById('postFull');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            textarea.value = text.substring(0, start) + wrapperBefore + text.substring(start, end) + wrapperAfter + text.substring(end);
-            textarea.focus();
-            textarea.setSelectionRange(start + wrapperBefore.length, end + wrapperBefore.length);
+        // Форматирование для contenteditable
+        function formatContent(command) {
+            document.execCommand(command, false, null);
+            document.getElementById('postFull').focus();
+        }
+
+        function insertLink() {
+            const url = prompt("Введите URL ссылки:", "https://");
+            if (url) {
+                document.execCommand('createLink', false, url);
+            }
+            document.getElementById('postFull').focus();
         }
 
         function addAiPair() {
@@ -220,20 +301,23 @@
             const div = document.createElement('div');
             div.className = 'ai-qa-pair';
             div.innerHTML = `
-                <input type="text" class="form-control ai-key" placeholder="Ключевое слово">
-                <input type="text" class="form-control ai-val" placeholder="Ответ ИИ">
+                <input type="text" class="form-control ai-key" placeholder="Ключ">
+                <input type="text" class="form-control ai-val" placeholder="Ответ ассистента">
             `;
             container.appendChild(div);
         }
 
-        function generateJson() {
+        let generatedDataObject = null;
+
+        function openJsonModal() {
             const id = document.getElementById('postId').value || 'new_event_' + Date.now();
             const title = document.getElementById('postTitle').value || 'Новое событие';
             const shortDesc = document.getElementById('postShort').value || '';
-            const fullDesc = document.getElementById('postFull').value || '';
+            const fullDescHTML = document.getElementById('postFull').innerHTML || '';
             const actionUrl = document.getElementById('postActionUrl').value || '#';
             const dateMode = document.getElementById('dateMode').value;
             const aiGreeting = document.getElementById('aiGreeting').value;
+            const type = document.getElementById('postType').value;
 
             let displayStart = "Скоро";
             let displayEnd = "Дата уточняется";
@@ -254,10 +338,10 @@
                 if (k && v) keywords[k] = v;
             });
 
-            const eventObj = {
+            generatedDataObject = {
                 id: id,
                 title: title,
-                badge: document.getElementById('postType').value === 'news' ? 'newspaper' : 'event',
+                badge: type === 'news' ? 'newspaper' : 'event',
                 is_new: true,
                 dates: {
                     start: start,
@@ -269,7 +353,7 @@
                 },
                 description: {
                     short: shortDesc,
-                    full: [fullDesc]
+                    full: [fullDescHTML]
                 },
                 image: null,
                 has_image: false,
@@ -297,9 +381,38 @@
                 }
             };
 
-            document.getElementById('jsonOutput').value = JSON.stringify(eventObj, null, 2);
-            navigator.clipboard.writeText(document.getElementById('jsonOutput').value);
-            alert("JSON успешно сгенерирован и скопирован в буфер обмена! Можешь вставить его в events.json.");
+            document.getElementById('jsonOutputContent').innerText = JSON.stringify(generatedDataObject, null, 2);
+            document.getElementById('previewCardArea').style.display = 'none';
+            document.getElementById('jsonModal').style.display = 'flex';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function copyJsonCode() {
+            const codeText = document.getElementById('jsonOutputContent').innerText;
+            navigator.clipboard.writeText(codeText);
+            alert("JSON успешно скопирован в буфер обмена!");
+        }
+
+        function togglePreview() {
+            const area = document.getElementById('previewCardArea');
+            const mock = document.getElementById('previewCardMock');
+            
+            if (area.style.display === 'none') {
+                area.style.display = 'block';
+                mock.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong style="color:var(--accent-color);">${generatedDataObject.title}</strong>
+                        <span class="material-symbols-outlined" style="color:var(--text-secondary);">notifications</span>
+                    </div>
+                    <p style="font-size:0.85em; color:var(--text-secondary); margin:8px 0;">${generatedDataObject.description.short}</p>
+                    <div style="font-size:0.8em; text-align:center; color:var(--active-green); font-weight:bold;">${generatedDataObject.dates.display_end}</div>
+                `;
+            } else {
+                area.style.display = 'none';
+            }
         }
     </script>
 </body>
