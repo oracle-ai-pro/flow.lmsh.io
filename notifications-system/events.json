@@ -21,8 +21,8 @@
           "Обратите внимание: подробные источники и детали содержимого пака пока отсутствуют у ИИ-ассистента."
         ]
       },
-      "image": null,
-      "has_image": false,
+      "image": "lumi_halloween.gif",
+      "has_image": true,
       "links": {
         "action_url": "https://sites.google.com/view/kosmo-level-store/link/kosmo-level-unofficial-packs/kosmo-level-halloween?authuser=0",
         "ai_privacy_url": "#ai-privacy-modal"
@@ -57,9 +57,9 @@
             "начало": "Ивент начинается сегодня, 31 октября 2026 года, ровно в 20:00!",
             "время": "Старт в 20:00 по текущему дню, продлится до 5 ноября.",
             "люми": "Хеллоуин Пак с Люми — специальный ивент. Переходите по кнопке «Перейти» в карточке, чтобы открыть страницу пака.",
-            "пак": "Пак доступен по официальной ссылке ивента."
+            "пак": "Пак доступен по официальной ссылке ивента: https://sites.google.com/view/kosmo-level-store/link/kosmo-level-unofficial-packs/kosmo-level-halloween?authuser=0"
           },
-          "default": "Ивент Хеллоуин Пак с Люми стартует сегодня в 20:00 и продлится до 5 ноября. Вы можете перейти к нему по кнопке ниже!"
+          "default": "Ивент Хеллоуин Пак с Люми стартует сегодня в 20:00 и продлится до 5 ноября. Вы можете перейти к нему по кнопке ниже или по ссылке: https://sites.google.com/view/kosmo-level-store/link/kosmo-level-unofficial-packs/kosmo-level-halloween?authuser=0"
         }
       }
     },
@@ -116,11 +116,11 @@
         ],
         "knowledge_base": {
           "keywords": {
-            "когда": "Даже спустя долгое время точная дата релиза UI2 всё ещё неизвестна! Но страница проекта уже открыта по ссылке.",
+            "когда": "Даже спустя долгое время точная дата релиза UI2 всё ещё неизвестна! Но страница проекта уже открыта по ссылке: https://sites.google.com/view/kosmo-level-store/link/kosmo-level-packs/kosmo-level-ui2?authuser=0",
             "дата": "Дата релиза по-прежнему не объявлена. Включите колокольчик для получения пуша.",
-            "ссылка": "Вы можете посетить страницу проекта Kosmo Level UI2 через кнопку перехода в модальном окне."
+            "ссылка": "Вы можете посетить страницу проекта Kosmo Level UI2 через кнопку перехода в модальном окне или прямо тут: https://sites.google.com/view/kosmo-level-store/link/kosmo-level-packs/kosmo-level-ui2?authuser=0"
           },
-          "default": "Сроки релиза Kosmo Level UI2 всё ещё не определены. Воспользуйтесь кнопкой перехода, чтобы открыть страницу проекта, и включите уведомления!"
+          "default": "Сроки релиза Kosmo Level UI2 всё ещё не определены. Воспользуйтесь кнопкой перехода или ссылкой (https://sites.google.com/view/kosmo-level-store/link/kosmo-level-packs/kosmo-level-ui2?authuser=0), чтобы открыть страницу проекта!"
         }
       }
     }
